@@ -7,7 +7,7 @@
 
 ##  Documentation Structure
 
-### 📘 [Phase 1 Documentation](phase1/)
+###  [Phase 1 Documentation](phase1/)
 Complete week-by-week breakdown of Phase 1 development:
 - **[Week 1-2](phase1/week1-2/)**: StreamAgreement + Accrual Formula
 - **[Week 3-4](phase1/week3-4/)**: ObligationView + LifecycleManager

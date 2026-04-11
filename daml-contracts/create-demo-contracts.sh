@@ -8,7 +8,7 @@ echo ""
 cd ~/Documents/canton/GrowStreams_Backend-main/daml-contracts
 export PATH="$HOME/.daml/bin:$PATH"
 
-echo "1️⃣ Checking Canton sandbox..."
+echo "1️ Checking Canton sandbox..."
 if lsof -i:6865 > /dev/null 2>&1; then
     echo " Canton sandbox running on port 6865"
 else
@@ -18,7 +18,7 @@ else
 fi
 echo ""
 
-echo "2️⃣ Checking parties..."
+echo "2️Checking parties..."
 PARTIES=$(daml ledger list-parties --host localhost --port 6865 2>&1 | grep -c "displayName")
 if [ "$PARTIES" -ge 3 ]; then
     echo " Parties already allocated: Admin, Alice, Bob"
@@ -29,7 +29,7 @@ else
 fi
 echo ""
 
-echo "3️⃣ Creating contracts via Daml REPL..."
+echo "3️ Creating contracts via Daml REPL..."
 echo ""
 echo "   Creating Faucet, GrowToken, StreamFactory, and StreamAgreement..."
 echo ""
@@ -106,7 +106,7 @@ rm daml/DemoScript.daml
 rm /tmp/demo-script.daml
 
 echo ""
-echo "4️⃣ Verifying deployment..."
+echo "4️ Verifying deployment..."
 PARTY_COUNT=$(daml ledger list-parties --host localhost --port 6865 2>&1 | grep "displayName" | wc -l)
 echo " Parties on ledger: $PARTY_COUNT"
 echo ""
@@ -119,7 +119,7 @@ echo "   - GrowToken (Alice has 9000 GROW)"
 echo "   - StreamFactory (Creates streams)"
 echo "   - StreamAgreement (Alice → Bob at 1 GROW/second)"
 echo ""
-echo "🌐 Open Navigator to see contracts:"
+echo " Open Navigator to see contracts:"
 echo "   1. Run: daml navigator server localhost 6865"
 echo "   2. Open: http://localhost:4000"
 echo "   3. Login as: Admin, Alice, or Bob"

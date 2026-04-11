@@ -6,7 +6,7 @@
 
 ---
 
-## 📅 Phase 1 Timeline
+##  Phase 1 Timeline
 
 ### [Week 1-2: Foundation](week1-2/)
 **Goal**: StreamAgreement Template + Accrual Formula

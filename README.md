@@ -1,4 +1,4 @@
-# 💧 GrowStreams — Real-Time Money Streaming on Canton Network
+# GrowStreams — Real-Time Money Streaming on Canton Network
 
 > **The per-second streaming payment primitive for Canton — turning $500T in institutional financial obligations from monthly batch invoices into real-time programmable streams.**
 
@@ -152,12 +152,7 @@ Located in `daml-contracts/daml/Test/`:
 - **`GrowTokenTest.daml`** (~430 lines): 15 comprehensive tests
 - **`StreamCoreTest.daml`** (~575 lines): 15 streaming tests
 
-### Documentation
 
-- **`DEPLOYMENT_SUCCESS_REPORT.md`**: Complete technical report
-- **`WEEK5-7_COMPLETION_REPORT.md`**: StreamCore implementation details
-- **`WEEK3-4_COMPLETION_REPORT.md`**: GrowToken implementation details
-- **`WEEK1-2_COMPLETION_REPORT.md`**: Setup and planning
 
 ---
 
@@ -531,7 +526,7 @@ Previous architecture:
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! Here's how:
 
@@ -553,7 +548,7 @@ We welcome contributions! Here's how:
 
 ---
 
-## 📞 Support & Community
+## Support & Community
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/BlockXAI/GrowStreams_Backend/issues)
 - **Documentation**: See `daml-contracts/` folder
@@ -561,7 +556,7 @@ We welcome contributions! Here's how:
 
 ---
 
-## 📄 License
+## License
 
 MIT License - see LICENSE file for details
 
@@ -580,14 +575,14 @@ MIT License - see LICENSE file for details
 
 ---
 
-## 📈 Roadmap
+## Roadmap
 
 ### Phase 1: Foundation (80% Complete) 
 -  Week 1-2: Environment setup
 -  Week 3-4: GrowToken implementation (15/15 tests)
 -  Week 5-7: StreamCore implementation (11/15 tests)
 -  Week 8-9: Daml sandbox deployment
-- ⬜ Week 10: Final verification
+-  Week 10: Final verification
 
 ### Phase 2: Integration (Upcoming)
 - ⬜ REST API migration
