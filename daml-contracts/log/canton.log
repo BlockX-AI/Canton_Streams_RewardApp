@@ -1,0 +1,526 @@
+2026-03-27 00:18:12,205 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=17m21s495ms).
+2026-03-27 00:18:12,212 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=17m21s496ms).
+2026-03-27 00:19:16,577 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1m4s332ms).
+2026-03-27 00:19:16,577 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1m4s340ms).
+2026-03-27 00:28:07,940 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=6m51s336ms).
+2026-03-27 00:28:07,941 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=6m51s340ms).
+2026-03-27 00:31:53,953 [daml.index.db.threadpool.connection.indexer-14] INFO  c.d.c.p.i.MeteringAggregator:participant=sandbox - Aggregating transaction metering for LedgerMeteringEnd(Offset(Bytes(000000000000000019)),2026-03-26T19:00:00Z)
+2026-03-27 00:31:53,973 [daml.index.db.threadpool.connection.indexer-14] INFO  c.d.c.p.i.MeteringAggregator:participant=sandbox - Aggregating transaction metering completed up to LedgerMeteringEnd(Offset(Bytes(000000000000000019)),2026-03-26T19:00:00Z)
+2026-03-27 00:59:04,510 [canton-env-ec-93] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T20:29:04.509130Z
+2026-03-27 00:59:04,510 [canton-env-ec-113] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T20:29:04.510331Z
+2026-03-27 00:59:04,510 [canton-env-ec-102] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T20:29:04.509263Z
+2026-03-27 00:59:04,510 [canton-env-ec-105] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T20:29:04.508772Z
+2026-03-27 00:59:04,510 [canton-env-ec-103] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T20:29:04.508772Z
+2026-03-27 00:59:04,511 [canton-env-ec-98] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T20:29:04.508792Z
+2026-03-27 00:59:04,635 [canton-env-ec-98] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - DOM::local::122090f94aef... authenticated new token with expiry 2026-03-26T20:29:04.635312Z
+2026-03-27 00:59:04,637 [canton-env-ec-96] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 00:59:04,638 [canton-env-ec-113] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - MED::local::122090f94aef... authenticated new token with expiry 2026-03-26T20:29:04.638656Z
+2026-03-27 00:59:04,640 [canton-env-ec-107] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 00:59:04,642 [canton-env-ec-107] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=topology-manager - The sequencer subscription has been terminated by the server.
+2026-03-27 00:59:04,642 [canton-env-ec-102] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=topology-manager - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 00:59:04,644 [canton-env-ec-107] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=mediator - The sequencer subscription has been terminated by the server.
+2026-03-27 00:59:04,644 [canton-env-ec-98] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=mediator - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 00:59:04,702 [canton-env-ec-95] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - PAR::sandbox::12203e76b582... subscribes from counter=93
+2026-03-27 00:59:04,725 [canton-env-ec-102] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - DOM::local::122090f94aef... subscribes from counter=25
+2026-03-27 00:59:04,729 [canton-env-ec-50] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - MED::local::122090f94aef... subscribes from counter=81
+2026-03-27 00:59:16,506 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=16m8s468ms).
+2026-03-27 00:59:16,506 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=16m8s466ms).
+2026-03-27 01:13:54,234 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=12m1s62ms).
+2026-03-27 01:13:54,234 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=12m1s61ms).
+2026-03-27 01:25:00,449 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=11m6s214ms).
+2026-03-27 01:25:00,449 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=11m6s214ms).
+2026-03-27 01:29:25,349 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=2m24s882ms).
+2026-03-27 01:29:25,349 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=2m24s882ms).
+2026-03-27 01:41:25,954 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=12m605ms).
+2026-03-27 01:41:25,954 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=12m605ms).
+2026-03-27 01:58:17,766 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=16m51s748ms).
+2026-03-27 01:58:17,766 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=16m51s748ms).
+2026-03-27 02:05:30,192 [canton-env-ec-95] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T21:35:30.191170Z
+2026-03-27 02:05:30,192 [canton-env-ec-107] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T21:35:30.191170Z
+2026-03-27 02:05:30,192 [canton-env-ec-96] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T21:35:30.192416Z
+2026-03-27 02:05:30,193 [canton-env-ec-50] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T21:35:30.192792Z
+2026-03-27 02:05:30,193 [canton-env-ec-96] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T21:35:30.193633Z
+2026-03-27 02:05:30,194 [canton-env-ec-105] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T21:35:30.193496Z
+2026-03-27 02:05:46,655 [canton-env-ec-105] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=topology-manager - The sequencer subscription has been terminated by the server.
+2026-03-27 02:05:46,657 [canton-env-ec-48] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 02:05:46,659 [canton-env-ec-96] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 02:05:46,659 [canton-env-ec-51] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=topology-manager - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 02:05:46,659 [canton-env-ec-106] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=mediator - The sequencer subscription has been terminated by the server.
+2026-03-27 02:05:46,660 [canton-env-ec-113] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=mediator - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 02:05:46,679 [canton-env-ec-95] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - DOM::local::122090f94aef... authenticated new token with expiry 2026-03-26T21:35:46.679041Z
+2026-03-27 02:05:46,681 [canton-env-ec-48] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - MED::local::122090f94aef... authenticated new token with expiry 2026-03-26T21:35:46.681216Z
+2026-03-27 02:05:46,722 [canton-env-ec-113] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - MED::local::122090f94aef... subscribes from counter=81
+2026-03-27 02:05:46,731 [canton-env-ec-99] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - DOM::local::122090f94aef... subscribes from counter=25
+2026-03-27 02:05:46,733 [canton-env-ec-50] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - PAR::sandbox::12203e76b582... subscribes from counter=93
+2026-03-27 02:05:49,841 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=7m32s138ms).
+2026-03-27 02:05:49,845 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=7m32s144ms).
+2026-03-27 02:06:28,962 [daml.index.db.threadpool.connection.indexer-1] INFO  c.d.c.p.i.MeteringAggregator:participant=sandbox - Aggregating transaction metering for LedgerMeteringEnd(Offset(Bytes(000000000000000019)),2026-03-26T20:00:00Z)
+2026-03-27 02:06:28,979 [daml.index.db.threadpool.connection.indexer-1] INFO  c.d.c.p.i.MeteringAggregator:participant=sandbox - Aggregating transaction metering completed up to LedgerMeteringEnd(Offset(Bytes(000000000000000019)),2026-03-26T20:00:00Z)
+2026-03-27 02:25:02,424 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1m12s460ms).
+2026-03-27 02:25:02,424 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1m12s458ms).
+2026-03-27 02:31:32,573 [daml.index.db.threadpool.connection.indexer-6] INFO  c.d.c.p.i.MeteringAggregator:participant=sandbox - Aggregating transaction metering for LedgerMeteringEnd(Offset(Bytes(000000000000000019)),2026-03-26T21:00:00Z)
+2026-03-27 02:31:32,586 [daml.index.db.threadpool.connection.indexer-6] INFO  c.d.c.p.i.MeteringAggregator:participant=sandbox - Aggregating transaction metering completed up to LedgerMeteringEnd(Offset(Bytes(000000000000000019)),2026-03-26T21:00:00Z)
+2026-03-27 03:02:51,003 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=13m48s450ms).
+2026-03-27 03:02:51,004 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=13m48s442ms).
+2026-03-27 03:19:56,338 [canton-env-ec-106] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T22:49:56.338710Z
+2026-03-27 03:19:56,338 [canton-env-ec-50] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T22:49:56.336763Z
+2026-03-27 03:19:56,339 [canton-env-ec-102] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T22:49:56.339288Z
+2026-03-27 03:19:56,339 [canton-env-ec-103] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T22:49:56.339581Z
+2026-03-27 03:19:56,339 [canton-env-ec-105] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T22:49:56.339405Z
+2026-03-27 03:19:56,341 [canton-env-ec-95] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T22:49:56.341007Z
+2026-03-27 04:09:01,734 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1h6m10s742ms).
+2026-03-27 04:09:01,734 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1h6m10s742ms).
+2026-03-27 04:24:44,408 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T23:54:44.407473Z
+2026-03-27 04:24:44,408 [canton-env-ec-93] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T23:54:44.407982Z
+2026-03-27 04:24:44,408 [canton-env-ec-96] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T23:54:44.408029Z
+2026-03-27 04:24:44,408 [canton-env-ec-106] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T23:54:44.408786Z
+2026-03-27 04:24:44,411 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T23:54:44.408640Z
+2026-03-27 04:24:44,419 [canton-env-ec-107] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-26T23:54:44.419115Z
+2026-03-27 05:07:21,843 [canton-env-ec-93] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 05:07:21,846 [canton-env-ec-96] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=topology-manager - The sequencer subscription has been terminated by the server.
+2026-03-27 05:07:21,850 [canton-env-ec-95] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 05:07:21,850 [canton-env-ec-113] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=topology-manager - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 05:07:21,851 [canton-env-ec-102] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=mediator - The sequencer subscription has been terminated by the server.
+2026-03-27 05:07:21,851 [canton-env-ec-113] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=mediator - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 05:07:21,865 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - DOM::local::122090f94aef... authenticated new token with expiry 2026-03-27T00:37:21.865281Z
+2026-03-27 05:07:21,871 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - MED::local::122090f94aef... authenticated new token with expiry 2026-03-27T00:37:21.871644Z
+2026-03-27 05:07:21,912 [canton-env-ec-50] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - PAR::sandbox::12203e76b582... subscribes from counter=93
+2026-03-27 05:07:21,927 [canton-env-ec-107] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - MED::local::122090f94aef... subscribes from counter=81
+2026-03-27 05:07:21,930 [canton-env-ec-95] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - DOM::local::122090f94aef... subscribes from counter=25
+2026-03-27 05:22:49,900 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1h13m48s167ms).
+2026-03-27 05:22:49,900 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1h13m48s167ms).
+2026-03-27 05:39:24,588 [canton-env-ec-98] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T01:09:24.588232Z
+2026-03-27 05:39:24,589 [canton-env-ec-101] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T01:09:24.588409Z
+2026-03-27 05:39:24,589 [canton-env-ec-107] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T01:09:24.589071Z
+2026-03-27 05:39:24,591 [canton-env-ec-93] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T01:09:24.591247Z
+2026-03-27 05:39:24,591 [canton-env-ec-102] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T01:09:24.591247Z
+2026-03-27 05:39:24,592 [canton-env-ec-103] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T01:09:24.592240Z
+2026-03-27 06:42:04,964 [canton-env-ec-50] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T02:12:04.964273Z
+2026-03-27 06:42:04,966 [canton-env-ec-107] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T02:12:04.966285Z
+2026-03-27 06:42:04,967 [canton-env-ec-107] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T02:12:04.967040Z
+2026-03-27 06:42:04,968 [canton-env-ec-49] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T02:12:04.967970Z
+2026-03-27 06:42:04,968 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T02:12:04.968243Z
+2026-03-27 06:42:04,968 [canton-env-ec-101] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T02:12:04.968380Z
+2026-03-27 06:42:08,078 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1h19m18s178ms).
+2026-03-27 06:42:08,078 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1h19m18s178ms).
+2026-03-27 07:42:55,305 [canton-env-ec-101] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T03:12:55.305072Z
+2026-03-27 07:42:55,306 [canton-env-ec-105] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T03:12:55.306364Z
+2026-03-27 07:42:55,306 [canton-env-ec-102] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T03:12:55.306703Z
+2026-03-27 07:42:55,306 [canton-env-ec-49] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T03:12:55.306660Z
+2026-03-27 07:42:55,307 [canton-env-ec-95] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T03:12:55.307548Z
+2026-03-27 07:42:55,307 [canton-env-ec-106] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T03:12:55.307674Z
+2026-03-27 07:53:09,848 [canton-env-ec-107] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 07:53:09,849 [canton-env-ec-49] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 07:53:09,852 [canton-env-ec-101] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=topology-manager - The sequencer subscription has been terminated by the server.
+2026-03-27 07:53:09,852 [canton-env-ec-103] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=topology-manager - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 07:53:09,853 [canton-env-ec-102] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=mediator - The sequencer subscription has been terminated by the server.
+2026-03-27 07:53:09,854 [canton-env-ec-113] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=mediator - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 07:53:09,866 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - DOM::local::122090f94aef... authenticated new token with expiry 2026-03-27T03:23:09.866323Z
+2026-03-27 07:53:09,871 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - MED::local::122090f94aef... authenticated new token with expiry 2026-03-27T03:23:09.871403Z
+2026-03-27 07:53:09,906 [canton-env-ec-48] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - MED::local::122090f94aef... subscribes from counter=81
+2026-03-27 07:53:09,912 [canton-env-ec-113] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - DOM::local::122090f94aef... subscribes from counter=25
+2026-03-27 07:53:09,914 [canton-env-ec-105] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - PAR::sandbox::12203e76b582... subscribes from counter=93
+2026-03-27 07:53:13,164 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1h11m5s86ms).
+2026-03-27 07:53:13,164 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1h11m5s86ms).
+2026-03-27 08:43:38,978 [canton-env-ec-99] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T04:13:38.978365Z
+2026-03-27 08:43:38,979 [canton-env-ec-107] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T04:13:38.978513Z
+2026-03-27 08:43:38,979 [canton-env-ec-93] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T04:13:38.979136Z
+2026-03-27 08:43:38,979 [canton-env-ec-98] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T04:13:38.979272Z
+2026-03-27 08:43:38,979 [canton-env-ec-49] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T04:13:38.979578Z
+2026-03-27 08:43:38,981 [canton-env-ec-105] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T04:13:38.980582Z
+2026-03-27 09:27:02,494 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1h33m49s330ms).
+2026-03-27 09:27:02,494 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1h33m49s330ms).
+2026-03-27 09:43:24,851 [canton-env-ec-101] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 09:43:24,853 [canton-env-ec-107] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=topology-manager - The sequencer subscription has been terminated by the server.
+2026-03-27 09:43:24,854 [canton-env-ec-99] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 09:43:24,854 [canton-env-ec-105] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=topology-manager - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 09:43:24,856 [canton-env-ec-99] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=mediator - The sequencer subscription has been terminated by the server.
+2026-03-27 09:43:24,856 [canton-env-ec-105] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=mediator - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 09:43:24,882 [canton-env-ec-93] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - MED::local::122090f94aef... authenticated new token with expiry 2026-03-27T05:13:24.882426Z
+2026-03-27 09:43:24,883 [canton-env-ec-106] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - DOM::local::122090f94aef... authenticated new token with expiry 2026-03-27T05:13:24.883044Z
+2026-03-27 09:43:24,915 [canton-env-ec-98] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - DOM::local::122090f94aef... subscribes from counter=25
+2026-03-27 09:43:24,922 [canton-env-ec-95] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - PAR::sandbox::12203e76b582... subscribes from counter=93
+2026-03-27 09:43:24,925 [canton-env-ec-106] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - MED::local::122090f94aef... subscribes from counter=81
+2026-03-27 09:43:26,261 [canton-env-ec-106] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T05:13:26.259436Z
+2026-03-27 09:43:26,263 [canton-env-ec-105] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T05:13:26.262390Z
+2026-03-27 09:43:26,263 [canton-env-ec-102] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T05:13:26.263559Z
+2026-03-27 09:43:26,263 [canton-env-ec-107] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T05:13:26.263136Z
+2026-03-27 09:43:26,265 [canton-env-ec-105] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T05:13:26.264351Z
+2026-03-27 09:43:26,266 [canton-env-ec-103] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T05:13:26.266098Z
+2026-03-27 10:20:40,584 [canton-env-ec-93] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 10:20:40,587 [canton-env-ec-48] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 10:20:40,652 [canton-env-ec-93] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - PAR::sandbox::12203e76b582... subscribes from counter=93
+2026-03-27 10:37:55,751 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=1h10m53s257ms).
+2026-03-27 10:37:55,752 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=1h10m53s257ms).
+2026-03-27 10:53:52,570 [canton-env-ec-51] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T06:23:52.570465Z
+2026-03-27 10:53:52,570 [canton-env-ec-106] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T06:23:52.570337Z
+2026-03-27 10:53:52,570 [canton-env-ec-102] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T06:23:52.570880Z
+2026-03-27 10:53:52,571 [canton-env-ec-98] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T06:23:52.570342Z
+2026-03-27 10:53:52,571 [canton-env-ec-50] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T06:23:52.571319Z
+2026-03-27 10:53:52,571 [canton-env-ec-113] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - PAR::sandbox::12203e76b582... authenticated new token with expiry 2026-03-27T06:23:52.571588Z
+2026-03-27 10:57:53,945 [daml.index.db.connection.api-server housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.api-server - Thread starvation or clock leap detected (housekeeper delta=19m58s193ms).
+2026-03-27 10:57:53,945 [daml.index.db.connection.indexer housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - daml.index.db.connection.indexer - Thread starvation or clock leap detected (housekeeper delta=19m58s193ms).
+2026-03-27 10:58:20,641 [canton-env-ec-51] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=mediator - The sequencer subscription has been terminated by the server.
+2026-03-27 10:58:20,645 [canton-env-ec-106] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=mediator - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 10:58:20,646 [canton-env-ec-102] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=topology-manager - The sequencer subscription has been terminated by the server.
+2026-03-27 10:58:20,647 [canton-env-ec-48] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:domain=local/client=topology-manager - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 10:58:20,650 [canton-env-ec-99] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 10:58:20,650 [canton-env-ec-95] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 10:58:20,669 [canton-env-ec-101] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - MED::local::122090f94aef... authenticated new token with expiry 2026-03-27T06:28:20.669643Z
+2026-03-27 10:58:20,670 [canton-env-ec-102] INFO  c.d.c.d.s.a.MemberAuthenticationServiceOld:domain=local - DOM::local::122090f94aef... authenticated new token with expiry 2026-03-27T06:28:20.669780Z
+2026-03-27 10:58:20,703 [canton-env-ec-106] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - PAR::sandbox::12203e76b582... subscribes from counter=93
+2026-03-27 10:58:20,709 [canton-env-ec-103] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - MED::local::122090f94aef... subscribes from counter=81
+2026-03-27 10:58:20,711 [canton-env-ec-50] INFO  c.d.c.d.s.s.GrpcSequencerService:domain=local - DOM::local::122090f94aef... subscribes from counter=25
+2026-03-27 10:58:45,491 [Thread-0] INFO  c.d.canton.CantonCommunityApp$ - Shutting down...
+2026-03-27 10:58:45,556 [Thread-0] INFO  c.d.c.e.CommunityEnvironment - Closing environment...
+2026-03-27 10:58:45,589 [canton-env-ec-98] INFO  c.d.c.h.MutableHealthComponent:participant=sandbox - 'sync-domain' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:45,591 [canton-env-ec-98] INFO  c.d.c.h.MutableHealthComponent:participant=sandbox - 'sync-domain-ephemeral' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:45,591 [canton-env-ec-98] INFO  c.d.c.h.MutableHealthComponent:participant=sandbox - 'sequencer-client' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:45,592 [canton-env-ec-98] INFO  c.d.c.h.MutableHealthComponent:participant=sandbox - 'acs-commitment-processor' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:45,777 [canton-env-ec-98] INFO  c.d.c.p.ParticipantNode:participant=sandbox - Stopping participant node
+2026-03-27 10:58:45,820 [canton-env-ec-51] INFO  c.d.c.n.g.ApiRequestLogger:participant=sandbox tid:da31600f7cbe9b68ffd0e8e8f0e29024 - Request c.d.l.a.v.TransactionService/GetTransactions by /127.0.0.1:64705: cancelled. Cancellations can be caused by timeouts, explicit cancellation by the client, network errors, etc.
+2026-03-27 10:58:45,871 [canton-env-ec-51] INFO  c.d.c.p.a.s.c.CommandServiceImpl:participant=sandbox - Shutting down Command Service.
+2026-03-27 10:58:45,907 [canton-env-ec-50] INFO  com.zaxxer.hikari.HikariDataSource - daml.index.db.connection.api-server - Shutdown initiated...
+2026-03-27 10:58:45,914 [canton-env-ec-50] INFO  com.zaxxer.hikari.HikariDataSource - daml.index.db.connection.api-server - Shutdown completed.
+2026-03-27 10:58:45,915 [canton-env-ec-101] INFO  c.d.c.p.i.RecoveringIndexer:participant=sandbox - Stopping Indexer Server
+2026-03-27 10:58:50,344 [canton-env-ec-98] INFO  c.d.c.p.l.a.StartableStoppableLedgerApiServer:participant=sandbox tid:d50f7064514365387f17a9fd63ef69fa - Task closing ledger API server still not completed after 4500 milliseconds. Continue waiting...
+2026-03-27 10:58:50,578 [Thread-0] INFO  c.d.c.environment.ParticipantNodes - Task closing node-sandbox still not completed after 5 seconds. Continue waiting...
+2026-03-27 10:58:52,602 [canton-env-ec-98] INFO  c.d.c.p.l.a.StartableStoppableLedgerApiServer:participant=sandbox tid:d50f7064514365387f17a9fd63ef69fa - Task closing ledger API server still not completed after 6760 milliseconds. Continue waiting...
+2026-03-27 10:58:53,084 [Thread-0] INFO  c.d.c.environment.ParticipantNodes - Task closing node-sandbox still not completed after 7510 milliseconds. Continue waiting...
+2026-03-27 10:58:54,837 [canton-env-ec-98] INFO  c.d.c.p.l.a.StartableStoppableLedgerApiServer:participant=sandbox tid:d50f7064514365387f17a9fd63ef69fa - Task closing ledger API server still not completed after 9 seconds. Continue waiting...
+2026-03-27 10:58:54,861 [canton-env-ec-98] WARN  c.d.c.p.l.a.StartableStoppableLedgerApiServer:participant=sandbox tid:d50f7064514365387f17a9fd63ef69fa - Task closing ledger API server did not complete within 9 seconds. Stack traces:
+  Thread[#125,sandbox-wallclock-0,5,main] is-daemon=false state=TIMED_WAITING
+    java.base@25.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+    java.base@25.0.2/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:271)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1803)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1166)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:883)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1016)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1076)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+    java.base@25.0.2/java.lang.Thread.runWith(Thread.java:1487)
+    java.base@25.0.2/java.lang.Thread.run(Thread.java:1474)
+
+  Thread[#126,delay-util-0,5,main] is-daemon=true state=WAITING
+    java.base@25.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+    java.base@25.0.2/java.util.concurrent.locks.LockSupport.park(LockSupport.java:369)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(AbstractQueuedSynchronizer.java:520)
+    java.base@25.0.2/java.util.concurrent.ForkJoinPool.unmanagedBlock(ForkJoinPool.java:4364)
+    java.base@25.0.2/java.util.concurrent.ForkJoinPool.managedBlock(ForkJoinPool.java:4310)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1752)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1154)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:883)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1016)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1076)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+    java.base@25.0.2/java.lang.Thread.runWith(Thread.java:1487)
+    java.base@25.0.2/java.lang.Thread.run(Thread.java:1474)
+
+  Thread[#63,local-wallclock-0,5,main] is-daemon=false state=TIMED_WAITING
+    java.base@25.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+    java.base@25.0.2/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:271)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1803)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1166)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:883)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1016)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1076)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+    java.base@25.0.2/java.lang.Thread.runWith(Thread.java:1487)
+    java.base@25.0.2/java.lang.Thread.run(Thread.java:1474)
+
+2026-03-27 10:58:54,868 [canton-env-ec-98] WARN  c.d.c.p.l.a.StartableStoppableLedgerApiServer:participant=sandbox - Closing 'AsyncCloseable(name=ledger API server)' failed! Reason:
+java.util.concurrent.TimeoutException: Task closing ledger API server did not complete within 9 seconds.
+	at com.digitalasset.canton.util.FutureUtil$.retry$1(FutureUtil.scala:300)
+	at com.digitalasset.canton.util.FutureUtil$.noisyAwaitResultForTesting(FutureUtil.scala:304)
+	at com.digitalasset.canton.util.FutureUtil$.noisyAwaitResult(FutureUtil.scala:205)
+	at com.digitalasset.canton.lifecycle.AsyncCloseable.close(FlagCloseableAsync.scala:36)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.LinearSeqOps.foldLeft(LinearSeq.scala:183)
+	at scala.collection.LinearSeqOps.foldLeft$(LinearSeq.scala:179)
+	at scala.collection.immutable.List.foldLeft(List.scala:79)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.lifecycle.FlagCloseableAsync.onClosed(FlagCloseableAsync.scala:22)
+	at com.digitalasset.canton.lifecycle.FlagCloseableAsync.onClosed$(FlagCloseableAsync.scala:22)
+	at com.digitalasset.canton.participant.ledger.api.StartableStoppableLedgerApiServer.onClosed(StartableStoppableLedgerApiServer.scala:90)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose(PerformUnlessClosing.scala:227)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose$(PerformUnlessClosing.scala:192)
+	at com.digitalasset.canton.participant.ledger.api.StartableStoppableLedgerApiServer.onFirstClose(StartableStoppableLedgerApiServer.scala:90)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close(OnShutdownRunner.scala:93)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close$(OnShutdownRunner.scala:83)
+	at com.digitalasset.canton.participant.ledger.api.StartableStoppableLedgerApiServer.com$digitalasset$canton$lifecycle$FlagCloseable$$super$close(StartableStoppableLedgerApiServer.scala:90)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close(FlagCloseable.scala:27)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close$(FlagCloseable.scala:27)
+	at com.digitalasset.canton.participant.ledger.api.StartableStoppableLedgerApiServer.close(StartableStoppableLedgerApiServer.scala:90)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.immutable.ArraySeq.foldLeft(ArraySeq.scala:222)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.participant.ledger.api.CantonLedgerApiServerWrapper$LedgerApiServerState.onClosed(CantonLedgerApiServerWrapper.scala:233)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose(PerformUnlessClosing.scala:227)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose$(PerformUnlessClosing.scala:192)
+	at com.digitalasset.canton.participant.ledger.api.CantonLedgerApiServerWrapper$LedgerApiServerState.onFirstClose(CantonLedgerApiServerWrapper.scala:225)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close(OnShutdownRunner.scala:93)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close$(OnShutdownRunner.scala:83)
+	at com.digitalasset.canton.participant.ledger.api.CantonLedgerApiServerWrapper$LedgerApiServerState.com$digitalasset$canton$lifecycle$FlagCloseable$$super$close(CantonLedgerApiServerWrapper.scala:225)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close(FlagCloseable.scala:27)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close$(FlagCloseable.scala:27)
+	at com.digitalasset.canton.participant.ledger.api.CantonLedgerApiServerWrapper$LedgerApiServerState.close(CantonLedgerApiServerWrapper.scala:225)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.immutable.ArraySeq.foldLeft(ArraySeq.scala:222)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.participant.ParticipantNode.close(ParticipantNode.scala:713)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.LinearSeqOps.foldLeft(LinearSeq.scala:183)
+	at scala.collection.LinearSeqOps.foldLeft$(LinearSeq.scala:179)
+	at scala.collection.immutable.List.foldLeft(List.scala:79)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.environment.CantonNodeBootstrapBase.onClosed(CantonNodeBootstrap.scala:636)
+	at com.digitalasset.canton.participant.ParticipantNodeBootstrap.onClosed(ParticipantNode.scala:423)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose(PerformUnlessClosing.scala:227)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose$(PerformUnlessClosing.scala:192)
+	at com.digitalasset.canton.environment.CantonNodeBootstrapBase.onFirstClose(CantonNodeBootstrap.scala:83)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close(OnShutdownRunner.scala:93)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close$(OnShutdownRunner.scala:83)
+	at com.digitalasset.canton.environment.CantonNodeBootstrapBase.com$digitalasset$canton$lifecycle$FlagCloseable$$super$close(CantonNodeBootstrap.scala:83)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close(FlagCloseable.scala:27)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close$(FlagCloseable.scala:27)
+	at com.digitalasset.canton.environment.CantonNodeBootstrapBase.close(CantonNodeBootstrap.scala:83)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.immutable.ArraySeq.foldLeft(ArraySeq.scala:222)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.environment.ManagedNodes.$anonfun$stopStage$2(Nodes.scala:283)
+	at com.digitalasset.canton.environment.ManagedNodes.$anonfun$stopStage$2$adapted(Nodes.scala:280)
+	at scala.Option.foreach(Option.scala:437)
+	at com.digitalasset.canton.environment.ManagedNodes.$anonfun$stopStage$1(Nodes.scala:280)
+	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+	at com.daml.executors.QueueAwareExecutorService$TrackingRunnable.run(QueueAwareExecutorService.scala:98)
+	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1750)
+	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.compute(ForkJoinTask.java:1742)
+	at java.base/java.util.concurrent.ForkJoinTask$InterruptibleTask.exec(ForkJoinTask.java:1659)
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:511)
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1450)
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2019)
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187)
+2026-03-27 10:58:55,577 [Thread-0] INFO  c.d.c.environment.ParticipantNodes - Task closing node-sandbox still not completed after 10 seconds. Continue waiting...
+2026-03-27 10:58:55,588 [Thread-0] WARN  c.d.c.environment.ParticipantNodes - Task closing node-sandbox did not complete within 10 seconds. Stack traces:
+  Thread[#125,sandbox-wallclock-0,5,main] is-daemon=false state=TIMED_WAITING
+    java.base@25.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+    java.base@25.0.2/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:271)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1803)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1166)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:883)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1016)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1076)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+    java.base@25.0.2/java.lang.Thread.runWith(Thread.java:1487)
+    java.base@25.0.2/java.lang.Thread.run(Thread.java:1474)
+
+  Thread[#126,delay-util-0,5,main] is-daemon=true state=WAITING
+    java.base@25.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+    java.base@25.0.2/java.util.concurrent.locks.LockSupport.park(LockSupport.java:369)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(AbstractQueuedSynchronizer.java:520)
+    java.base@25.0.2/java.util.concurrent.ForkJoinPool.unmanagedBlock(ForkJoinPool.java:4364)
+    java.base@25.0.2/java.util.concurrent.ForkJoinPool.managedBlock(ForkJoinPool.java:4310)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1752)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1154)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:883)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1016)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1076)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+    java.base@25.0.2/java.lang.Thread.runWith(Thread.java:1487)
+    java.base@25.0.2/java.lang.Thread.run(Thread.java:1474)
+
+  Thread[#63,local-wallclock-0,5,main] is-daemon=false state=TIMED_WAITING
+    java.base@25.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+    java.base@25.0.2/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:271)
+    java.base@25.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1803)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1166)
+    java.base@25.0.2/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:883)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1016)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1076)
+    java.base@25.0.2/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+    java.base@25.0.2/java.lang.Thread.runWith(Thread.java:1487)
+    java.base@25.0.2/java.lang.Thread.run(Thread.java:1474)
+
+2026-03-27 10:58:55,589 [Thread-0] WARN  c.d.c.environment.ParticipantNodes - Closing 'AsyncCloseable(name=node-sandbox)' failed! Reason:
+java.util.concurrent.TimeoutException: Task closing node-sandbox did not complete within 10 seconds.
+	at com.digitalasset.canton.util.FutureUtil$.retry$1(FutureUtil.scala:300)
+	at com.digitalasset.canton.util.FutureUtil$.noisyAwaitResultForTesting(FutureUtil.scala:304)
+	at com.digitalasset.canton.util.FutureUtil$.noisyAwaitResult(FutureUtil.scala:205)
+	at com.digitalasset.canton.lifecycle.AsyncCloseable.close(FlagCloseableAsync.scala:36)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.LinearSeqOps.foldLeft(LinearSeq.scala:183)
+	at scala.collection.LinearSeqOps.foldLeft$(LinearSeq.scala:179)
+	at scala.collection.immutable.List.foldLeft(List.scala:79)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.lifecycle.FlagCloseableAsync.onClosed(FlagCloseableAsync.scala:22)
+	at com.digitalasset.canton.lifecycle.FlagCloseableAsync.onClosed$(FlagCloseableAsync.scala:22)
+	at com.digitalasset.canton.environment.ManagedNodes.onClosed(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose(PerformUnlessClosing.scala:227)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose$(PerformUnlessClosing.scala:192)
+	at com.digitalasset.canton.environment.ManagedNodes.onFirstClose(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close(OnShutdownRunner.scala:93)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close$(OnShutdownRunner.scala:83)
+	at com.digitalasset.canton.environment.ManagedNodes.com$digitalasset$canton$lifecycle$FlagCloseable$$super$close(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close(FlagCloseable.scala:27)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close$(FlagCloseable.scala:27)
+	at com.digitalasset.canton.environment.ManagedNodes.close(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.LinearSeqOps.foldLeft(LinearSeq.scala:183)
+	at scala.collection.LinearSeqOps.foldLeft$(LinearSeq.scala:179)
+	at scala.collection.immutable.List.foldLeft(List.scala:79)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.environment.Environment.$anonfun$close$1(Environment.scala:559)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:62)
+	at scala.concurrent.package$.blocking(package.scala:124)
+	at com.digitalasset.canton.environment.Environment.close(Environment.scala:540)
+	at com.digitalasset.canton.environment.Environment.close$(Environment.scala:540)
+	at com.digitalasset.canton.environment.CommunityEnvironment.close(CommunityEnvironment.scala:33)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$3(CantonAppDriver.scala:109)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$3$adapted(CantonAppDriver.scala:109)
+	at scala.Option.foreach(Option.scala:437)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$2(CantonAppDriver.scala:109)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-03-27 10:58:55,593 [Thread-0] WARN  c.d.c.e.CommunityEnvironment - Closing 'com.digitalasset.canton.environment.ParticipantNodes@37a39730' failed! Reason:
+com.digitalasset.canton.lifecycle.ShutdownFailedException: Unable to close 'AsyncCloseable(name=node-sandbox)'.
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$8(Lifecycle.scala:65)
+	at scala.Option.foreach(Option.scala:437)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:65)
+	at com.digitalasset.canton.lifecycle.FlagCloseableAsync.onClosed(FlagCloseableAsync.scala:22)
+	at com.digitalasset.canton.lifecycle.FlagCloseableAsync.onClosed$(FlagCloseableAsync.scala:22)
+	at com.digitalasset.canton.environment.ManagedNodes.onClosed(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose(PerformUnlessClosing.scala:227)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.onFirstClose$(PerformUnlessClosing.scala:192)
+	at com.digitalasset.canton.environment.ManagedNodes.onFirstClose(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close(OnShutdownRunner.scala:93)
+	at com.digitalasset.canton.lifecycle.OnShutdownRunner.close$(OnShutdownRunner.scala:83)
+	at com.digitalasset.canton.environment.ManagedNodes.com$digitalasset$canton$lifecycle$FlagCloseable$$super$close(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close(FlagCloseable.scala:27)
+	at com.digitalasset.canton.lifecycle.FlagCloseable.close$(FlagCloseable.scala:27)
+	at com.digitalasset.canton.environment.ManagedNodes.close(Nodes.scala:104)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$1(Lifecycle.scala:47)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.util.Try$.apply(Try.scala:210)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.stopSingle$1(Lifecycle.scala:47)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$7(Lifecycle.scala:62)
+	at scala.collection.LinearSeqOps.foldLeft(LinearSeq.scala:183)
+	at scala.collection.LinearSeqOps.foldLeft$(LinearSeq.scala:179)
+	at scala.collection.immutable.List.foldLeft(List.scala:79)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:61)
+	at com.digitalasset.canton.environment.Environment.$anonfun$close$1(Environment.scala:559)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:62)
+	at scala.concurrent.package$.blocking(package.scala:124)
+	at com.digitalasset.canton.environment.Environment.close(Environment.scala:540)
+	at com.digitalasset.canton.environment.Environment.close$(Environment.scala:540)
+	at com.digitalasset.canton.environment.CommunityEnvironment.close(CommunityEnvironment.scala:33)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$3(CantonAppDriver.scala:109)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$3$adapted(CantonAppDriver.scala:109)
+	at scala.Option.foreach(Option.scala:437)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$2(CantonAppDriver.scala:109)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-03-27 10:58:55,595 [canton-env-ec-95] INFO  c.d.c.d.DomainNodeBootstrap:domain=local - Stopping domain node
+2026-03-27 10:58:55,604 [canton-env-ec-95] INFO  c.d.c.d.t.DomainTopologySender$Impl:domain=local/identity - 'domain-topology-sender' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:55,604 [canton-env-ec-95] INFO  c.d.c.h.MutableHealthComponent:domain=local - 'domain-topology-sender' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:55,611 [canton-env-ec-95] INFO  c.d.c.s.c.ResilientSequencerSubscription:domain=local/client=topology-manager - 'sequencer-client' is now in state Failed(Disconnected from domain). Previous state was Ok().
+2026-03-27 10:58:55,613 [canton-env-ec-95] INFO  c.d.c.h.DelegatingMutableHealthComponent:domain=local/client=topology-manager - 'sequencer-client' is now in state Failed(Disconnected from domain). Previous state was Ok().
+2026-03-27 10:58:55,614 [canton-env-ec-99] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=topology-manager - GRPC subscription successfully closed due to client shutdown.
+2026-03-27 10:58:55,614 [canton-env-ec-99] INFO  c.d.c.n.g.ApiRequestLogger:domain=local tid:c91cfd0f82722fc540715b2d0850f7bc - Request c.d.c.d.a.v.SequencerService/SubscribeVersioned by /127.0.0.1:64661: cancelled. Cancellations can be caused by timeouts, explicit cancellation by the client, network errors, etc.
+2026-03-27 10:58:55,615 [canton-env-ec-99] INFO  c.d.c.d.s.s.GrpcManagedSubscription:domain=local/member=DOM::local::122090f94aef - Subscription cancelled by client DOM::local::122090f94aef....
+2026-03-27 10:58:55,626 [canton-env-ec-95] INFO  c.d.c.s.c.ResilientSequencerSubscription:domain=local/client=mediator - 'sequencer-client' is now in state Failed(Disconnected from domain). Previous state was Ok().
+2026-03-27 10:58:55,626 [canton-env-ec-95] INFO  c.d.c.h.DelegatingMutableHealthComponent:domain=local/client=mediator - 'sequencer-client' is now in state Failed(Disconnected from domain). Previous state was Ok().
+2026-03-27 10:58:55,627 [canton-env-ec-99] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:domain=local/client=mediator - GRPC subscription successfully closed due to client shutdown.
+2026-03-27 10:58:55,627 [canton-env-ec-99] INFO  c.d.c.n.g.ApiRequestLogger:domain=local tid:2e5a45bb06b57eddde8039d70589e987 - Request c.d.c.d.a.v.SequencerService/SubscribeVersioned by /127.0.0.1:64665: cancelled. Cancellations can be caused by timeouts, explicit cancellation by the client, network errors, etc.
+2026-03-27 10:58:55,627 [canton-env-ec-99] INFO  c.d.c.d.s.s.GrpcManagedSubscription:domain=local/member=MED::local::122090f94aef - Subscription cancelled by client MED::local::122090f94aef....
+2026-03-27 10:58:55,633 [canton-env-ec-51] INFO  c.d.c.s.c.t.GrpcSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - The sequencer subscription has been terminated by the server.
+2026-03-27 10:58:55,633 [canton-env-ec-51] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after Connection terminated by the server.)
+2026-03-27 10:58:55,634 [canton-env-ec-95] INFO  c.d.c.d.s.s.DatabaseSequencer:domain=local - 'sequencer' is now in state SequencerHealthStatus(active = false, details = Sequencer is closed). Previous state was SequencerHealthStatus(active = true).
+2026-03-27 10:58:55,635 [canton-env-ec-95] INFO  c.d.c.h.MutableHealthQuasiComponent:domain=local - 'sequencer' is now in state SequencerHealthStatus(active = false, details = Sequencer is closed). Previous state was SequencerHealthStatus(active = true).
+2026-03-27 10:58:55,635 [canton-env-ec-95] INFO  c.d.c.d.DomainNodeBootstrap:domain=local - 'sequencer-health-check-service' is now in state ServingStatus(status = 'NOT_SERVING'). Previous state was ServingStatus(status = 'SERVING').
+2026-03-27 10:58:55,648 [canton-env-ec-95] INFO  c.d.c.r.MemoryStorage:domain=local - 'memory_storage' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:55,648 [canton-env-ec-95] INFO  c.d.c.d.DomainNodeBootstrap:domain=local - 'domain' is now in state ServingStatus(status = 'NOT_SERVING'). Previous state was ServingStatus(status = 'SERVING').
+2026-03-27 10:58:55,649 [canton-env-ec-95] INFO  c.d.c.crypto.Crypto:domain=local - 'crypto' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:55,649 [canton-env-ec-95] INFO  c.d.c.c.p.t.TinkPrivateCrypto:domain=local - 'tink-private-crypto' is now in state Failed(Component is closed). Previous state was Ok().
+2026-03-27 10:58:55,684 [canton-env-ec-48] INFO  o.a.pekko.actor.CoordinatedShutdown - Running CoordinatedShutdown with reason [ActorSystemTerminateReason]
+2026-03-27 10:58:55,691 [canton-env-ec-51] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after io exception, Connection refused: /127.0.0.1:6867, Connection refused)
+2026-03-27 10:58:55,792 [canton-env-ec-51] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after io exception, Connection refused: /127.0.0.1:6867, Connection refused)
+2026-03-27 10:58:55,997 [canton-env-ec-102] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after io exception, Connection refused: /127.0.0.1:6867, Connection refused)
+2026-03-27 10:58:56,403 [canton-env-ec-48] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after io exception, Connection refused: /127.0.0.1:6867, Connection refused)
+2026-03-27 10:58:57,205 [canton-env-ec-101] INFO  c.d.c.s.c.t.GrpcSubscriptionErrorRetryPolicy:participant=sandbox/domainId=local::122090f94aef - Trying to reconnect to give the sequencer the opportunity to become available again (after io exception, Connection refused: /127.0.0.1:6867, Connection refused)
+2026-03-27 10:58:58,709 [Thread-0] INFO  c.d.c.e.CommunityEnvironment - executor-ForkJoinIdlenessExecutorService-canton-env-ec: java.util.concurrent.ForkJoinPool@2c49c4e[Running, parallelism = 10, size = 29, active = 1, running = 0, steals = 118857, tasks = 0, submissions = 0]: idleness not reached within allotted 3 seconds.
+2026-03-27 10:58:58,811 [delay-util-0] ERROR c.d.c.s.c.ResilientSequencerSubscription:participant=sandbox/domainId=local::122090f94aef - Delaying setup of new sequencer subscription failed
+java.util.concurrent.RejectedExecutionException: null
+	at java.base/java.util.concurrent.ForkJoinPool.submissionQueue(ForkJoinPool.java:2611)
+	at java.base/java.util.concurrent.ForkJoinPool.poolSubmit(ForkJoinPool.java:2623)
+	at java.base/java.util.concurrent.ForkJoinPool.execute(ForkJoinPool.java:3179)
+	at com.daml.executors.QueueAwareExecutorService.execute(QueueAwareExecutorService.scala:92)
+	at scala.concurrent.impl.Promise$Transformation.submitWithValue(Promise.scala:429)
+	at scala.concurrent.impl.Promise$DefaultPromise.submitWithValue(Promise.scala:338)
+	at scala.concurrent.impl.Promise$DefaultPromise.tryComplete0(Promise.scala:285)
+	at scala.concurrent.impl.Promise$DefaultPromise.tryComplete(Promise.scala:278)
+	at scala.concurrent.Promise.complete(Promise.scala:57)
+	at scala.concurrent.Promise.complete$(Promise.scala:56)
+	at scala.concurrent.impl.Promise$DefaultPromise.complete(Promise.scala:104)
+	at scala.concurrent.Promise.success(Promise.scala:91)
+	at scala.concurrent.Promise.success$(Promise.scala:91)
+	at scala.concurrent.impl.Promise$DefaultPromise.success(Promise.scala:104)
+	at com.digitalasset.canton.util.DelayUtil$.$anonfun$delay$3(DelayUtil.scala:58)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.performUnlessClosing(PerformUnlessClosing.scala:62)
+	at com.digitalasset.canton.lifecycle.PerformUnlessClosing.performUnlessClosing$(PerformUnlessClosing.scala:54)
+	at com.digitalasset.canton.sequencing.client.ResilientSequencerSubscription.performUnlessClosing(ResilientSequencerSubscription.scala:54)
+	at com.digitalasset.canton.util.DelayUtil$.$anonfun$delay$2(DelayUtil.scala:58)
+	at com.digitalasset.canton.util.DelayUtil$.$anonfun$delay$2$adapted(DelayUtil.scala:57)
+	at com.digitalasset.canton.util.DelayUtil$.$anonfun$delay$4(DelayUtil.scala:68)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-03-27 10:59:01,714 [Thread-0] WARN  c.d.c.e.CommunityEnvironment - executor-ForkJoinIdlenessExecutorService-canton-env-ec: java.util.concurrent.ForkJoinPool@2c49c4e[Running, parallelism = 10, size = 29, active = 1, running = 0, steals = 118857, tasks = 0, submissions = 0]: shutdown did not complete gracefully in allotted 3 seconds.
+2026-03-27 10:59:01,718 [Thread-0] ERROR c.d.canton.CantonCommunityApp$ - Failed to shut down successfully.
+com.digitalasset.canton.lifecycle.ShutdownFailedException: Unable to close 'com.digitalasset.canton.environment.ParticipantNodes@37a39730'.
+	at com.digitalasset.canton.lifecycle.Lifecycle$.$anonfun$close$8(Lifecycle.scala:65)
+	at scala.Option.foreach(Option.scala:437)
+	at com.digitalasset.canton.lifecycle.Lifecycle$.close(Lifecycle.scala:65)
+	at com.digitalasset.canton.environment.Environment.$anonfun$close$1(Environment.scala:559)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:62)
+	at scala.concurrent.package$.blocking(package.scala:124)
+	at com.digitalasset.canton.environment.Environment.close(Environment.scala:540)
+	at com.digitalasset.canton.environment.Environment.close$(Environment.scala:540)
+	at com.digitalasset.canton.environment.CommunityEnvironment.close(CommunityEnvironment.scala:33)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$3(CantonAppDriver.scala:109)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$3$adapted(CantonAppDriver.scala:109)
+	at scala.Option.foreach(Option.scala:437)
+	at com.digitalasset.canton.CantonAppDriver.$anonfun$new$2(CantonAppDriver.scala:109)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-03-27 10:59:01,718 [Thread-0] INFO  c.d.canton.CantonCommunityApp$ - Shutting down logger. Bye bye.
