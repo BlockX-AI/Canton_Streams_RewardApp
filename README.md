@@ -62,7 +62,7 @@ Imagine paying someone not monthly or weekly, but **every single second**. That'
 - Alice can pause, resume, or stop the stream anytime
 - Bob can withdraw his earned tokens whenever he wants
 
-**No more waiting for payday. Money flows like water.** 💧
+**No more waiting for payday. Money flows like water.** 
 
 ---
 
@@ -621,7 +621,7 @@ MIT License - see LICENSE file for details
 
 ---
 
-**🎊 GrowStreams is now streaming on Canton Network! 🎊**
+** GrowStreams is now streaming on Canton Network! **
 
 **Ready to stream money in real-time?** Start the sandbox and try it yourself!
 
@@ -631,7 +631,7 @@ daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
 daml navigator server localhost 6865
 ```
 
-**Let the tokens flow!** 💧
+**Let the tokens flow!** 
 
 ---
 
