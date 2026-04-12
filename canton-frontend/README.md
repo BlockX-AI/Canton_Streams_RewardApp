@@ -80,7 +80,7 @@ canton-frontend/
 1. Start Canton sandbox:
 ```bash
 cd daml-contracts
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+dpm sandbox --dar .daml/dist/growstreams-1.0.0.dar
 ```
 
 2. Start Canton JSON API:
@@ -94,7 +94,7 @@ daml json-api \
 
 3. Verify JSON API is running:
 ```bash
-curl http://localhost:7575/v1/query
+curl http://localhost:7575/v2/state/active-contracts
 ```
 
 ### API Methods

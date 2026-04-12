@@ -24,7 +24,7 @@ interface CantonContract {
 function calculateAccrued(stream: StreamPayload, now: Date): number {
   if (stream.status !== 'Active') return 0;
   const lastUpdate = new Date(stream.lastUpdate);
-  const elapsed = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
+  const elapsed = (now.getTime() - lastUpdate.getTime()) / 1000;
   const rate = parseFloat(stream.flowRate);
   const available = parseFloat(stream.deposited) - parseFloat(stream.withdrawn);
   return Math.min(rate * elapsed, available);
@@ -188,7 +188,7 @@ export default function Home() {
           <div className="flex-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-4 py-3 flex items-center gap-2">
             <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
             <span className="text-emerald-400 text-sm font-medium">Canton Sandbox</span>
-            <span className="text-gray-500 text-xs ml-1">localhost:6865</span>
+            <span className="text-gray-500 text-xs ml-1">localhost:6866</span>
             <span className="ml-auto text-gray-500 text-xs">JSON API :7575</span>
           </div>
           <div className="bg-gray-800/60 border border-gray-700 rounded-lg px-3 py-2 flex items-center gap-2">
@@ -369,7 +369,7 @@ export default function Home() {
         {/* Footer */}
         <div className="mt-10 text-center text-xs text-gray-600 space-y-1">
           <p>GrowStreams Canton Native — Phase 1 Complete — Canton Dev Fund Submission</p>
-          <p>33/33 Tests Passing • 6/6 Acceptance Criteria Met • Daml SDK 2.10.3</p>
+          <p>33/33 Tests Passing • 6/6 Acceptance Criteria Met • Daml SDK 3.4.0</p>
         </div>
       </div>
     </main>

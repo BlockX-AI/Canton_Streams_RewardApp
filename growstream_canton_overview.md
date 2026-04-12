@@ -8,7 +8,7 @@
 
 ## 1. What's Done
 
-### Smart Contracts (Daml — Canton SDK 2.10.3)
+### Smart Contracts (Daml — Canton SDK 3.4.0)
 
 **StreamCore.daml** — The heart of the system
 - `StreamAgreement` template: per-second token accrual between two parties (sender → receiver)
@@ -183,7 +183,7 @@ The only remaining blocker for Canton Dev Fund submission is a 2-minute demo vid
 We've only deployed to local Canton sandbox. Testnet requires credentials, network access, and running the demo scripts against real Canton infrastructure. Not yet done.
 
 **8. Navigator has cosmetic React errors**  
-Navigator UI shows a `500 Internal Server Error` on `/api/config` and some React console errors. These are harmless (Navigator still works, parties are selectable, contracts are visible), but they look bad in a demo. The root cause is likely a Navigator version mismatch with SDK 2.10.3.
+Navigator UI shows a `500 Internal Server Error` on `/api/config` and some React console errors. These are harmless (Navigator still works, parties are selectable, contracts are visible), but they look bad in a demo. The root cause is likely a Navigator version mismatch with SDK 3.4.0.
 
 ---
 
