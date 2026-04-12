@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, canton_native ]
+  pull_request:
+    branches: [ main, canton_native ]
+
+jobs:
+  test-daml:
+    name: Test Daml Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Daml SDK
+        run: |
+          curl -sSL https://get.daml.com/ | sh
+          echo "$HOME/.daml/bin" >> $GITHUB_PATH
+      
+      - name: Build Daml contracts
+        run: |
+          cd daml-contracts
+          dpm build
+      
+      - name: Run Daml tests
+        run: |
+          cd daml-contracts
+          dpm test --project-root daml-contracts-tests
+
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: canton-frontend/package-lock.json
+      
+      - name: Install dependencies
+        run: |
+          cd canton-frontend
+          npm ci
+      
+      - name: Lint
+        run: |
+          cd canton-frontend
+          npm run lint
+      
+      - name: Build
+        run: |
+          cd canton-frontend
+          npm run build

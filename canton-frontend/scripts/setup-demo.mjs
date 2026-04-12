@@ -7,8 +7,8 @@
 import crypto from 'crypto';
 
 const CANTON_JSON_API = 'http://localhost:7575';
-const PACKAGE_ID = 'a60b6d5c583f91e98770e754fe71d1fbc737b36bb9b2ff5d4911dd86ad79358b';
-const NAMESPACE = '12203e76b582b4c420f1e6ee4d1992042e9e5e1bacff0166fc4e87764459aea1d771';
+const PACKAGE_ID = process.env.CANTON_PACKAGE_ID ?? 'a60b6d5c583f91e98770e754fe71d1fbc737b36bb9b2ff5d4911dd86ad79358b';
+const NAMESPACE = process.env.CANTON_NAMESPACE ?? '12203e76b582b4c420f1e6ee4d1992042e9e5e1bacff0166fc4e87764459aea1d771';
 
 const PARTIES = {
   admin: `Admin::${NAMESPACE}`,

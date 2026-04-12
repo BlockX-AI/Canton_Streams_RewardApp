@@ -99,7 +99,7 @@ export const cantonAPI = {
     templateId: string,
     contractId: string,
     choice: string,
-    argument: any,
+    argument: Record<string, unknown>,
     party: string,
   ) {
     const commandBody = {
@@ -132,7 +132,7 @@ export const cantonAPI = {
   },
 
   // Create contract
-  async createContract(templateId: string, payload: any, party: string) {
+  async createContract(templateId: string, payload: Record<string, unknown>, party: string) {
     const commandBody = {
       actAs: [party],
       readAs: [party],
