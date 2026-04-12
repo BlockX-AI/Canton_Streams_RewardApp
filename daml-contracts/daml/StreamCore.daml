@@ -5,6 +5,7 @@ module StreamCore where
 
 import DA.Time
 import GrowToken
+import FeaturedAppActivity
 
 data StreamStatus = Active | Paused | Stopped
   deriving (Eq, Show)
@@ -162,6 +163,20 @@ template StreamAgreement
           else return ()
         return (finalAccrued, refundAmount)
     
+    -- CIP-0047: allow admin to emit an activity marker for any stream event
+    -- (Withdraw, Stop, etc.) after it has been exercised.
+    nonconsuming choice RecordActivity : ContractId FeaturedAppActivityRecord
+      with
+        activityType : Text
+        timestamp    : Time
+      controller admin
+      do
+        create FeaturedAppActivityRecord with
+          provider     = admin
+          activityType = activityType
+          referenceId  = show streamId
+          timestamp    = timestamp
+
     -- ObligationView: Real-time balance query (non-consuming, zero gas)
     -- Matches Canton Dev Fund proposal requirement
     nonconsuming choice ObligationView : Decimal
@@ -210,6 +225,13 @@ template StreamFactory
         assertMsg "Invalid flow rate" (flowRate > 0.0)
         assertMsg "Invalid deposit"   (initialDeposit > 0.0)
         
+        -- CIP-0047: emit activity marker for stream creation
+        _ <- create FeaturedAppActivityRecord with
+               provider     = admin
+               activityType = "stream_created"
+               referenceId  = show nextStreamId
+               timestamp    = currentTime
+
         -- Create stream (sender signs)
         stream <- create StreamAgreement with
           streamId = nextStreamId
