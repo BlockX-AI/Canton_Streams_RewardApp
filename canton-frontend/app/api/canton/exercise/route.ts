@@ -36,10 +36,27 @@ export async function POST(req: NextRequest) {
     `Admin::${NAMESPACE}`,
   ]);
 
-  const res = await fetch(`${CANTON_URL}/v1/exercise`, {
+  const commandBody = {
+    actAs: [partyId],
+    readAs: [partyId],
+    applicationId: 'growstreams',
+    commandId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    commands: [
+      {
+        exerciseCommand: {
+          templateId: fullTemplateId,
+          contractId,
+          choice,
+          choiceArgument: { value: argument },
+        },
+      },
+    ],
+  };
+
+  const res = await fetch(`${CANTON_URL}/v2/commands/submit-and-wait`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ templateId: fullTemplateId, contractId, choice, argument }),
+    body: JSON.stringify(commandBody),
   });
 
   const data = await res.json();

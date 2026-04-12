@@ -36,10 +36,24 @@ export async function POST(req: NextRequest) {
     `Admin::${NAMESPACE}`,
   ]);
 
-  const res = await fetch(`${CANTON_URL}/v1/query`, {
+  const filter = {
+    filtersByParty: {
+      [partyId]: {
+        cumulative: [
+          {
+            templateFilter: {
+              value: { templateId: fullTemplateId },
+            },
+          },
+        ],
+      },
+    },
+  };
+
+  const res = await fetch(`${CANTON_URL}/v2/state/active-contracts`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ templateIds: [fullTemplateId] }),
+    body: JSON.stringify({ filter }),
   });
 
   const data = await res.json();
