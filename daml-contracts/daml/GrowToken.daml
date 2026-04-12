@@ -15,7 +15,7 @@ template GrowToken
     signatory issuer
     observer owner
     
-    ensure amount > 0.0 && symbol == "GROW" && decimals == 12
+    ensure amount > 0.0 && symbol == "GROW" && decimals == 10
     
     -- Transfer tokens
     choice Transfer : (ContractId GrowToken, Optional (ContractId GrowToken))
@@ -79,21 +79,30 @@ template GrowToken
         else
           return None
     
-    -- Approve spender (creates Allowance)
-    choice Approve : ContractId Allowance
+    -- Approve spender: locks allowanceAmount in Allowance, returns any
+    -- remaining balance to the owner as a new GrowToken (UTXO conservation)
+    choice Approve : (ContractId Allowance, Optional (ContractId GrowToken))
       with
-        spender        : Party
+        spender         : Party
         allowanceAmount : Decimal
       controller owner
       do
         assertMsg "Allowance must be positive" (allowanceAmount > 0.0)
         assertMsg "Insufficient balance for allowance" (amount >= allowanceAmount)
-        
-        create Allowance with
+
+        allowanceCid <- create Allowance with
           tokenOwner = owner
-          spender = spender
-          amount = allowanceAmount
-          issuer = issuer
+          spender    = spender
+          amount     = allowanceAmount
+          issuer     = issuer
+
+        remainder <- if amount > allowanceAmount
+          then do
+            remCid <- create this with amount = amount - allowanceAmount
+            return (Some remCid)
+          else return None
+
+        return (allowanceCid, remainder)
 
 -- Allowance for vault deposits
 template Allowance
@@ -123,7 +132,7 @@ template Allowance
           issuer = issuer
           amount = transferAmount
           symbol = "GROW"
-          decimals = 12
+          decimals = 10
         
         -- Update allowance
         newAllowance <- if amount > transferAmount then do
@@ -159,7 +168,7 @@ template Faucet
           issuer = admin
           amount = amount
           symbol = "GROW"
-          decimals = 12
+          decimals = 10
     
     -- Mint to multiple recipients
     nonconsuming choice MintBatch : [ContractId GrowToken]
@@ -174,4 +183,4 @@ template Faucet
             issuer = admin
             amount = amt
             symbol = "GROW"
-            decimals = 12
+            decimals = 10

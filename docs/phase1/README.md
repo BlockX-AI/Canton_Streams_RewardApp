@@ -93,7 +93,7 @@
 
 ### Deployment
 - **Platform**: Canton Sandbox
-- **SDK Version**: 2.10.3
+- **SDK Version**: 3.4.0
 - **Parties**: 22 allocated
 - **Status**:  Running and verified
 

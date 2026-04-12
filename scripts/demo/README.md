@@ -266,7 +266,7 @@ Expected: ~120 GROW (80 + 40 at 2.0 GROW/second)
 
 ### "passTime not supported"
 **Issue**: Running on old Canton version  
-**Solution**: Upgrade to Canton 2.10.3+
+**Solution**: Upgrade to Canton 3.4.0+
 
 ### "Accrual doesn't match expected"
 **Issue**: Clock skew or network delay  

@@ -1,0 +1,27 @@
+-- daml/FeaturedAppActivity.daml
+-- CIP-0047 FeaturedAppActivityMarker stub
+--
+-- In production replace this template with the upstream Splice library type:
+--   data-dependencies:
+--     - splice-amulet-<version>.dar   (from Canton DevNet artifact repo)
+-- and use Splice.Amulet.FeaturedApp.FeaturedAppActivityMarker directly.
+-- The semantics are identical: each instance records one dApp interaction and
+-- is consumed by the Canton validator to credit CC rewards to the provider.
+module FeaturedAppActivity where
+
+import DA.Time
+
+-- One record per user interaction.  The provider (dApp operator / admin party)
+-- must sign, ensuring the marker can only be minted by the authorised dApp.
+template FeaturedAppActivityRecord
+  with
+    provider     : Party   -- dApp operator who earns CC rewards
+    activityType : Text    -- e.g. "stream_created", "stream_withdraw", "stream_stopped"
+    referenceId  : Text    -- stream ID or contract ID for correlation
+    timestamp    : Time
+  where
+    signatory provider
+
+    nonconsuming choice GetActivity : (Text, Text, Time)
+      controller provider
+      do return (activityType, referenceId, timestamp)

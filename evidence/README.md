@@ -90,7 +90,7 @@ http://localhost:4000
 
 ### Deployment
 - **Platform**: Canton Sandbox
-- **SDK Version**: 2.10.3
+- **SDK Version**: 3.4.0
 - **DAR Size**: ~500KB
 - **Parties**: 22 allocated
 - **Status**:  Running and verified

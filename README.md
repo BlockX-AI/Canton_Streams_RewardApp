@@ -83,7 +83,7 @@ GrowStreams is a **real-time streaming protocol** built on **Canton Network** us
 ##  Current Status
 
 **Branch**: `canton_native`  
-**Platform**: Canton Network (Daml SDK 2.10.3)  
+**Platform**: Canton Network (Daml SDK 3.4.0)  
 **Status**:  **PHASE 1: 85% COMPLETE → 100% IN 3 DAYS**
 
 **Canton Dev Fund**: Phase 1 ($70K) ready for submission  
@@ -237,7 +237,7 @@ calculateAccrued stream currentTime =
 
 ### Prerequisites
 
-- **Daml SDK 2.10.3** (already installed if you're in this repo)
+- **Daml SDK 3.4.0** (already installed if you're in this repo)
 - **Java 11+** (for Canton/Daml runtime)
 - **Git** (for version control)
 

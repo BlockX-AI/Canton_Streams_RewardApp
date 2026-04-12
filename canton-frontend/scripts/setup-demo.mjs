@@ -1,10 +1,14 @@
 // canton-frontend/scripts/setup-demo.mjs
 // Creates demo contracts on Canton sandbox via JSON API
 // Run: node scripts/setup-demo.mjs
+//
+// Requires env: CANTON_AUTH_SECRET (must match participant JWT secret)
+// Production: replace makeToken with tokens from a real OIDC provider (RS256).
+import crypto from 'crypto';
 
 const CANTON_JSON_API = 'http://localhost:7575';
-const PACKAGE_ID = 'a60b6d5c583f91e98770e754fe71d1fbc737b36bb9b2ff5d4911dd86ad79358b';
-const NAMESPACE = '12203e76b582b4c420f1e6ee4d1992042e9e5e1bacff0166fc4e87764459aea1d771';
+const PACKAGE_ID = process.env.CANTON_PACKAGE_ID ?? 'a60b6d5c583f91e98770e754fe71d1fbc737b36bb9b2ff5d4911dd86ad79358b';
+const NAMESPACE = process.env.CANTON_NAMESPACE ?? '12203e76b582b4c420f1e6ee4d1992042e9e5e1bacff0166fc4e87764459aea1d771';
 
 const PARTIES = {
   admin: `Admin::${NAMESPACE}`,
@@ -12,18 +16,22 @@ const PARTIES = {
   bob: `Bob::${NAMESPACE}`,
 };
 
-// Generate unsigned JWT for Canton JSON API (--allow-insecure-tokens mode)
+// HS256-signed JWT — configure CANTON_AUTH_SECRET to match participant config.
+// Never use alg:none in production; replace with RS256 + OIDC for mainnet.
 function makeToken(actAs, readAs) {
-  const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
+  const secret = process.env.CANTON_AUTH_SECRET ?? 'change-me-in-production';
+  const actAsList  = Array.isArray(actAs)  ? actAs  : [actAs];
+  const readAsList = Array.isArray(readAs) ? readAs : (readAs ? [readAs] : actAsList);
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(JSON.stringify({
     'https://daml.com/ledger-api': {
-      ledgerId: 'sandbox',
-      applicationId: 'growstreams-demo',
-      actAs: Array.isArray(actAs) ? actAs : [actAs],
-      readAs: Array.isArray(readAs) ? readAs : (readAs ? [readAs] : (Array.isArray(actAs) ? actAs : [actAs])),
+      applicationId: 'growstreams',
+      actAs: actAsList,
+      readAs: readAsList,
     },
   })).toString('base64url');
-  return `${header}.${payload}.`;
+  const sig = crypto.createHmac('sha256', secret).update(`${header}.${payload}`).digest('base64url');
+  return `${header}.${payload}.${sig}`;
 }
 
 const TOKENS = {
@@ -49,12 +57,39 @@ async function cantonRequest(method, path, body, token) {
   return json;
 }
 
-async function createContract(templateId, payload, token) {
-  return cantonRequest('POST', '/v1/create', { templateId, payload }, token);
+async function createContract(templateId, payload, actAs, token) {
+  const body = {
+    actAs: Array.isArray(actAs) ? actAs : [actAs],
+    readAs: [],
+    applicationId: 'growstreams',
+    commandId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    commands: [{ createCommand: { templateId, createArguments: payload } }],
+  };
+  return cantonRequest('POST', '/v2/commands/submit-and-wait', body, token);
 }
 
-async function queryContracts(templateId, token) {
-  const res = await cantonRequest('POST', '/v1/query', { templateIds: [templateId] }, token);
+async function exerciseChoice(templateId, contractId, choice, argument, actAs, token) {
+  const body = {
+    actAs: Array.isArray(actAs) ? actAs : [actAs],
+    readAs: [],
+    applicationId: 'growstreams',
+    commandId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    commands: [{
+      exerciseCommand: { templateId, contractId, choice, choiceArgument: { value: argument } },
+    }],
+  };
+  return cantonRequest('POST', '/v2/commands/submit-and-wait', body, token);
+}
+
+async function queryContracts(templateId, party, token) {
+  const filter = {
+    filtersByParty: {
+      [party]: {
+        cumulative: [{ templateFilter: { value: { templateId } } }],
+      },
+    },
+  };
+  const res = await cantonRequest('POST', '/v2/state/active-contracts', { filter }, token);
   return res.result || [];
 }
 
@@ -82,7 +117,7 @@ async function main() {
   try {
     const res = await createContract(`${PACKAGE_ID}:GrowToken:Faucet`, {
       admin: PARTIES.admin,
-    }, TOKENS.admin);
+    }, PARTIES.admin, TOKENS.admin);
     faucetId = res.result?.contractId;
     console.log('    Faucet:', faucetId);
   } catch (e) {
@@ -94,12 +129,10 @@ async function main() {
   let aliceTokenId;
   if (faucetId) {
     try {
-      const res = await cantonRequest('POST', '/v1/exercise', {
-        templateId: `${PACKAGE_ID}:GrowToken:Faucet`,
-        contractId: faucetId,
-        choice: 'Mint',
-        argument: { recipient: PARTIES.alice, amount: '10000.0' },
-      }, TOKENS.admin);
+      const res = await exerciseChoice(
+        `${PACKAGE_ID}:GrowToken:Faucet`, faucetId, 'Mint',
+        { recipient: PARTIES.alice, amount: '10000.0' }, PARTIES.admin, TOKENS.admin
+      );
       aliceTokenId = res.result?.exerciseResult;
       console.log('    Alice GrowToken minted:', aliceTokenId);
     } catch (e) {
@@ -111,12 +144,10 @@ async function main() {
   console.log('3. Minting GrowToken for Bob (5,000 GROW via Faucet)...');
   if (faucetId) {
     try {
-      const res = await cantonRequest('POST', '/v1/exercise', {
-        templateId: `${PACKAGE_ID}:GrowToken:Faucet`,
-        contractId: faucetId,
-        choice: 'Mint',
-        argument: { recipient: PARTIES.bob, amount: '5000.0' },
-      }, TOKENS.admin);
+      const res = await exerciseChoice(
+        `${PACKAGE_ID}:GrowToken:Faucet`, faucetId, 'Mint',
+        { recipient: PARTIES.bob, amount: '5000.0' }, PARTIES.admin, TOKENS.admin
+      );
       console.log('    Bob GrowToken minted:', res.result?.exerciseResult);
     } catch (e) {
       console.log('     Mint Bob failed:', e.message);
@@ -131,7 +162,7 @@ async function main() {
       admin: PARTIES.admin,
       users: [PARTIES.alice, PARTIES.bob],
       nextStreamId: 1,
-    }, TOKENS.admin);
+    }, PARTIES.admin, TOKENS.admin);
     factoryId = res.result?.contractId;
     console.log('    StreamFactory:', factoryId);
   } catch (e) {
@@ -153,7 +184,7 @@ async function main() {
       deposited: '500.0',
       withdrawn: '0.0',
       status: 'Active',
-    }, TOKENS.alice);
+    }, PARTIES.alice, TOKENS.alice);
     streamId1 = res.result?.contractId;
     console.log('    StreamAgreement #1:', streamId1);
   } catch (e) {
@@ -176,7 +207,7 @@ async function main() {
       deposited: '200.0',
       withdrawn: '45.0',
       status: 'Paused',
-    }, TOKENS.alice);
+    }, PARTIES.alice, TOKENS.alice);
     streamId2 = res.result?.contractId;
     console.log('    StreamAgreement #2:', streamId2);
   } catch (e) {

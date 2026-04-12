@@ -7,7 +7,7 @@
 ##  Prerequisites
 
 - Node.js 18+ and npm
-- Daml SDK 2.10.3 (already installed)
+- Daml SDK 3.4.0 (already installed)
 - Canton sandbox running
 - Git
 
@@ -19,18 +19,18 @@
 
 ```bash
 cd daml-contracts
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+dpm sandbox --dar .daml/dist/growstreams-1.0.0.dar
 ```
 
 **Expected output**:
 ```
 Canton sandbox is ready.
-Listening on localhost:6865
+Listening on localhost:6866
 ```
 
 **Verify**:
 ```bash
-lsof -i:6865
+lsof -i:6866
 # Should show daml process
 ```
 
@@ -42,7 +42,7 @@ Open a **new terminal**:
 
 ```bash
 cd daml-contracts
-daml navigator server localhost 6865 --port 4000 -c ui-backend.conf
+daml navigator server localhost 6866 --port 4000 -c ui-backend.conf
 ```
 
 **Expected output**:
@@ -63,14 +63,14 @@ For full frontend integration (not required for Phase 1 demo):
 ```bash
 daml json-api \
   --ledger-host localhost \
-  --ledger-port 6865 \
+  --ledger-port 6866 \
   --http-port 7575 \
   --allow-insecure-tokens
 ```
 
 **Verify**:
 ```bash
-curl http://localhost:7575/v1/query
+curl http://localhost:7575/v2/state/active-contracts
 ```
 
 ---
@@ -116,13 +116,13 @@ Open 4 terminals:
 **Terminal 1** - Canton Sandbox:
 ```bash
 cd daml-contracts
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+dpm sandbox --port 6866 --dar .daml/dist/growstreams-1.0.0.dar
 ```
 
 **Terminal 2** - Navigator:
 ```bash
 cd daml-contracts
-daml navigator server localhost 6865 --port 4000 -c ui-backend.conf
+daml navigator server localhost 6866 --port 4000 -c ui-backend.conf
 ```
 
 **Terminal 3** - Frontend (optional):
@@ -168,7 +168,7 @@ Before you start recording:
 Use `CANTON_DEMO_VIDEO_SCRIPT.md` for detailed recording instructions.
 
 **Key sections to show**:
-1. Canton sandbox running (`lsof -i:6865`)
+1. Canton sandbox running (`lsof -i:6866`)
 2. Navigator UI with parties and contracts
 3. Test results (`daml test` - 33/33 passing)
 4. Live stream demo (ObligationView, Withdraw, Pause)
@@ -181,16 +181,16 @@ Use `CANTON_DEMO_VIDEO_SCRIPT.md` for detailed recording instructions.
 
 ### **Canton sandbox won't start**
 
-**Error**: "Port 6865 already in use"
+**Error**: "Port 6866 already in use"
 
 **Fix**:
 ```bash
 # Kill existing process
-lsof -i:6865
+lsof -i:6866
 kill -9 <PID>
 
 # Restart sandbox
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+dpm sandbox --port 6866 --dar .daml/dist/growstreams-1.0.0.dar
 ```
 
 ---
@@ -199,7 +199,7 @@ daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
 
 **Fix**: Use the config file:
 ```bash
-daml navigator server localhost 6865 --port 4000 -c ui-backend.conf
+daml navigator server localhost 6866 --port 4000 -c ui-backend.conf
 ```
 
 Make sure `ui-backend.conf` exists with party IDs.
@@ -210,7 +210,7 @@ Make sure `ui-backend.conf` exists with party IDs.
 
 **Status**: Cosmetic only - Navigator still works
 **Impact**: None - contracts are visible and choices are executable
-**Cause**: Navigator version mismatch with SDK 2.10.3
+**Cause**: Navigator version mismatch with SDK 3.4.0
 
 **Workaround**: Ignore the errors, they don't affect functionality.
 
@@ -246,7 +246,7 @@ daml test
 
 ### **Check Canton is running**:
 ```bash
-lsof -i:6865
+lsof -i:6866
 ```
 
 ### **Check Navigator is running**:
@@ -261,7 +261,7 @@ lsof -i:7575
 
 ### **List parties**:
 ```bash
-daml ledger list-parties --host localhost --port 6865
+daml ledger list-parties --host localhost --port 6866
 ```
 
 ### **Run tests**:
@@ -281,7 +281,7 @@ find . -name "*.md" -type f | grep -v node_modules | wc -l
 
 Before recording your demo video:
 
-- [ ] Canton sandbox running on port 6865
+- [ ] Canton sandbox running on port 6866
 - [ ] Navigator UI accessible at `http://localhost:4000`
 - [ ] Alice, Bob, Admin parties visible in Navigator
 - [ ] Active contracts visible (StreamFactory, GrowToken, StreamAgreement)

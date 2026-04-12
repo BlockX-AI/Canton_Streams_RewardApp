@@ -39,7 +39,7 @@ A Daml-native primitive that enables continuous, programmable financial obligati
 ### What You're Migrating To
 
 **Canton Network** - Privacy-first, institutional-grade distributed ledger  
-**Daml 2.10.3** - Functional smart contract language  
+**Daml 3.4.0** - Functional smart contract language  
 **Canton JSON API v1** - Proven working (validated via Canton_Ginie)  
 **Target Users** - Node operators, consortiums, enterprise service providers
 
@@ -70,7 +70,7 @@ A Daml-native primitive that enables continuous, programmable financial obligati
 
 | Aspect | Vara (Current) | Canton (Target) |
 |--------|---------------|-----------------|
-| **Language** | Rust (Gear Sails 0.6) | Daml 2.10.3 |
+| **Language** | Rust (Gear Sails 0.6) | Daml 3.4.0 |
 | **State Model** | Mutable actor state | Immutable contracts |
 | **Time** | Block timestamp | Ledger Time (native) |
 | **Privacy** | Public by default | Sub-transaction privacy |
@@ -95,10 +95,10 @@ A Daml-native primitive that enables continuous, programmable financial obligati
 #### Week 1: Daml SDK Setup
 
 **Tasks**:
-- [ ] Install Daml SDK 2.10.3
+- [ ] Install Daml SDK 3.4.0
   ```bash
   curl -sSL https://get.daml.com/ | sh
-  daml version  # Verify 2.10.3
+  daml version  # Verify 3.4.0
   ```
 
 - [ ] Study Canton_Ginie examples
@@ -113,7 +113,7 @@ A Daml-native primitive that enables continuous, programmable financial obligati
   
   # Create daml.yaml
   cat > daml.yaml << 'EOF'
-  sdk-version: 2.10.3
+  sdk-version: 3.4.0
   name: growstreams
   version: 1.0.0
   source: daml
@@ -845,9 +845,9 @@ testStreamTopUp = script do
 - [ ] Download Canton SDK
   ```bash
   cd ~/Downloads
-  wget https://github.com/digital-asset/canton/releases/download/v2.10.3/canton-open-source-2.10.3.tar.gz
-  tar -xzf canton-open-source-2.10.3.tar.gz
-  cd canton-open-source-2.10.3
+  wget https://github.com/digital-asset/canton/releases/download/v3.4.0/canton-open-source-3.4.0.tar.gz
+  tar -xzf canton-open-source-3.4.0.tar.gz
+  cd canton-open-source-3.4.0
   ```
 
 - [ ] Start Canton sandbox

@@ -8,35 +8,35 @@
 ##  Local Deployment (Sandbox)
 
 ### Prerequisites
-- Daml SDK 2.10.3+
+- Daml SDK 3.4.0
 - Canton SDK
 - Java 11+
 
 ### Step 1: Build DAR
 ```bash
 cd daml-contracts
-daml build
+dpm build
 # Output: .daml/dist/growstreams-1.0.0.dar
 ```
 
 ### Step 2: Start Canton Sandbox
 ```bash
-daml sandbox
-# Runs on port 6865
+dpm sandbox
+# Runs on port 6866
 ```
 
 ### Step 3: Verify Deployment
 ```bash
 # Check Canton is running
-lsof -i:6865
+lsof -i:6866
 
 # List parties
-daml ledger list-parties --host localhost --port 6865
+daml ledger list-parties --host localhost --port 6866
 ```
 
 ### Step 4: Start Navigator (Optional)
 ```bash
-daml navigator server localhost 6865 --port 4000 -c ui-backend.conf
+daml navigator server localhost 6866 --port 4000 -c ui-backend.conf
 # Open http://localhost:4000
 ```
 
@@ -157,13 +157,13 @@ daml build
 ```bash
 # Check SDK version
 daml version
-# Should be 2.10.3+
+# Should be 3.4.0
 ```
 
 ### Navigator not connecting
 ```bash
 # Verify Canton is running
-lsof -i:6865
+lsof -i:6866
 # Check Navigator config
 cat ui-backend.conf
 ```

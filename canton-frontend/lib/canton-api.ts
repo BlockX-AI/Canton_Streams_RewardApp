@@ -35,7 +35,7 @@ export function calculateAccrued(stream: StreamAgreement, currentTime: Date): nu
   if (stream.status !== 'Active') return 0;
   
   const lastUpdate = new Date(stream.lastUpdate);
-  const elapsedSeconds = Math.floor((currentTime.getTime() - lastUpdate.getTime()) / 1000);
+  const elapsedSeconds = (currentTime.getTime() - lastUpdate.getTime()) / 1000;
   const flowRate = parseFloat(stream.flowRate);
   const accrued = flowRate * elapsedSeconds;
   const available = parseFloat(stream.deposited) - parseFloat(stream.withdrawn);
@@ -68,63 +68,95 @@ export function formatTimeRemaining(stream: StreamAgreement, currentTime: Date):
 export const cantonAPI = {
   // Query active contracts
   async queryContracts<T>(templateId: string, party: string): Promise<ContractResponse<T>> {
-    const response = await fetch(`${CANTON_JSON_API_URL}/v1/query`, {
+    const filter = {
+      filtersByParty: {
+        [party]: {
+          cumulative: [
+            {
+              templateFilter: {
+                value: { templateId },
+              },
+            },
+          ],
+        },
+      },
+    };
+    const response = await fetch(`${CANTON_JSON_API_URL}/v2/state/active-contracts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        templateIds: [templateId],
-        query: {},
-      }),
+      body: JSON.stringify({ filter }),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Canton API error: ${response.statusText}`);
     }
-    
+
     return response.json();
   },
 
   // Exercise choice on contract
-  async exerciseChoice(contractId: string, choice: string, argument: any, party: string) {
-    const response = await fetch(`${CANTON_JSON_API_URL}/v1/exercise`, {
+  async exerciseChoice(
+    templateId: string,
+    contractId: string,
+    choice: string,
+    argument: Record<string, unknown>,
+    party: string,
+  ) {
+    const commandBody = {
+      actAs: [party],
+      readAs: [party],
+      applicationId: 'growstreams',
+      commandId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      commands: [
+        {
+          exerciseCommand: {
+            templateId,
+            contractId,
+            choice,
+            choiceArgument: { value: argument },
+          },
+        },
+      ],
+    };
+    const response = await fetch(`${CANTON_JSON_API_URL}/v2/commands/submit-and-wait`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        templateId: 'StreamCore:StreamAgreement',
-        contractId,
-        choice,
-        argument,
-        meta: {
-          actAs: [party],
-        },
-      }),
+      body: JSON.stringify(commandBody),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Canton API error: ${response.statusText}`);
     }
-    
+
     return response.json();
   },
 
   // Create contract
-  async createContract(templateId: string, payload: any, party: string) {
-    const response = await fetch(`${CANTON_JSON_API_URL}/v1/create`, {
+  async createContract(templateId: string, payload: Record<string, unknown>, party: string) {
+    const commandBody = {
+      actAs: [party],
+      readAs: [party],
+      applicationId: 'growstreams',
+      commandId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      commands: [
+        {
+          createCommand: {
+            templateId,
+            createArguments: payload,
+          },
+        },
+      ],
+    };
+    const response = await fetch(`${CANTON_JSON_API_URL}/v2/commands/submit-and-wait`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        templateId,
-        payload,
-        meta: {
-          actAs: [party],
-        },
-      }),
+      body: JSON.stringify(commandBody),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Canton API error: ${response.statusText}`);
     }
-    
+
     return response.json();
   },
 };

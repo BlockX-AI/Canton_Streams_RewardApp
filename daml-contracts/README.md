@@ -17,7 +17,7 @@ daml-contracts/
 
 ## Prerequisites
 
-### 1. Install Daml SDK 2.10.3
+### 1. Install Daml SDK 3.4.0
 
 **Option A: Automatic Install (Recommended)**
 ```bash
@@ -25,7 +25,7 @@ curl -sSL https://get.daml.com/ | sh
 ```
 
 **Option B: Manual Install**
-1. Download from: https://github.com/digital-asset/daml/releases/tag/v2.10.3
+1. Download from: https://github.com/digital-asset/daml/releases/tag/v3.4.0
 2. Extract and add to PATH
 3. Verify: `daml version`
 
@@ -40,7 +40,7 @@ daml version
 
 ```bash
 daml version
-# Should output: SDK versions: 2.10.3
+# Should output: SDK versions: 3.4.0
 ```
 
 ## Week 1-2 Tasks
@@ -50,7 +50,7 @@ daml version
 - [x] Create project structure
 - [x] Create `daml.yaml`
 - [x] Create `daml/` directory
-- [ ] Install Daml SDK 2.10.3
+- [ ] Install Daml SDK 3.4.0
 - [ ] Test compile empty project
 
 ### Week 2: Learning
@@ -173,7 +173,7 @@ After completing Week 1-2:
 - **Solution**: Add to PATH: `export PATH="$HOME/.daml/bin:$PATH"`
 
 **Issue**: Wrong SDK version
-- **Solution**: `daml install 2.10.3`
+- **Solution**: `daml install 3.4.0`
 
 ### Compilation Errors
 
