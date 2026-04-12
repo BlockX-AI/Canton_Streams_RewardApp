@@ -49,12 +49,39 @@ async function cantonRequest(method, path, body, token) {
   return json;
 }
 
-async function createContract(templateId, payload, token) {
-  return cantonRequest('POST', '/v1/create', { templateId, payload }, token);
+async function createContract(templateId, payload, actAs, token) {
+  const body = {
+    actAs: Array.isArray(actAs) ? actAs : [actAs],
+    readAs: [],
+    applicationId: 'growstreams',
+    commandId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    commands: [{ createCommand: { templateId, createArguments: payload } }],
+  };
+  return cantonRequest('POST', '/v2/commands/submit-and-wait', body, token);
 }
 
-async function queryContracts(templateId, token) {
-  const res = await cantonRequest('POST', '/v1/query', { templateIds: [templateId] }, token);
+async function exerciseChoice(templateId, contractId, choice, argument, actAs, token) {
+  const body = {
+    actAs: Array.isArray(actAs) ? actAs : [actAs],
+    readAs: [],
+    applicationId: 'growstreams',
+    commandId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    commands: [{
+      exerciseCommand: { templateId, contractId, choice, choiceArgument: { value: argument } },
+    }],
+  };
+  return cantonRequest('POST', '/v2/commands/submit-and-wait', body, token);
+}
+
+async function queryContracts(templateId, party, token) {
+  const filter = {
+    filtersByParty: {
+      [party]: {
+        cumulative: [{ templateFilter: { value: { templateId } } }],
+      },
+    },
+  };
+  const res = await cantonRequest('POST', '/v2/state/active-contracts', { filter }, token);
   return res.result || [];
 }
 
@@ -82,7 +109,7 @@ async function main() {
   try {
     const res = await createContract(`${PACKAGE_ID}:GrowToken:Faucet`, {
       admin: PARTIES.admin,
-    }, TOKENS.admin);
+    }, PARTIES.admin, TOKENS.admin);
     faucetId = res.result?.contractId;
     console.log('    Faucet:', faucetId);
   } catch (e) {
@@ -94,12 +121,10 @@ async function main() {
   let aliceTokenId;
   if (faucetId) {
     try {
-      const res = await cantonRequest('POST', '/v1/exercise', {
-        templateId: `${PACKAGE_ID}:GrowToken:Faucet`,
-        contractId: faucetId,
-        choice: 'Mint',
-        argument: { recipient: PARTIES.alice, amount: '10000.0' },
-      }, TOKENS.admin);
+      const res = await exerciseChoice(
+        `${PACKAGE_ID}:GrowToken:Faucet`, faucetId, 'Mint',
+        { recipient: PARTIES.alice, amount: '10000.0' }, PARTIES.admin, TOKENS.admin
+      );
       aliceTokenId = res.result?.exerciseResult;
       console.log('    Alice GrowToken minted:', aliceTokenId);
     } catch (e) {
@@ -111,12 +136,10 @@ async function main() {
   console.log('3. Minting GrowToken for Bob (5,000 GROW via Faucet)...');
   if (faucetId) {
     try {
-      const res = await cantonRequest('POST', '/v1/exercise', {
-        templateId: `${PACKAGE_ID}:GrowToken:Faucet`,
-        contractId: faucetId,
-        choice: 'Mint',
-        argument: { recipient: PARTIES.bob, amount: '5000.0' },
-      }, TOKENS.admin);
+      const res = await exerciseChoice(
+        `${PACKAGE_ID}:GrowToken:Faucet`, faucetId, 'Mint',
+        { recipient: PARTIES.bob, amount: '5000.0' }, PARTIES.admin, TOKENS.admin
+      );
       console.log('    Bob GrowToken minted:', res.result?.exerciseResult);
     } catch (e) {
       console.log('     Mint Bob failed:', e.message);
@@ -131,7 +154,7 @@ async function main() {
       admin: PARTIES.admin,
       users: [PARTIES.alice, PARTIES.bob],
       nextStreamId: 1,
-    }, TOKENS.admin);
+    }, PARTIES.admin, TOKENS.admin);
     factoryId = res.result?.contractId;
     console.log('    StreamFactory:', factoryId);
   } catch (e) {
@@ -153,7 +176,7 @@ async function main() {
       deposited: '500.0',
       withdrawn: '0.0',
       status: 'Active',
-    }, TOKENS.alice);
+    }, PARTIES.alice, TOKENS.alice);
     streamId1 = res.result?.contractId;
     console.log('    StreamAgreement #1:', streamId1);
   } catch (e) {
@@ -176,7 +199,7 @@ async function main() {
       deposited: '200.0',
       withdrawn: '45.0',
       status: 'Paused',
-    }, TOKENS.alice);
+    }, PARTIES.alice, TOKENS.alice);
     streamId2 = res.result?.contractId;
     console.log('    StreamAgreement #2:', streamId2);
   } catch (e) {
