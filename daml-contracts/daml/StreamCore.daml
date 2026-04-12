@@ -9,21 +9,20 @@ import GrowToken
 data StreamStatus = Active | Paused | Stopped
   deriving (Eq, Show)
 
--- Helper function to convert microseconds to seconds
-convertMicrosecondsToSeconds : RelTime -> Int
-convertMicrosecondsToSeconds rt = 
-  let micros = convertRelTimeToMicroseconds rt
-  in truncate (intToDecimal micros / 1000000.0)
+-- Convert RelTime to Decimal seconds without integer truncation
+relTimeToSeconds : RelTime -> Decimal
+relTimeToSeconds rt =
+  intToDecimal (convertRelTimeToMicroseconds rt) / 1000000.0
 
 -- Calculate accrued amount (THE CORE FORMULA)
 calculateAccrued : StreamAgreement -> Time -> Decimal
 calculateAccrued stream currentTime =
   if stream.status /= Active then 0.0
   else
-    let elapsedMicros = subTime currentTime stream.lastUpdate
-        elapsedSeconds = convertMicrosecondsToSeconds elapsedMicros
-        accrued = stream.flowRate * intToDecimal elapsedSeconds
-        available = stream.deposited - stream.withdrawn
+    let elapsed        = subTime currentTime stream.lastUpdate
+        elapsedSeconds = relTimeToSeconds elapsed
+        accrued        = stream.flowRate * elapsedSeconds
+        available      = stream.deposited - stream.withdrawn
     in if accrued > available then available else accrued
 
 -- Main stream template (Obligation-First model)
@@ -83,9 +82,20 @@ template StreamAgreement
         assertMsg "Invalid rate" (newRate > 0.0)
         assertMsg "Stream must be active" (status == Active)
         
-        -- Update rate and reset lastUpdate (new rate starts from this point)
+        let accrued = calculateAccrued this currentTime
+        if accrued > 0.0
+          then do
+            _ <- create GrowToken with
+                   owner    = receiver
+                   issuer   = sender
+                   amount   = accrued
+                   symbol   = "GROW"
+                   decimals = 10
+            return ()
+          else return ()
         create this with
-          flowRate = newRate
+          flowRate   = newRate
+          withdrawn  = withdrawn + accrued
           lastUpdate = currentTime
     
     -- Sender pauses stream
@@ -95,9 +105,20 @@ template StreamAgreement
       do
         assertMsg "Already paused or stopped" (status == Active)
         
-        -- Update lastUpdate to current time (freezes accrual at this point)
+        let accrued = calculateAccrued this currentTime
+        if accrued > 0.0
+          then do
+            _ <- create GrowToken with
+                   owner    = receiver
+                   issuer   = sender
+                   amount   = accrued
+                   symbol   = "GROW"
+                   decimals = 10
+            return ()
+          else return ()
         create this with
-          status = Paused
+          status     = Paused
+          withdrawn  = withdrawn + accrued
           lastUpdate = currentTime
     
     -- Sender resumes stream
@@ -107,19 +128,38 @@ template StreamAgreement
       do
         assertMsg "Not paused" (status == Paused)
         
-        -- Resume without updating lastUpdate (continues from pause point)
+        -- Anchor accrual to resumeTime so paused duration is excluded
         create this with
-          status = Active
+          status     = Active
+          lastUpdate = currentTime
     
     -- Sender stops stream permanently
     choice Stop : (Decimal, Decimal)
       with currentTime : Time
       controller sender
       do
-        let finalAccrued = calculateAccrued this currentTime
-        let refundAmount = deposited - withdrawn - finalAccrued
-        
-        -- Archive stream (returns final amounts)
+        let finalAccrued  = calculateAccrued this currentTime
+        let refundAmount  = deposited - withdrawn - finalAccrued
+        if finalAccrued > 0.0
+          then do
+            _ <- create GrowToken with
+                   owner    = receiver
+                   issuer   = sender
+                   amount   = finalAccrued
+                   symbol   = "GROW"
+                   decimals = 10
+            return ()
+          else return ()
+        if refundAmount > 0.0
+          then do
+            _ <- create GrowToken with
+                   owner    = sender
+                   issuer   = sender
+                   amount   = refundAmount
+                   symbol   = "GROW"
+                   decimals = 10
+            return ()
+          else return ()
         return (finalAccrued, refundAmount)
     
     -- ObligationView: Real-time balance query (non-consuming, zero gas)
@@ -165,8 +205,10 @@ template StreamFactory
         currentTime    : Time
       controller sender
       do
+        assertMsg "Sender not in authorized users"   (sender   `elem` users)
+        assertMsg "Receiver not in authorized users" (receiver `elem` users)
         assertMsg "Invalid flow rate" (flowRate > 0.0)
-        assertMsg "Invalid deposit" (initialDeposit > 0.0)
+        assertMsg "Invalid deposit"   (initialDeposit > 0.0)
         
         -- Create stream (sender signs)
         stream <- create StreamAgreement with
