@@ -127,7 +127,7 @@ daml script \
 daml script --dar .daml/dist/growstreams-1.0.0.dar \
   --script-name Demo.SetupTestnet:setupTestnet \
   --ledger-host testnet.canton.network \
-  --ledger-port 6865
+  --ledger-port 6866
 ```
 **Say**: "Setting up GrowStreams on Canton testnet with parties and tokens."
 
@@ -137,7 +137,7 @@ daml script --dar .daml/dist/growstreams-1.0.0.dar \
 daml script --dar .daml/dist/growstreams-1.0.0.dar \
   --script-name Demo.CreateStreamRealtime:createStreamQuickDemo \
   --ledger-host testnet.canton.network \
-  --ledger-port 6865
+  --ledger-port 6866
 ```
 **Say**: "Creating stream at 10 GROW per second. Waiting 10 real seconds... Balance now shows 100 GROW accrued in real-time."
 
@@ -147,7 +147,7 @@ daml script --dar .daml/dist/growstreams-1.0.0.dar \
 daml script --dar .daml/dist/growstreams-1.0.0.dar \
   --script-name Demo.LifecycleRealtime:lifecycleQuickDemo \
   --ledger-host testnet.canton.network \
-  --ledger-port 6865
+  --ledger-port 6866
 ```
 **Say**: "Demonstrating pause - stream stops accruing. Resume - accrual continues. TopUp and UpdateRate working in real-time."
 
@@ -175,7 +175,7 @@ daml script \
   --dar .daml/dist/growstreams-1.0.0.dar \
   --script-name Demo.CreateStreamRealtime:createStreamQuickDemo \
   --ledger-host localhost \
-  --ledger-port 6865
+  --ledger-port 6866
 ```
 
 **Note**: Even on sandbox, these scripts will wait real time (not instant like tests).

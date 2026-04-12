@@ -53,14 +53,14 @@ daml test
 
 ### 2. Canton Running
 ```bash
-lsof -i:6865
+lsof -i:6866
 # Result: Canton sandbox running
 ```
 **Evidence**: criterion-6-canton-deployment.md
 
 ### 3. Contracts Active
 ```bash
-daml ledger list-parties --host localhost --port 6865
+daml ledger list-parties --host localhost --port 6866
 # Result: 22 parties allocated
 ```
 **Evidence**: contract-ids.txt
@@ -155,7 +155,7 @@ daml test
 daml sandbox
 
 # Start Navigator
-daml navigator server localhost 6865 --port 4000 -c ui-backend.conf
+daml navigator server localhost 6866 --port 4000 -c ui-backend.conf
 ```
 
 ---

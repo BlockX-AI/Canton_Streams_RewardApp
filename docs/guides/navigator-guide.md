@@ -10,7 +10,7 @@
 ### 1. Start Navigator
 ```bash
 cd daml-contracts
-daml navigator server localhost 6865 --port 4000 -c ui-backend.conf
+daml navigator server localhost 6866 --port 4000 -c ui-backend.conf
 ```
 
 ### 2. Open Browser

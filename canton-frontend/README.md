@@ -8,7 +8,7 @@ Real-time token streaming on Canton Network. Demo frontend for Canton Dev Fund s
 
 ### Prerequisites
 - Node.js 18+ and npm
-- Canton sandbox running on `localhost:6865`
+- Canton sandbox running on `localhost:6866`
 - Canton JSON API running on `localhost:7575`
 
 ### Installation
@@ -87,7 +87,7 @@ dpm sandbox --dar .daml/dist/growstreams-1.0.0.dar
 ```bash
 daml json-api \
   --ledger-host localhost \
-  --ledger-port 6865 \
+  --ledger-port 6866 \
   --http-port 7575 \
   --allow-insecure-tokens
 ```

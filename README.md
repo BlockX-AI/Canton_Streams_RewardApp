@@ -108,7 +108,7 @@ All core streaming functionality validated!
 ### Deployment
 
 ```
- Daml Sandbox: Running on port 6865
+ Daml Sandbox: Running on port 6866
  DAR File: growstreams-1.0.0.dar uploaded
  Contracts: GrowToken, StreamCore, StreamFactory deployed
  Ready for: Live testing and integration
@@ -265,16 +265,16 @@ daml test --files daml/Test/GrowTokenTest.daml
 
 ```bash
 # Start sandbox with GrowStreams DAR
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+daml sandbox --port 6866 --dar .daml/dist/growstreams-1.0.0.dar
 ```
 
-Sandbox runs on `localhost:6865`
+Sandbox runs on `localhost:6866`
 
 ### 4. Use Daml Navigator (Visual UI)
 
 ```bash
 # In a new terminal
-daml navigator server localhost 6865
+daml navigator server localhost 6866
 ```
 
 Open browser: **http://localhost:7500**
@@ -282,9 +282,9 @@ Open browser: **http://localhost:7500**
 ### 5. Allocate Parties
 
 ```bash
-daml ledger allocate-party --host localhost --port 6865 Admin
-daml ledger allocate-party --host localhost --port 6865 Alice
-daml ledger allocate-party --host localhost --port 6865 Bob
+daml ledger allocate-party --host localhost --port 6866 Admin
+daml ledger allocate-party --host localhost --port 6866 Alice
+daml ledger allocate-party --host localhost --port 6866 Bob
 ```
 
 ### 6. Create Contracts & Test!
@@ -386,16 +386,16 @@ daml test
 daml test --files daml/Test/StreamCoreTest.daml
 
 # Start sandbox
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+daml sandbox --port 6866 --dar .daml/dist/growstreams-1.0.0.dar
 
 # Navigator (visual UI)
-daml navigator server localhost 6865
+daml navigator server localhost 6866
 
 # Allocate parties
-daml ledger allocate-party --host localhost --port 6865 <PartyName>
+daml ledger allocate-party --host localhost --port 6866 <PartyName>
 
 # JSON API (for REST access)
-daml json-api --ledger-host localhost --ledger-port 6865 --http-port 7575
+daml json-api --ledger-host localhost --ledger-port 6866 --http-port 7575
 ```
 
 ### Adding New Features
@@ -452,7 +452,7 @@ daml test --show-coverage
 
 ```bash
 # Start sandbox
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+daml sandbox --port 6866 --dar .daml/dist/growstreams-1.0.0.dar
 
 # Sandbox is ready when you see:
 # "Canton sandbox is ready."
@@ -600,7 +600,7 @@ MIT License - see LICENSE file for details
 
 ##  Quick Links
 
-- **Daml Sandbox**: `localhost:6865`
+- **Daml Sandbox**: `localhost:6866`
 - **Navigator UI**: `localhost:7500`
 - **JSON API**: `localhost:7575` (when started)
 - **DAR File**: `.daml/dist/growstreams-1.0.0.dar`
@@ -627,8 +627,8 @@ MIT License - see LICENSE file for details
 
 ```bash
 cd daml-contracts
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
-daml navigator server localhost 6865
+daml sandbox --port 6866 --dar .daml/dist/growstreams-1.0.0.dar
+daml navigator server localhost 6866
 ```
 
 **Let the tokens flow!** 

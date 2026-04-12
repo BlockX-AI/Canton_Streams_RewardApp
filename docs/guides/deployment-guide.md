@@ -97,7 +97,7 @@ daml test
 daml script --dar .daml/dist/growstreams-1.0.0.dar \
   --script-name Test.StreamCoreTest:testStreamLifecycle \
   --ledger-host localhost \
-  --ledger-port 6865
+  --ledger-port 6866
 ```
 
 ---
@@ -106,7 +106,7 @@ daml script --dar .daml/dist/growstreams-1.0.0.dar \
 
 ### Canton Running 
 ```bash
-lsof -i:6865
+lsof -i:6866
 # Should show Java process
 ```
 
@@ -118,7 +118,7 @@ ls -lh .daml/dist/growstreams-1.0.0.dar
 
 ### Parties Allocated 
 ```bash
-daml ledger list-parties --host localhost --port 6865
+daml ledger list-parties --host localhost --port 6866
 # Should show Admin, Alice, Bob
 ```
 
@@ -141,7 +141,7 @@ http://localhost:4000
 ### Canton won't start
 ```bash
 # Check port not in use
-lsof -i:6865
+lsof -i:6866
 # Kill existing process if needed
 kill -9 <PID>
 ```

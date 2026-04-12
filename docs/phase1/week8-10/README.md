@@ -22,7 +22,7 @@
 ### 1. Canton Sandbox Deployment 
 **Platform**: Canton Sandbox  
 **Host**: localhost  
-**Port**: 6865
+**Port**: 6866
 
 **Status**:
 -  Canton running
@@ -33,8 +33,8 @@
 
 **Verification**:
 ```bash
-lsof -i:6865  # Canton running
-daml ledger list-parties --host localhost --port 6865  # 22 parties
+lsof -i:6866  # Canton running
+daml ledger list-parties --host localhost --port 6866  # 22 parties
 ```
 
 ---
@@ -109,12 +109,12 @@ users {
 # Quick stream demo (10s)
 daml script --dar .daml/dist/growstreams-1.0.0.dar \
   --script-name Demo.CreateStreamRealtime:createStreamQuickDemo \
-  --ledger-host localhost --ledger-port 6865
+  --ledger-host localhost --ledger-port 6866
 
 # Quick lifecycle demo (5s intervals)
 daml script --dar .daml/dist/growstreams-1.0.0.dar \
   --script-name Demo.LifecycleRealtime:lifecycleQuickDemo \
-  --ledger-host localhost --ledger-port 6865
+  --ledger-host localhost --ledger-port 6866
 ```
 
 ---

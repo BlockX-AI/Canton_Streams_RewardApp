@@ -55,7 +55,7 @@ Tests cover: happy path, sequential withdrawals, stream depletion, pause/resume 
 
 ### Canton Deployment (Local Sandbox)
 
-- Canton sandbox running on `localhost:6865`
+- Canton sandbox running on `localhost:6866`
 - DAR uploaded: `growstreams-1.0.0.dar`
 - Navigator UI running on `localhost:4000` (configured with `ui-backend.conf`)
 - 22 parties allocated on ledger (Admin, Alice, Bob + test parties)
