@@ -1,0 +1,7 @@
+# Canton MCP multi-package project definition (DPM 3.4.0)
+# Build: dpm build --all
+# Test:  dpm test --project-root daml-contracts-tests
+
+packages:
+  - ./daml-contracts         # production DAR  (no daml-script dep)
+  - ./daml-contracts-tests   # test-only DAR   (daml-script + data-dep on production)
