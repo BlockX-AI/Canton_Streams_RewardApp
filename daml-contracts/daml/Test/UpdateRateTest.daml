@@ -5,6 +5,7 @@ import Daml.Script
 import DA.Time
 import DA.Date
 import StreamCore
+import GrowToken
 
 testUpdateRate : Script ()
 testUpdateRate = script do
@@ -31,20 +32,26 @@ testUpdateRate = script do
   -- Stream for 100 seconds at 0.1 GROW/s (10 GROW accrued)
   let updateTime = addRelTime startTime (seconds 100)
   
-  -- Update rate to 0.2 GROW/second
+  -- Update rate to 0.2 GROW/s; Commit 2 fix: settles 10 accrued GROW first
   updatedStream <- submit alice do
     exerciseCmd stream UpdateRate with
       newRate = 0.2
       currentTime = updateTime
-  
-  -- Stream for 100 more seconds at 0.2 GROW/s (20 GROW accrued)
+
+  -- Verify UpdateRate settled the 10 GROW obligation on-ledger for Bob
+  settledTokens <- query @GrowToken bob
+  assertMsg "UpdateRate should create 1 GrowToken for Bob" (length settledTokens == 1)
+  let [(_, settledToken)] = settledTokens
+  assertMsg "Settled token should be 10 GROW (100s x 0.1 GROW/s)" (settledToken.amount == 10.0)
+
+  -- Stream 100 more seconds at new rate 0.2 GROW/s (20 GROW accrued from updateTime)
   let withdrawTime = addRelTime updateTime (seconds 100)
-  
-  -- Bob withdraws (UpdateRate resets timer, so only 20 GROW from new rate)
+
+  -- Bob withdraws: 20 GROW at new rate (timer was correctly reset by UpdateRate)
   (_, amount) <- submit bob do
     exerciseCmd updatedStream Withdraw with
       currentTime = withdrawTime
-  
+
   assertMsg "Should withdraw 20 GROW (100s at new rate 0.2)" (amount == 20.0)
   
   return ()

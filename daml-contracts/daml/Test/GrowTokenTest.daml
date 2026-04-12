@@ -172,12 +172,17 @@ testAllowance = script do
       recipient = alice
       amount = 1000.0
   
-  -- Alice approves vault to spend 500
-  allowance <- submit alice do
+  -- Alice approves vault for 500; remainder 500 returned to Alice (UTXO conservation)
+  (allowance, aliceRemainderOpt) <- submit alice do
     exerciseCmd aliceToken Approve with
       spender = vault
       allowanceAmount = 500.0
-  
+  case aliceRemainderOpt of
+    None -> abort "UTXO conservation failed: Alice remainder token not created"
+    Some remCid -> do
+      Some rem <- queryContractId alice remCid
+      assertMsg "Alice remainder after Approve should be 500 GROW" (rem.amount == 500.0)
+
   -- Vault transfers 200 from Alice's allowance to itself
   (vaultToken, remainingAllowance) <- submit vault do
     exerciseCmd allowance TransferFrom with
@@ -277,12 +282,12 @@ testCancelAllowance = script do
       recipient = alice
       amount = 1000.0
   
-  -- Alice approves vault
-  allowance <- submit alice do
+  -- Alice approves vault (remainder returned to Alice)
+  (allowance, _) <- submit alice do
     exerciseCmd aliceToken Approve with
       spender = vault
       allowanceAmount = 500.0
-  
+
   -- Alice cancels allowance
   submit alice do
     exerciseCmd allowance CancelAllowance
@@ -445,15 +450,57 @@ testExceedAllowance = script do
       recipient = alice
       amount = 1000.0
   
-  allowance <- submit alice do
+  (allowance, _) <- submit alice do
     exerciseCmd aliceToken Approve with
       spender = vault
       allowanceAmount = 100.0
-  
+
   -- Try to transfer more than allowance (should fail)
   submitMustFail vault do
     exerciseCmd allowance TransferFrom with
       transferAmount = 200.0
       recipient = vault
-  
+
+  return ()
+
+-- Test 16: Approve UTXO conservation (Commit 3 fix)
+testApproveUtxoConservation : Script ()
+testApproveUtxoConservation = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  vault <- allocateParty "Vault"
+
+  faucet <- submit admin do
+    createCmd Faucet with admin = admin
+
+  aliceToken <- submit admin do
+    exerciseCmd faucet Mint with
+      recipient = alice
+      amount = 1000.0
+
+  -- Alice approves 300 of 1000; expect remainder 700 returned (no token loss)
+  (allowanceCid, remainderOpt) <- submit alice do
+    exerciseCmd aliceToken Approve with
+      spender = vault
+      allowanceAmount = 300.0
+
+  Some allowance <- queryContractId alice allowanceCid
+  assertMsg "Allowance should be 300 GROW" (allowance.amount == 300.0)
+
+  case remainderOpt of
+    None -> abort "UTXO conservation violated: remainder token missing"
+    Some remCid -> do
+      Some rem <- queryContractId alice remCid
+      assertMsg "Remainder should be 700 GROW (1000 - 300)" (rem.amount == 700.0)
+
+  -- Approve exact balance: no remainder should be created
+  (_, noRemainder) <- submit alice do
+    exerciseCmd (case remainderOpt of Some r -> r; None -> error "unreachable") Approve with
+      spender = vault
+      allowanceAmount = 700.0
+
+  case noRemainder of
+    Some _ -> abort "No remainder expected when approving exact balance"
+    None   -> return ()
+
   return ()

@@ -52,12 +52,23 @@ testStreamLifecycle = script do
     exerciseCmd updatedStream Stop with
       currentTime = stopTime
   
-  -- Verify final balances
+  -- Verify final balances (return values)
   -- Bob gets remaining 40 GROW (50 total - 10 already withdrawn)
   assertMsg "Receiver should get 40 GROW" (receiverFinal == 40.0)
   -- Alice gets refund of 50 GROW (100 - 50 streamed)
   assertMsg "Sender should get 50 GROW refund" (senderRefund == 50.0)
-  
+
+  -- Verify Stop created on-ledger GrowToken contracts (Commit 2 fix)
+  bobStopTokens <- query @GrowToken bob
+  assertMsg "Stop should create GrowToken for receiver" (length bobStopTokens == 1)
+  let [(_, bobStopToken)] = bobStopTokens
+  assertMsg "Receiver GrowToken should be 40 GROW" (bobStopToken.amount == 40.0)
+
+  aliceRefundTokens <- query @GrowToken alice
+  assertMsg "Stop should create refund GrowToken for sender" (length aliceRefundTokens == 1)
+  let [(_, aliceRefundToken)] = aliceRefundTokens
+  assertMsg "Sender refund GrowToken should be 50 GROW" (aliceRefundToken.amount == 50.0)
+
   return ()
 
 -- Test 2: Stream Pause and Resume
@@ -85,29 +96,35 @@ testStreamPauseResume = script do
   -- Stream for 100 seconds (10 GROW accrued)
   let pauseTime = addRelTime startTime (seconds 100)
   
-  -- Pause stream
+  -- Pause: Commit 2 fix - settles 10 accrued GROW as on-ledger GrowToken for Bob
   pausedStream <- submit alice do
     exerciseCmd stream Pause with
       currentTime = pauseTime
-  
-  -- Wait 100 more seconds while paused (no accrual)
+
+  -- Verify Pause settled 10 GROW on-ledger (no dangling obligation)
+  bobPauseTokens <- query @GrowToken bob
+  assertMsg "Pause should create 1 GrowToken for Bob" (length bobPauseTokens == 1)
+  let [(_, pauseToken)] = bobPauseTokens
+  assertMsg "Pause-settled token should be 10 GROW" (pauseToken.amount == 10.0)
+
+  -- Wait 100 more seconds while paused (no accrual during pause)
   let resumeTime = addRelTime pauseTime (seconds 100)
-  
-  -- Resume stream
+
+  -- Resume: Commit 2 fix - anchors lastUpdate to resumeTime (excludes paused duration)
   resumedStream <- submit alice do
     exerciseCmd pausedStream Resume with
       currentTime = resumeTime
-  
-  -- Wait 100 more seconds (10 more GROW accrued)
+
+  -- Wait 100 more seconds from resume (10 GROW accrued from resumeTime only)
   let withdrawTime = addRelTime resumeTime (seconds 100)
-  
-  -- Withdraw
+
+  -- Withdraw: 10 GROW (paused duration excluded; 100s x 0.1 from resumeTime)
   (_, amount) <- submit bob do
     exerciseCmd resumedStream Withdraw with
       currentTime = withdrawTime
-  
-  -- Should be 20 GROW (100s before pause + 100s after resume = 200s × 0.1)
-  assertMsg "Should withdraw 20 GROW" (amount == 20.0)
+
+  -- 10 GROW from Withdraw; total received = 10 (Pause token) + 10 (Withdraw) = 20 GROW
+  assertMsg "Should withdraw 10 GROW (10 already settled by Pause)" (amount == 10.0)
   
   return ()
 
@@ -571,4 +588,40 @@ testInvalidDeposit = script do
       initialDeposit = 0.0
       currentTime = startTime
   
+  return ()
+
+-- Test 16: Allowlist enforcement (Commit 2 CreateStream fix)
+testUnauthorizedCreateStream : Script ()
+testUnauthorizedCreateStream = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob <- allocateParty "Bob"
+  charlie <- allocateParty "Charlie"
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin = admin
+      nextStreamId = 1
+      users = [alice, bob]  -- charlie is NOT in the allowlist
+
+  let startTime = time (date 2026 Mar 11) 0 0 0
+
+  -- Charlie (not in users) cannot be a sender
+  submitMustFail charlie do
+    exerciseCmd factory CreateStream with
+      sender = charlie
+      receiver = bob
+      flowRate = 0.1
+      initialDeposit = 100.0
+      currentTime = startTime
+
+  -- Charlie (not in users) cannot be a receiver
+  submitMustFail alice do
+    exerciseCmd factory CreateStream with
+      sender = alice
+      receiver = charlie
+      flowRate = 0.1
+      initialDeposit = 100.0
+      currentTime = startTime
+
   return ()
