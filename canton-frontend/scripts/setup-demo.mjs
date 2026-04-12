@@ -1,6 +1,10 @@
 // canton-frontend/scripts/setup-demo.mjs
 // Creates demo contracts on Canton sandbox via JSON API
 // Run: node scripts/setup-demo.mjs
+//
+// Requires env: CANTON_AUTH_SECRET (must match participant JWT secret)
+// Production: replace makeToken with tokens from a real OIDC provider (RS256).
+import crypto from 'crypto';
 
 const CANTON_JSON_API = 'http://localhost:7575';
 const PACKAGE_ID = 'a60b6d5c583f91e98770e754fe71d1fbc737b36bb9b2ff5d4911dd86ad79358b';
@@ -12,18 +16,22 @@ const PARTIES = {
   bob: `Bob::${NAMESPACE}`,
 };
 
-// Generate unsigned JWT for Canton JSON API (--allow-insecure-tokens mode)
+// HS256-signed JWT — configure CANTON_AUTH_SECRET to match participant config.
+// Never use alg:none in production; replace with RS256 + OIDC for mainnet.
 function makeToken(actAs, readAs) {
-  const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
+  const secret = process.env.CANTON_AUTH_SECRET ?? 'change-me-in-production';
+  const actAsList  = Array.isArray(actAs)  ? actAs  : [actAs];
+  const readAsList = Array.isArray(readAs) ? readAs : (readAs ? [readAs] : actAsList);
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(JSON.stringify({
     'https://daml.com/ledger-api': {
-      ledgerId: 'sandbox',
-      applicationId: 'growstreams-demo',
-      actAs: Array.isArray(actAs) ? actAs : [actAs],
-      readAs: Array.isArray(readAs) ? readAs : (readAs ? [readAs] : (Array.isArray(actAs) ? actAs : [actAs])),
+      applicationId: 'growstreams',
+      actAs: actAsList,
+      readAs: readAsList,
     },
   })).toString('base64url');
-  return `${header}.${payload}.`;
+  const sig = crypto.createHmac('sha256', secret).update(`${header}.${payload}`).digest('base64url');
+  return `${header}.${payload}.${sig}`;
 }
 
 const TOKENS = {
