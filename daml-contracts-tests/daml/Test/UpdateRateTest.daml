@@ -1,0 +1,104 @@
+module Test.UpdateRateTest where
+
+import Daml.Script
+import DA.Date
+import DA.Time
+import StreamCore
+import GrowToken
+
+testUpdateRateSettlesAccrual : Script ()
+testUpdateRateSettlesAccrual = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 0.1
+      initialDeposit = 1000.0
+
+  passTime (seconds 100)
+
+  updatedStream <- submit alice do
+    exerciseCmd stream UpdateRate with newRate = 0.2
+
+  settledTokens <- query @GrowToken bob
+  assertMsg "UpdateRate must create 1 GrowToken for Bob" (length settledTokens == 1)
+  let [(_, st)] = settledTokens
+  assertMsg "Settled amount = 10 GROW (100s x 0.1)" (st.amount == 10.0)
+
+  passTime (seconds 100)
+
+  (_, amount) <- submit bob do exerciseCmd updatedStream Withdraw
+
+  assertMsg "Withdraw after rate change = 20 GROW (100s x 0.2)" (amount == 20.0)
+
+testObligationViewUsesLedgerTime : Script ()
+testObligationViewUsesLedgerTime = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 0.1
+      initialDeposit = 1000.0
+
+  passTime (seconds 100)
+
+  obligation <- submit bob do exerciseCmd stream ObligationView
+  assertMsg "ObligationView = 10 GROW" (obligation == 10.0)
+
+  passTime (seconds 200)
+
+  obligation2 <- submit bob do exerciseCmd stream ObligationView
+  assertMsg "ObligationView = 30 GROW after 300s total" (obligation2 == 30.0)
+
+testGetWithdrawableIsConsistentWithWithdraw : Script ()
+testGetWithdrawableIsConsistentWithWithdraw = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 0.5
+      initialDeposit = 500.0
+
+  passTime (seconds 200)
+
+  queryResult <- submit bob do exerciseCmd stream GetWithdrawable
+  assertMsg "GetWithdrawable = 100 GROW" (queryResult == 100.0)
+
+  (_, actualAmount) <- submit bob do exerciseCmd stream Withdraw
+  assertMsg "Actual withdraw matches query" (actualAmount == 100.0)

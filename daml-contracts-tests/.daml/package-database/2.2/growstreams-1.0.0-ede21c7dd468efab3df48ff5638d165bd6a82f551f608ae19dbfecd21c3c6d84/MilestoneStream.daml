@@ -1,0 +1,532 @@
+{-# LANGUAGE NoDamlSyntax #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoOverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE DatatypeContexts #-}
+{-# OPTIONS_GHC -Wno-unused-imports -Wno-missing-methods -Wno-deprecations -Wno-x-crypto -Wno-x-exceptions #-}
+module MilestoneStream (
+        type MilestoneStream.Milestone(MilestoneStream.Milestone, amount,
+                                       done, name),
+        type MilestoneStream.MilestoneStream(MilestoneStream.MilestoneStream,
+                                             admin, deposited, milestoneId, milestones, receiver,
+                                             sender),
+        type MilestoneStream.GetPendingMilestones(MilestoneStream.GetPendingMilestones),
+        type MilestoneStream.GetTotalPending(MilestoneStream.GetTotalPending),
+        type MilestoneStream.ConfirmMilestone(MilestoneStream.ConfirmMilestone,
+                                              milestoneName),
+        type MilestoneStream.RefundRemaining(MilestoneStream.RefundRemaining),
+        type MilestoneStream.ForceRefund(MilestoneStream.ForceRefund),
+        type MilestoneStream.MilestoneFactory(MilestoneStream.MilestoneFactory,
+                                              admin, nextMilestone, users),
+        type MilestoneStream.CreateMilestoneStream(MilestoneStream.CreateMilestoneStream,
+                                                   deposited, milestones, receiver, sender)
+    ) where
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Exception
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Fail
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Interface.AnyView
+    ()
+import CurrentSdk.DA.Internal.LF
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Prelude
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record
+import CurrentSdk.DA.Internal.Template
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+    ()
+import CurrentSdk.Data.String
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes
+import CurrentSdk.GHC.Err
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show
+import CurrentSdk.GHC.Types
+import GrowToken
+data CreateMilestoneStream
+  = CreateMilestoneStream {sender :: CurrentSdk.DA.Internal.LF.Party,
+                           receiver :: CurrentSdk.DA.Internal.LF.Party,
+                           milestones :: ([] MilestoneStream.Milestone),
+                           deposited :: (CurrentSdk.GHC.Types.Numeric 10)}
+data CurrentSdk.GHC.Types.DamlTemplate => MilestoneFactory
+  = MilestoneFactory {admin :: CurrentSdk.DA.Internal.LF.Party,
+                      users :: ([] CurrentSdk.DA.Internal.LF.Party),
+                      nextMilestone :: CurrentSdk.GHC.Types.Int}
+data ForceRefund = ForceRefund {}
+data RefundRemaining = RefundRemaining {}
+data ConfirmMilestone
+  = ConfirmMilestone {milestoneName :: CurrentSdk.GHC.Types.Text}
+data GetTotalPending = GetTotalPending {}
+data GetPendingMilestones = GetPendingMilestones {}
+data CurrentSdk.GHC.Types.DamlTemplate => MilestoneStream
+  = MilestoneStream {milestoneId :: CurrentSdk.GHC.Types.Int,
+                     sender :: CurrentSdk.DA.Internal.LF.Party,
+                     receiver :: CurrentSdk.DA.Internal.LF.Party,
+                     admin :: CurrentSdk.DA.Internal.LF.Party,
+                     milestones :: ([] MilestoneStream.Milestone),
+                     deposited :: (CurrentSdk.GHC.Types.Numeric 10)}
+data Milestone
+  = Milestone {name :: CurrentSdk.GHC.Types.Text,
+               amount :: (CurrentSdk.GHC.Types.Numeric 10),
+               done :: CurrentSdk.GHC.Types.Bool}
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.RefundRemaining) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.MilestoneStream) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.MilestoneFactory) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.Milestone) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.GetTotalPending) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.GetPendingMilestones) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.ForceRefund) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.CreateMilestoneStream) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show MilestoneStream.ConfirmMilestone) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "users" MilestoneStream.MilestoneFactory ([] CurrentSdk.DA.Internal.LF.Party))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "sender" MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "sender" MilestoneStream.CreateMilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "receiver" MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "receiver" MilestoneStream.CreateMilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "nextMilestone" MilestoneStream.MilestoneFactory CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "name" MilestoneStream.Milestone CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "milestones" MilestoneStream.MilestoneStream ([] MilestoneStream.Milestone))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "milestones" MilestoneStream.CreateMilestoneStream ([] MilestoneStream.Milestone))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "milestoneName" MilestoneStream.ConfirmMilestone CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "milestoneId" MilestoneStream.MilestoneStream CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "done" MilestoneStream.Milestone CurrentSdk.GHC.Types.Bool)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "deposited" MilestoneStream.MilestoneStream (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "deposited" MilestoneStream.CreateMilestoneStream (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "amount" MilestoneStream.Milestone (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "admin" MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "admin" MilestoneStream.MilestoneFactory CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate MilestoneStream.MilestoneStream) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate MilestoneStream.MilestoneFactory) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneStream MilestoneStream.RefundRemaining (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneStream MilestoneStream.GetTotalPending (CurrentSdk.GHC.Types.Numeric 10)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneStream MilestoneStream.GetPendingMilestones ([] MilestoneStream.Milestone)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneStream MilestoneStream.ForceRefund (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneStream MilestoneStream.ConfirmMilestone (((,) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneStream)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneFactory MilestoneStream.CreateMilestoneStream (((,) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneFactory)) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneStream))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice MilestoneStream.MilestoneFactory CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep MilestoneStream.MilestoneStream) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep MilestoneStream.MilestoneFactory) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory MilestoneStream.MilestoneStream) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory MilestoneStream.MilestoneFactory) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver MilestoneStream.MilestoneStream) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver MilestoneStream.MilestoneFactory) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType MilestoneStream.MilestoneStream) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType MilestoneStream.MilestoneFactory) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate MilestoneStream.MilestoneStream) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate MilestoneStream.MilestoneFactory) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneStream MilestoneStream.RefundRemaining (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneStream MilestoneStream.GetTotalPending (CurrentSdk.GHC.Types.Numeric 10)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneStream MilestoneStream.GetPendingMilestones ([] MilestoneStream.Milestone)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneStream MilestoneStream.ForceRefund (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneStream MilestoneStream.ConfirmMilestone (((,) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneStream)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneFactory MilestoneStream.CreateMilestoneStream (((,) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneFactory)) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneStream))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice MilestoneStream.MilestoneFactory CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch MilestoneStream.MilestoneStream) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch MilestoneStream.MilestoneFactory) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneStream MilestoneStream.RefundRemaining (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneStream MilestoneStream.GetTotalPending (CurrentSdk.GHC.Types.Numeric 10)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneStream MilestoneStream.GetPendingMilestones ([] MilestoneStream.Milestone)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneStream MilestoneStream.ForceRefund (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneStream MilestoneStream.ConfirmMilestone (((,) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneStream)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneFactory MilestoneStream.CreateMilestoneStream (((,) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneFactory)) (CurrentSdk.DA.Internal.LF.ContractId MilestoneStream.MilestoneStream))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise MilestoneStream.MilestoneFactory CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure MilestoneStream.MilestoneStream) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure MilestoneStream.MilestoneFactory) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate MilestoneStream.MilestoneStream) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate MilestoneStream.MilestoneFactory) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive MilestoneStream.MilestoneStream) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive MilestoneStream.MilestoneFactory) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "users" MilestoneStream.MilestoneFactory ([] CurrentSdk.DA.Internal.LF.Party))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "sender" MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "sender" MilestoneStream.CreateMilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "receiver" MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "receiver" MilestoneStream.CreateMilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "nextMilestone" MilestoneStream.MilestoneFactory CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "name" MilestoneStream.Milestone CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "milestones" MilestoneStream.MilestoneStream ([] MilestoneStream.Milestone))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "milestones" MilestoneStream.CreateMilestoneStream ([] MilestoneStream.Milestone))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "milestoneName" MilestoneStream.ConfirmMilestone CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "milestoneId" MilestoneStream.MilestoneStream CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "done" MilestoneStream.Milestone CurrentSdk.GHC.Types.Bool)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "deposited" MilestoneStream.MilestoneStream (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "deposited" MilestoneStream.CreateMilestoneStream (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "amount" MilestoneStream.Milestone (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "admin" MilestoneStream.MilestoneStream CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "admin" MilestoneStream.MilestoneFactory CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.RefundRemaining) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.MilestoneStream) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.MilestoneFactory) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.Milestone) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.GetTotalPending) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.GetPendingMilestones) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.ForceRefund) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.CreateMilestoneStream) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq MilestoneStream.ConfirmMilestone) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))

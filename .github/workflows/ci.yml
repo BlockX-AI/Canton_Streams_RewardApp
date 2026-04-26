@@ -20,26 +20,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Daml SDK 3.4.0
+      - name: Install DPM
         run: |
-          curl -fsSL \
-            "https://github.com/digital-asset/daml/releases/download/v3.4.0/daml-sdk-3.4.0-linux.tar.gz" \
-            -o daml-sdk.tar.gz
-          tar xzf daml-sdk.tar.gz
-          ./daml-sdk-3.4.0/install.sh
-          echo "$HOME/.daml/bin" >> $GITHUB_PATH
-          rm -f daml-sdk.tar.gz
+          curl -sSL https://get.digitalasset.com/install/install.sh | sh
+          echo "$HOME/.dpm/bin" >> $GITHUB_PATH
 
-      - name: Verify SDK
-        run: daml version
+      - name: Install SDK 3.4.11
+        run: dpm install 3.4.11
+
+      - name: Verify DPM
+        run: dpm version --active
 
       - name: Build production DAR
-        run: daml build
-        working-directory: daml-contracts
+        run: dpm build --package-root daml-contracts
 
       - name: Run contract tests
-        run: daml test
-        working-directory: daml-contracts-tests
+        run: dpm test --package-root daml-contracts-tests
 
       - name: Upload DAR artifact
         uses: actions/upload-artifact@v4

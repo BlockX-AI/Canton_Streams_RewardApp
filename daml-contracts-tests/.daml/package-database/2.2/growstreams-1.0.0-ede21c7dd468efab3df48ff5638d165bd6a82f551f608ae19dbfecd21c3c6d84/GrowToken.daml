@@ -1,0 +1,728 @@
+{-# LANGUAGE NoDamlSyntax #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoOverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE DatatypeContexts #-}
+{-# OPTIONS_GHC -Wno-unused-imports -Wno-missing-methods -Wno-deprecations -Wno-x-crypto -Wno-x-exceptions #-}
+module GrowToken (
+        type GrowToken.Split(GrowToken.Split, splitAmount),
+        type GrowToken.Merge(GrowToken.Merge, otherCid),
+        type GrowToken.Burn(GrowToken.Burn, burnAmount),
+        type GrowToken.Approve(GrowToken.Approve, allowanceAmount,
+                               spender),
+        type GrowToken.Allowance(GrowToken.Allowance, amount, issuer,
+                                 spender, tokenOwner),
+        type GrowToken.TransferFrom(GrowToken.TransferFrom, recipient,
+                                    transferAmount),
+        type GrowToken.CancelAllowance(GrowToken.CancelAllowance),
+        type GrowToken.Faucet(GrowToken.Faucet, admin),
+        type GrowToken.GrowToken(GrowToken.GrowToken, amount, decimals,
+                                 issuer, owner, symbol),
+        type GrowToken.Transfer(GrowToken.Transfer, newOwner,
+                                transferAmount),
+        type GrowToken.Mint(GrowToken.Mint, amount, recipient),
+        type GrowToken.MintBatch(GrowToken.MintBatch, recipients)
+    ) where
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Exception
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Fail
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Interface.AnyView
+    ()
+import CurrentSdk.DA.Internal.LF
+import CurrentSdk.DA.Internal.Prelude
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Prelude
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record
+import CurrentSdk.DA.Internal.Template
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+    ()
+import CurrentSdk.Data.String
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes
+import CurrentSdk.GHC.Err
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show
+import CurrentSdk.GHC.Types
+data MintBatch
+  = MintBatch {recipients :: ([] (((,) CurrentSdk.DA.Internal.LF.Party) (CurrentSdk.GHC.Types.Numeric 10)))}
+data Mint
+  = Mint {recipient :: CurrentSdk.DA.Internal.LF.Party,
+          amount :: (CurrentSdk.GHC.Types.Numeric 10)}
+data CurrentSdk.GHC.Types.DamlTemplate => Faucet
+  = Faucet {admin :: CurrentSdk.DA.Internal.LF.Party}
+data CancelAllowance = CancelAllowance {}
+data TransferFrom
+  = TransferFrom {transferAmount :: (CurrentSdk.GHC.Types.Numeric 10),
+                  recipient :: CurrentSdk.DA.Internal.LF.Party}
+data CurrentSdk.GHC.Types.DamlTemplate => Allowance
+  = Allowance {tokenOwner :: CurrentSdk.DA.Internal.LF.Party,
+               spender :: CurrentSdk.DA.Internal.LF.Party,
+               amount :: (CurrentSdk.GHC.Types.Numeric 10),
+               issuer :: CurrentSdk.DA.Internal.LF.Party}
+data Approve
+  = Approve {spender :: CurrentSdk.DA.Internal.LF.Party,
+             allowanceAmount :: (CurrentSdk.GHC.Types.Numeric 10)}
+data Burn = Burn {burnAmount :: (CurrentSdk.GHC.Types.Numeric 10)}
+data Merge
+  = Merge {otherCid :: (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)}
+data Split
+  = Split {splitAmount :: (CurrentSdk.GHC.Types.Numeric 10)}
+data Transfer
+  = Transfer {newOwner :: CurrentSdk.DA.Internal.LF.Party,
+              transferAmount :: (CurrentSdk.GHC.Types.Numeric 10)}
+data CurrentSdk.GHC.Types.DamlTemplate => GrowToken
+  = GrowToken {owner :: CurrentSdk.DA.Internal.LF.Party,
+               issuer :: CurrentSdk.DA.Internal.LF.Party,
+               amount :: (CurrentSdk.GHC.Types.Numeric 10),
+               symbol :: CurrentSdk.GHC.Types.Text,
+               decimals :: CurrentSdk.GHC.Types.Int}
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.TransferFrom) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Transfer) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Split) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.MintBatch) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Mint) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Merge) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.GrowToken) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Faucet) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.CancelAllowance) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Burn) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Approve) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show GrowToken.Allowance) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "transferAmount" GrowToken.Transfer (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "transferAmount" GrowToken.TransferFrom (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "tokenOwner" GrowToken.Allowance CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "symbol" GrowToken.GrowToken CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "splitAmount" GrowToken.Split (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "spender" GrowToken.Approve CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "spender" GrowToken.Allowance CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "recipients" GrowToken.MintBatch ([] (((,) CurrentSdk.DA.Internal.LF.Party) (CurrentSdk.GHC.Types.Numeric 10))))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "recipient" GrowToken.TransferFrom CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "recipient" GrowToken.Mint CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "owner" GrowToken.GrowToken CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "otherCid" GrowToken.Merge (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "newOwner" GrowToken.Transfer CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "issuer" GrowToken.GrowToken CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "issuer" GrowToken.Allowance CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "decimals" GrowToken.GrowToken CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "burnAmount" GrowToken.Burn (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "amount" GrowToken.Mint (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "amount" GrowToken.GrowToken (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "amount" GrowToken.Allowance (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "allowanceAmount" GrowToken.Approve (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "admin" GrowToken.Faucet CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate GrowToken.GrowToken) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate GrowToken.Faucet) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate GrowToken.Allowance) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.GrowToken GrowToken.Transfer (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.GrowToken GrowToken.Split (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.GrowToken GrowToken.Merge (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.GrowToken GrowToken.Burn (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.GrowToken CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.GrowToken GrowToken.Approve (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.Allowance)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.Faucet GrowToken.Mint (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.Faucet GrowToken.MintBatch ([] (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.Faucet CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.Allowance GrowToken.TransferFrom (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.Allowance)))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.Allowance GrowToken.CancelAllowance ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice GrowToken.Allowance CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep GrowToken.GrowToken) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep GrowToken.Faucet) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep GrowToken.Allowance) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory GrowToken.GrowToken) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory GrowToken.Faucet) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory GrowToken.Allowance) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver GrowToken.GrowToken) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver GrowToken.Faucet) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver GrowToken.Allowance) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType GrowToken.GrowToken) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType GrowToken.Faucet) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType GrowToken.Allowance) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate GrowToken.GrowToken) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate GrowToken.Faucet) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate GrowToken.Allowance) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.GrowToken GrowToken.Transfer (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.GrowToken GrowToken.Split (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.GrowToken GrowToken.Merge (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.GrowToken GrowToken.Burn (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.GrowToken CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.GrowToken GrowToken.Approve (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.Allowance)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.Faucet GrowToken.Mint (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.Faucet GrowToken.MintBatch ([] (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.Faucet CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.Allowance GrowToken.TransferFrom (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.Allowance)))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.Allowance GrowToken.CancelAllowance ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice GrowToken.Allowance CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch GrowToken.GrowToken) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch GrowToken.Faucet) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch GrowToken.Allowance) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.GrowToken GrowToken.Transfer (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.GrowToken GrowToken.Split (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.GrowToken GrowToken.Merge (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.GrowToken GrowToken.Burn (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.GrowToken CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.GrowToken GrowToken.Approve (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.Allowance)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.Faucet GrowToken.Mint (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.Faucet GrowToken.MintBatch ([] (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.Faucet CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.Allowance GrowToken.TransferFrom (((,) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken)) (CurrentSdk.DA.Internal.Prelude.Optional (CurrentSdk.DA.Internal.LF.ContractId GrowToken.Allowance)))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.Allowance GrowToken.CancelAllowance ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise GrowToken.Allowance CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure GrowToken.GrowToken) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure GrowToken.Faucet) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure GrowToken.Allowance) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate GrowToken.GrowToken) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate GrowToken.Faucet) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate GrowToken.Allowance) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive GrowToken.GrowToken) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive GrowToken.Faucet) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive GrowToken.Allowance) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "transferAmount" GrowToken.Transfer (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "transferAmount" GrowToken.TransferFrom (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "tokenOwner" GrowToken.Allowance CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "symbol" GrowToken.GrowToken CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "splitAmount" GrowToken.Split (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "spender" GrowToken.Approve CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "spender" GrowToken.Allowance CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "recipients" GrowToken.MintBatch ([] (((,) CurrentSdk.DA.Internal.LF.Party) (CurrentSdk.GHC.Types.Numeric 10))))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "recipient" GrowToken.TransferFrom CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "recipient" GrowToken.Mint CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "owner" GrowToken.GrowToken CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "otherCid" GrowToken.Merge (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "newOwner" GrowToken.Transfer CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "issuer" GrowToken.GrowToken CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "issuer" GrowToken.Allowance CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "decimals" GrowToken.GrowToken CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "burnAmount" GrowToken.Burn (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "amount" GrowToken.Mint (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "amount" GrowToken.GrowToken (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "amount" GrowToken.Allowance (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "allowanceAmount" GrowToken.Approve (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "admin" GrowToken.Faucet CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.TransferFrom) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Transfer) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Split) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.MintBatch) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Mint) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Merge) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.GrowToken) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Faucet) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.CancelAllowance) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Burn) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Approve) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq GrowToken.Allowance) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))

@@ -1,0 +1,21 @@
+{-# LANGUAGE NoDamlSyntax #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoOverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE DatatypeContexts #-}
+{-# OPTIONS_GHC -Wno-unused-imports -Wno-missing-methods -Wno-deprecations -Wno-x-crypto -Wno-x-exceptions #-}
+module Test.GrowTokenTest (
+    ) where
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Exception
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Fail
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Interface.AnyView
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Prelude
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+    ()

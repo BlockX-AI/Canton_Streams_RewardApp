@@ -1,0 +1,175 @@
+{-# LANGUAGE NoDamlSyntax #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoOverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE DatatypeContexts #-}
+{-# OPTIONS_GHC -Wno-unused-imports -Wno-missing-methods -Wno-deprecations -Wno-x-crypto -Wno-x-exceptions #-}
+module FeaturedAppActivity (
+        type FeaturedAppActivity.FeaturedAppActivityRecord(FeaturedAppActivity.FeaturedAppActivityRecord,
+                                                           activityType, provider, referenceId,
+                                                           timestamp),
+        type FeaturedAppActivity.GetActivity(FeaturedAppActivity.GetActivity)
+    ) where
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Exception
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Fail
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Interface.AnyView
+    ()
+import CurrentSdk.DA.Internal.LF
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Prelude
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record
+import CurrentSdk.DA.Internal.Template
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+    ()
+import CurrentSdk.Data.String
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes
+import CurrentSdk.GHC.Err
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show
+import CurrentSdk.GHC.Types
+data GetActivity = GetActivity {}
+data CurrentSdk.GHC.Types.DamlTemplate => FeaturedAppActivityRecord
+  = FeaturedAppActivityRecord {provider :: CurrentSdk.DA.Internal.LF.Party,
+                               activityType :: CurrentSdk.GHC.Types.Text,
+                               referenceId :: CurrentSdk.GHC.Types.Text,
+                               timestamp :: CurrentSdk.DA.Internal.LF.Time}
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show FeaturedAppActivity.GetActivity) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show FeaturedAppActivity.FeaturedAppActivityRecord) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "timestamp" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.DA.Internal.LF.Time)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "referenceId" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "provider" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "activityType" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate FeaturedAppActivity.FeaturedAppActivityRecord) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice FeaturedAppActivity.FeaturedAppActivityRecord FeaturedAppActivity.GetActivity ((((,,) CurrentSdk.GHC.Types.Text) CurrentSdk.GHC.Types.Text) CurrentSdk.DA.Internal.LF.Time)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep FeaturedAppActivity.FeaturedAppActivityRecord) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory FeaturedAppActivity.FeaturedAppActivityRecord) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver FeaturedAppActivity.FeaturedAppActivityRecord) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType FeaturedAppActivity.FeaturedAppActivityRecord) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate FeaturedAppActivity.FeaturedAppActivityRecord) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice FeaturedAppActivity.FeaturedAppActivityRecord FeaturedAppActivity.GetActivity ((((,,) CurrentSdk.GHC.Types.Text) CurrentSdk.GHC.Types.Text) CurrentSdk.DA.Internal.LF.Time)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch FeaturedAppActivity.FeaturedAppActivityRecord) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise FeaturedAppActivity.FeaturedAppActivityRecord FeaturedAppActivity.GetActivity ((((,,) CurrentSdk.GHC.Types.Text) CurrentSdk.GHC.Types.Text) CurrentSdk.DA.Internal.LF.Time)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure FeaturedAppActivity.FeaturedAppActivityRecord) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate FeaturedAppActivity.FeaturedAppActivityRecord) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive FeaturedAppActivity.FeaturedAppActivityRecord) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "timestamp" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.DA.Internal.LF.Time)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "referenceId" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "provider" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "activityType" FeaturedAppActivity.FeaturedAppActivityRecord CurrentSdk.GHC.Types.Text)
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq FeaturedAppActivity.GetActivity) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq FeaturedAppActivity.FeaturedAppActivityRecord) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))

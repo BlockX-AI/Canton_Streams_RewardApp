@@ -1,0 +1,116 @@
+-- daml/MilestoneStream.daml
+-- Conditional tranche release triggered by admin confirmation.
+-- No Superfluid equivalent — pure Canton DVP primitive.
+module MilestoneStream where
+
+import DA.Optional
+import GrowToken
+
+data Milestone = Milestone
+  with
+    name   : Text
+    amount : Decimal
+    done   : Bool
+  deriving (Eq, Show)
+
+template MilestoneStream
+  with
+    milestoneId : Int
+    sender      : Party
+    receiver    : Party
+    admin       : Party
+    milestones  : [Milestone]
+    deposited   : Decimal
+  where
+    signatory sender
+    observer  receiver, admin
+
+    ensure deposited >= 0.0 && length milestones > 0
+
+    nonconsuming choice GetPendingMilestones : [Milestone]
+      controller receiver, admin
+      do
+        return (filter (\m -> not m.done) milestones)
+
+    nonconsuming choice GetTotalPending : Decimal
+      controller receiver, admin
+      do
+        return (foldl (\acc m -> if not m.done then acc + m.amount else acc) 0.0 milestones)
+
+    choice ConfirmMilestone : (ContractId MilestoneStream, ContractId GrowToken)
+      with milestoneName : Text
+      controller admin
+      do
+        let target = find (\m -> m.name == milestoneName && not m.done) milestones
+        assertMsg "Milestone not found or already completed" (isSome target)
+        let m = fromSome target
+        assertMsg "Insufficient deposit for milestone" (deposited >= m.amount)
+        token <- create GrowToken with
+                   owner    = receiver
+                   issuer   = sender
+                   amount   = m.amount
+                   symbol   = "GROW"
+                   decimals = 10
+        let updated = map (\x -> if x.name == milestoneName
+                                 then x with done = True
+                                 else x) milestones
+        newStream <- create this with
+          milestones = updated
+          deposited  = deposited - m.amount
+        return (newStream, token)
+
+    choice RefundRemaining : ContractId GrowToken
+      controller sender
+      do
+        let allDone = all (\m -> m.done) milestones
+        assertMsg "All milestones must be done before claiming refund" allDone
+        assertMsg "No remaining deposit" (deposited > 0.0)
+        create GrowToken with
+          owner    = sender
+          issuer   = sender
+          amount   = deposited
+          symbol   = "GROW"
+          decimals = 10
+
+    choice ForceRefund : ContractId GrowToken
+      controller sender, admin
+      do
+        assertMsg "No remaining deposit" (deposited > 0.0)
+        create GrowToken with
+          owner    = sender
+          issuer   = sender
+          amount   = deposited
+          symbol   = "GROW"
+          decimals = 10
+
+template MilestoneFactory
+  with
+    admin         : Party
+    users         : [Party]
+    nextMilestone : Int
+  where
+    signatory admin
+    observer  users
+
+    choice CreateMilestoneStream : (ContractId MilestoneFactory, ContractId MilestoneStream)
+      with
+        sender     : Party
+        receiver   : Party
+        milestones : [Milestone]
+        deposited  : Decimal
+      controller sender
+      do
+        assertMsg "Sender not in authorized users" (sender `elem` users)
+        assertMsg "Need at least one milestone" (length milestones > 0)
+        let required = foldl (\acc m -> acc + m.amount) 0.0 milestones
+        assertMsg "Deposit must cover all milestones" (deposited >= required)
+        let initial = map (\m -> m with done = False) milestones
+        ms <- create MilestoneStream with
+          milestoneId = nextMilestone
+          sender      = sender
+          receiver    = receiver
+          admin       = admin
+          milestones  = initial
+          deposited   = deposited
+        newFactory <- create this with nextMilestone = nextMilestone + 1
+        return (newFactory, ms)

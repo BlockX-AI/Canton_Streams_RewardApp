@@ -1,0 +1,144 @@
+module Test.MilestoneStreamTest where
+
+import Daml.Script
+import DA.Date
+import DA.Time
+import DA.Optional
+import MilestoneStream
+import GrowToken
+
+testMilestoneHappyPath : Script ()
+testMilestoneHappyPath = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd MilestoneFactory with
+      admin         = admin
+      users         = [alice, bob]
+      nextMilestone = 1
+
+  let milestones = [ Milestone with name = "Design"; amount = 200.0; done = False
+                   , Milestone with name = "Build";  amount = 500.0; done = False
+                   , Milestone with name = "Launch"; amount = 300.0; done = False
+                   ]
+
+  (_, ms) <- submit alice do
+    exerciseCmd factory CreateMilestoneStream with
+      sender     = alice
+      receiver   = bob
+      milestones = milestones
+      deposited  = 1000.0
+
+  (ms2, tok1) <- submit admin do
+    exerciseCmd ms ConfirmMilestone with milestoneName = "Design"
+
+  Some t1d <- queryContractId bob tok1
+  assertMsg "Design milestone: 200 GROW" (t1d.amount == 200.0)
+
+  (ms3, tok2) <- submit admin do
+    exerciseCmd ms2 ConfirmMilestone with milestoneName = "Build"
+
+  Some t2d <- queryContractId bob tok2
+  assertMsg "Build milestone: 500 GROW" (t2d.amount == 500.0)
+
+  (ms4, tok3) <- submit admin do
+    exerciseCmd ms3 ConfirmMilestone with milestoneName = "Launch"
+
+  Some t3d <- queryContractId bob tok3
+  assertMsg "Launch milestone: 300 GROW" (t3d.amount == 300.0)
+
+  Some final <- queryContractId admin ms4
+  assertMsg "All milestones done, deposited = 0" (final.deposited == 0.0)
+
+testDuplicateMilestoneConfirmFails : Script ()
+testDuplicateMilestoneConfirmFails = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd MilestoneFactory with
+      admin         = admin
+      users         = [alice, bob]
+      nextMilestone = 1
+
+  let milestones = [ Milestone with name = "Phase1"; amount = 500.0; done = False ]
+
+  (_, ms) <- submit alice do
+    exerciseCmd factory CreateMilestoneStream with
+      sender     = alice
+      receiver   = bob
+      milestones = milestones
+      deposited  = 500.0
+
+  (ms2, _) <- submit admin do
+    exerciseCmd ms ConfirmMilestone with milestoneName = "Phase1"
+
+  submitMustFail admin do
+    exerciseCmd ms2 ConfirmMilestone with milestoneName = "Phase1"
+
+testUnknownMilestoneNameFails : Script ()
+testUnknownMilestoneNameFails = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd MilestoneFactory with
+      admin         = admin
+      users         = [alice, bob]
+      nextMilestone = 1
+
+  let milestones = [ Milestone with name = "Real"; amount = 100.0; done = False ]
+
+  (_, ms) <- submit alice do
+    exerciseCmd factory CreateMilestoneStream with
+      sender     = alice
+      receiver   = bob
+      milestones = milestones
+      deposited  = 100.0
+
+  submitMustFail admin do
+    exerciseCmd ms ConfirmMilestone with milestoneName = "DoesNotExist"
+
+testForceRefundBySenderAndAdmin : Script ()
+testForceRefundBySenderAndAdmin = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd MilestoneFactory with
+      admin         = admin
+      users         = [alice, bob]
+      nextMilestone = 1
+
+  let milestones = [ Milestone with name = "M1"; amount = 300.0; done = False
+                   , Milestone with name = "M2"; amount = 700.0; done = False
+                   ]
+
+  (_, ms) <- submit alice do
+    exerciseCmd factory CreateMilestoneStream with
+      sender     = alice
+      receiver   = bob
+      milestones = milestones
+      deposited  = 1000.0
+
+  (ms2, _) <- submit admin do
+    exerciseCmd ms ConfirmMilestone with milestoneName = "M1"
+
+  refundToken <- submitMulti [alice, admin] [] do
+    exerciseCmd ms2 ForceRefund
+
+  Some tokData <- queryContractId alice refundToken
+  assertMsg "Force refund returns remaining 700 GROW" (tokData.amount == 700.0)

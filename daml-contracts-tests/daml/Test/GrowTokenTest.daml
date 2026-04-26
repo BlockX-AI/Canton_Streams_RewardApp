@@ -1,0 +1,167 @@
+module Test.GrowTokenTest where
+
+import Daml.Script
+import GrowToken
+
+testTokenTransfer : Script ()
+testTokenTransfer = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  faucet <- submit admin do createCmd Faucet with admin = admin
+
+  aliceToken <- submit admin do
+    exerciseCmd faucet Mint with recipient = alice; amount = 1000.0
+
+  (bobToken, aliceRemainder) <- submit alice do
+    exerciseCmd aliceToken Transfer with newOwner = bob; transferAmount = 100.0
+
+  Some tok <- queryContractId bob bobToken
+  assertMsg "Bob should have 100 GROW" (tok.amount == 100.0)
+
+  case aliceRemainder of
+    Some remCid -> do
+      Some rem <- queryContractId alice remCid
+      assertMsg "Alice should have 900 GROW" (rem.amount == 900.0)
+    None -> abort "Alice should have remainder"
+
+testTokenSplit : Script ()
+testTokenSplit = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+
+  faucet     <- submit admin do createCmd Faucet with admin = admin
+  aliceToken <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 1000.0
+
+  (part1, part2) <- submit alice do
+    exerciseCmd aliceToken Split with splitAmount = 400.0
+
+  Some t1 <- queryContractId alice part1
+  Some t2 <- queryContractId alice part2
+  assertMsg "Part 1 = 400" (t1.amount == 400.0)
+  assertMsg "Part 2 = 600" (t2.amount == 600.0)
+
+testTokenMerge : Script ()
+testTokenMerge = script do
+  admin  <- allocateParty "Admin"
+  alice  <- allocateParty "Alice"
+
+  faucet <- submit admin do createCmd Faucet with admin = admin
+  tok1   <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 300.0
+  tok2   <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 700.0
+
+  merged <- submit alice do exerciseCmd tok1 Merge with otherCid = tok2
+
+  Some m <- queryContractId alice merged
+  assertMsg "Merged = 1000" (m.amount == 1000.0)
+
+testTokenBurn : Script ()
+testTokenBurn = script do
+  admin  <- allocateParty "Admin"
+  alice  <- allocateParty "Alice"
+
+  faucet     <- submit admin do createCmd Faucet with admin = admin
+  aliceToken <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 1000.0
+
+  remainingOpt <- submit alice do exerciseCmd aliceToken Burn with burnAmount = 300.0
+
+  case remainingOpt of
+    Some remCid -> do
+      Some rem <- queryContractId alice remCid
+      assertMsg "Should have 700 remaining" (rem.amount == 700.0)
+    None -> abort "Should have remaining"
+
+testBurnAll : Script ()
+testBurnAll = script do
+  admin  <- allocateParty "Admin"
+  alice  <- allocateParty "Alice"
+
+  faucet     <- submit admin do createCmd Faucet with admin = admin
+  aliceToken <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 100.0
+
+  remainingOpt <- submit alice do exerciseCmd aliceToken Burn with burnAmount = 100.0
+  case remainingOpt of
+    Some _ -> abort "No remaining expected"
+    None   -> return ()
+
+testAllowanceAndTransferFrom : Script ()
+testAllowanceAndTransferFrom = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  vault <- allocateParty "Vault"
+
+  faucet     <- submit admin do createCmd Faucet with admin = admin
+  aliceToken <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 1000.0
+
+  (allowance, aliceRemOpt) <- submit alice do
+    exerciseCmd aliceToken Approve with spender = vault; allowanceAmount = 500.0
+
+  case aliceRemOpt of
+    None -> abort "UTXO conservation failed"
+    Some remCid -> do
+      Some rem <- queryContractId alice remCid
+      assertMsg "Alice remainder = 500" (rem.amount == 500.0)
+
+  (vaultToken, remainingAllowance) <- submit vault do
+    exerciseCmd allowance TransferFrom with transferAmount = 200.0; recipient = vault
+
+  Some vtok <- queryContractId vault vaultToken
+  assertMsg "Vault got 200 GROW" (vtok.amount == 200.0)
+
+  case remainingAllowance of
+    Some aCid -> do
+      Some a <- queryContractId vault aCid
+      assertMsg "Remaining allowance = 300" (a.amount == 300.0)
+    None -> abort "Remaining allowance expected"
+
+testInsufficientBalanceTransfer : Script ()
+testInsufficientBalanceTransfer = script do
+  admin  <- allocateParty "Admin"
+  alice  <- allocateParty "Alice"
+  bob    <- allocateParty "Bob"
+
+  faucet     <- submit admin do createCmd Faucet with admin = admin
+  aliceToken <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 100.0
+
+  submitMustFail alice do
+    exerciseCmd aliceToken Transfer with newOwner = bob; transferAmount = 200.0
+
+testZeroTransfer : Script ()
+testZeroTransfer = script do
+  admin  <- allocateParty "Admin"
+  alice  <- allocateParty "Alice"
+  bob    <- allocateParty "Bob"
+
+  faucet     <- submit admin do createCmd Faucet with admin = admin
+  aliceToken <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 100.0
+
+  submitMustFail alice do
+    exerciseCmd aliceToken Transfer with newOwner = bob; transferAmount = 0.0
+
+testMergeDifferentOwnersFails : Script ()
+testMergeDifferentOwnersFails = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  faucet <- submit admin do createCmd Faucet with admin = admin
+  aTok   <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 100.0
+  bTok   <- submit admin do exerciseCmd faucet Mint with recipient = bob;   amount = 200.0
+
+  submitMustFail alice do exerciseCmd aTok Merge with otherCid = bTok
+
+testExceedAllowanceFails : Script ()
+testExceedAllowanceFails = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  vault <- allocateParty "Vault"
+
+  faucet     <- submit admin do createCmd Faucet with admin = admin
+  aliceToken <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 1000.0
+
+  (allowance, _) <- submit alice do
+    exerciseCmd aliceToken Approve with spender = vault; allowanceAmount = 100.0
+
+  submitMustFail vault do
+    exerciseCmd allowance TransferFrom with transferAmount = 200.0; recipient = vault

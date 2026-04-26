@@ -1,0 +1,669 @@
+{-# LANGUAGE NoDamlSyntax #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoOverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE DatatypeContexts #-}
+{-# OPTIONS_GHC -Wno-unused-imports -Wno-missing-methods -Wno-deprecations -Wno-x-crypto -Wno-x-exceptions #-}
+module StreamPool (
+        type StreamPool.StreamPool(StreamPool.StreamPool, admin, deposited,
+                                   memberStates, poolId, status, totalRate, totalUnits,
+                                   totalWithdrawn),
+        type StreamPool.GetMemberAccrued(StreamPool.GetMemberAccrued,
+                                         member),
+        type StreamPool.WithdrawMember(StreamPool.WithdrawMember, member),
+        type StreamPool.TopUpPool(StreamPool.TopUpPool, additionalDeposit),
+        type StreamPool.AddMember(StreamPool.AddMember, newMember, units),
+        type StreamPool.UpdateMemberUnits(StreamPool.UpdateMemberUnits,
+                                          member, newUnits),
+        type StreamPool.PausePool(StreamPool.PausePool),
+        type StreamPool.ResumePool(StreamPool.ResumePool),
+        StreamPool.memberAccrued, StreamPool.updateMember,
+        StreamPool.lookupMember,
+        type StreamPool.MemberState(StreamPool.MemberState, lastUpdate,
+                                    party, units, withdrawn),
+        type StreamPool.PoolFactory(StreamPool.PoolFactory, admin,
+                                    nextPoolId),
+        type StreamPool.CreatePool(StreamPool.CreatePool, deposit, members,
+                                   totalRate)
+    ) where
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Exception
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Fail
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Interface.AnyView
+    ()
+import CurrentSdk.DA.Internal.LF
+import CurrentSdk.DA.Internal.Prelude
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Prelude
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record
+import CurrentSdk.DA.Internal.Template
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions
+    ()
+import Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Time
+    ()
+import CurrentSdk.Data.String
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes
+import CurrentSdk.GHC.Err
+import Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show
+import CurrentSdk.GHC.Types
+import GrowToken
+import StreamCore
+data CreatePool
+  = CreatePool {members :: ([] (((,) CurrentSdk.DA.Internal.LF.Party) (CurrentSdk.GHC.Types.Numeric 10))),
+                totalRate :: (CurrentSdk.GHC.Types.Numeric 10),
+                deposit :: (CurrentSdk.GHC.Types.Numeric 10)}
+data CurrentSdk.GHC.Types.DamlTemplate => PoolFactory
+  = PoolFactory {admin :: CurrentSdk.DA.Internal.LF.Party,
+                 nextPoolId :: CurrentSdk.GHC.Types.Int}
+data ResumePool = ResumePool {}
+data PausePool = PausePool {}
+data UpdateMemberUnits
+  = UpdateMemberUnits {member :: CurrentSdk.DA.Internal.LF.Party,
+                       newUnits :: (CurrentSdk.GHC.Types.Numeric 10)}
+data AddMember
+  = AddMember {newMember :: CurrentSdk.DA.Internal.LF.Party,
+               units :: (CurrentSdk.GHC.Types.Numeric 10)}
+data TopUpPool
+  = TopUpPool {additionalDeposit :: (CurrentSdk.GHC.Types.Numeric 10)}
+data WithdrawMember
+  = WithdrawMember {member :: CurrentSdk.DA.Internal.LF.Party}
+data GetMemberAccrued
+  = GetMemberAccrued {member :: CurrentSdk.DA.Internal.LF.Party}
+data CurrentSdk.GHC.Types.DamlTemplate => StreamPool
+  = StreamPool {poolId :: CurrentSdk.GHC.Types.Int,
+                admin :: CurrentSdk.DA.Internal.LF.Party,
+                totalRate :: (CurrentSdk.GHC.Types.Numeric 10),
+                memberStates :: ([] StreamPool.MemberState),
+                totalUnits :: (CurrentSdk.GHC.Types.Numeric 10),
+                deposited :: (CurrentSdk.GHC.Types.Numeric 10),
+                totalWithdrawn :: (CurrentSdk.GHC.Types.Numeric 10),
+                status :: StreamCore.StreamStatus}
+data MemberState
+  = MemberState {party :: CurrentSdk.DA.Internal.LF.Party,
+                 units :: (CurrentSdk.GHC.Types.Numeric 10),
+                 withdrawn :: (CurrentSdk.GHC.Types.Numeric 10),
+                 lastUpdate :: CurrentSdk.DA.Internal.LF.Time}
+updateMember ::
+  (CurrentSdk.DA.Internal.LF.Party
+   -> ((StreamPool.MemberState -> StreamPool.MemberState)
+       -> (([] StreamPool.MemberState) -> ([] StreamPool.MemberState))))
+updateMember _ _ _
+  = (CurrentSdk.GHC.Err.error
+       (CurrentSdk.Data.String.fromString "data-dependency stub"))
+lookupMember ::
+  (CurrentSdk.DA.Internal.LF.Party
+   -> (([] StreamPool.MemberState)
+       -> (CurrentSdk.DA.Internal.Prelude.Optional StreamPool.MemberState)))
+lookupMember _ _
+  = (CurrentSdk.GHC.Err.error
+       (CurrentSdk.Data.String.fromString "data-dependency stub"))
+memberAccrued ::
+  (StreamPool.MemberState
+   -> ((CurrentSdk.GHC.Types.Numeric 10)
+       -> ((CurrentSdk.GHC.Types.Numeric 10)
+           -> (CurrentSdk.DA.Internal.LF.Time
+               -> (CurrentSdk.GHC.Types.Numeric 10)))))
+memberAccrued _ _ _ _
+  = (CurrentSdk.GHC.Err.error
+       (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.WithdrawMember) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.UpdateMemberUnits) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.TopUpPool) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.StreamPool) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.ResumePool) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.PoolFactory) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.PausePool) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.MemberState) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.GetMemberAccrued) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.CreatePool) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Show.Show StreamPool.AddMember) where
+  showsPrec _ _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  show _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  showList _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "withdrawn" StreamPool.MemberState (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "units" StreamPool.MemberState (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "units" StreamPool.AddMember (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "totalWithdrawn" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "totalUnits" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "totalRate" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "totalRate" StreamPool.CreatePool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "status" StreamPool.StreamPool StreamCore.StreamStatus)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "poolId" StreamPool.StreamPool CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "party" StreamPool.MemberState CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "nextPoolId" StreamPool.PoolFactory CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "newUnits" StreamPool.UpdateMemberUnits (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "newMember" StreamPool.AddMember CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "members" StreamPool.CreatePool ([] (((,) CurrentSdk.DA.Internal.LF.Party) (CurrentSdk.GHC.Types.Numeric 10))))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "memberStates" StreamPool.StreamPool ([] StreamPool.MemberState))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "member" StreamPool.WithdrawMember CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "member" StreamPool.UpdateMemberUnits CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "member" StreamPool.GetMemberAccrued CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "lastUpdate" StreamPool.MemberState CurrentSdk.DA.Internal.LF.Time)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "deposited" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "deposit" StreamPool.CreatePool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "admin" StreamPool.StreamPool CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "admin" StreamPool.PoolFactory CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.SetField "additionalDeposit" StreamPool.TopUpPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate StreamPool.StreamPool) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyTemplate StreamPool.PoolFactory) where
+  _toAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool StreamPool.WithdrawMember (((,) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool StreamPool.UpdateMemberUnits (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool StreamPool.TopUpPool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool StreamPool.ResumePool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool StreamPool.PausePool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool StreamPool.GetMemberAccrued (CurrentSdk.GHC.Types.Numeric 10)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.StreamPool StreamPool.AddMember (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.PoolFactory StreamPool.CreatePool (((,) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.PoolFactory)) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool))) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasToAnyChoice StreamPool.PoolFactory CurrentSdk.DA.Internal.Template.Archive ()) where
+  _toAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep StreamPool.StreamPool) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasTemplateTypeRep StreamPool.PoolFactory) where
+  _templateTypeRep _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory StreamPool.StreamPool) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasSignatory StreamPool.PoolFactory) where
+  signatory _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver StreamPool.StreamPool) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasObserver StreamPool.PoolFactory) where
+  observer _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType StreamPool.StreamPool) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Desugar.HasIsInterfaceType StreamPool.PoolFactory) where
+  _isInterfaceType _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate StreamPool.StreamPool) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyTemplate StreamPool.PoolFactory) where
+  _fromAnyTemplate _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool StreamPool.WithdrawMember (((,) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool StreamPool.UpdateMemberUnits (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool StreamPool.TopUpPool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool StreamPool.ResumePool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool StreamPool.PausePool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool StreamPool.GetMemberAccrued (CurrentSdk.GHC.Types.Numeric 10)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.StreamPool StreamPool.AddMember (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.PoolFactory StreamPool.CreatePool (((,) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.PoolFactory)) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool))) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFromAnyChoice StreamPool.PoolFactory CurrentSdk.DA.Internal.Template.Archive ()) where
+  _fromAnyChoice _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch StreamPool.StreamPool) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasFetch StreamPool.PoolFactory) where
+  fetch _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool StreamPool.WithdrawMember (((,) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) (CurrentSdk.DA.Internal.LF.ContractId GrowToken.GrowToken))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool StreamPool.UpdateMemberUnits (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool StreamPool.TopUpPool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool StreamPool.ResumePool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool StreamPool.PausePool (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool StreamPool.GetMemberAccrued (CurrentSdk.GHC.Types.Numeric 10)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.StreamPool StreamPool.AddMember (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool)) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.PoolFactory StreamPool.CreatePool (((,) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.PoolFactory)) (CurrentSdk.DA.Internal.LF.ContractId StreamPool.StreamPool))) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasExercise StreamPool.PoolFactory CurrentSdk.DA.Internal.Template.Archive ()) where
+  exercise _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure StreamPool.StreamPool) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasEnsure StreamPool.PoolFactory) where
+  ensure _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate StreamPool.StreamPool) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasCreate StreamPool.PoolFactory) where
+  create _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive StreamPool.StreamPool) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Template.Functions.HasArchive StreamPool.PoolFactory) where
+  archive _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "withdrawn" StreamPool.MemberState (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "units" StreamPool.MemberState (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "units" StreamPool.AddMember (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "totalWithdrawn" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "totalUnits" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "totalRate" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "totalRate" StreamPool.CreatePool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "status" StreamPool.StreamPool StreamCore.StreamStatus)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "poolId" StreamPool.StreamPool CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "party" StreamPool.MemberState CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "nextPoolId" StreamPool.PoolFactory CurrentSdk.GHC.Types.Int)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "newUnits" StreamPool.UpdateMemberUnits (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "newMember" StreamPool.AddMember CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "members" StreamPool.CreatePool ([] (((,) CurrentSdk.DA.Internal.LF.Party) (CurrentSdk.GHC.Types.Numeric 10))))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "memberStates" StreamPool.StreamPool ([] StreamPool.MemberState))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "member" StreamPool.WithdrawMember CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "member" StreamPool.UpdateMemberUnits CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "member" StreamPool.GetMemberAccrued CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "lastUpdate" StreamPool.MemberState CurrentSdk.DA.Internal.LF.Time)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "deposited" StreamPool.StreamPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "deposit" StreamPool.CreatePool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "admin" StreamPool.StreamPool CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "admin" StreamPool.PoolFactory CurrentSdk.DA.Internal.LF.Party)
+instance (() =>
+          Pkg_fc1d3f6c31caa8cf77688568b66fde20d6c87a92cd480a8b028a2943d04f2dc9.DA.Internal.Record.GetField "additionalDeposit" StreamPool.TopUpPool (CurrentSdk.GHC.Types.Numeric 10))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.WithdrawMember) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.UpdateMemberUnits) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.TopUpPool) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.StreamPool) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.ResumePool) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.PoolFactory) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.PausePool) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.MemberState) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.GetMemberAccrued) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.CreatePool) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+instance (() =>
+          Pkg_590736e6f7bc01492007ecb27f3fe75995c19fbd3d41b384aada69619fd4f76c.GHC.Classes.Eq StreamPool.AddMember) where
+  (==) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))
+  (/=) _ _
+    = (CurrentSdk.GHC.Err.error
+         (CurrentSdk.Data.String.fromString "data-dependency stub"))

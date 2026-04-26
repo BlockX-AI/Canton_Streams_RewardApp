@@ -1,0 +1,111 @@
+-- daml/VestingStream.daml
+-- Cliff + linear vesting. No Superfluid equivalent.
+module VestingStream where
+
+import DA.Time
+import GrowToken
+import StreamCore (relTimeToSeconds)
+
+template VestingStream
+  with
+    vestingId   : Int
+    sender      : Party
+    receiver    : Party
+    admin       : Party
+    cliffTime   : Time
+    vestingEnd  : Time
+    totalAmount : Decimal
+    withdrawn   : Decimal
+  where
+    signatory sender
+    observer  receiver, admin
+
+    ensure totalAmount > 0.0
+        && withdrawn >= 0.0
+        && withdrawn <= totalAmount
+        && cliffTime < vestingEnd
+
+    nonconsuming choice VestedBalance : Decimal
+      controller receiver
+      do
+        now <- getTime
+        if now < cliffTime
+          then return 0.0
+          else do
+            let totalDuration  = relTimeToSeconds (subTime vestingEnd cliffTime)
+                elapsed        = relTimeToSeconds (subTime now cliffTime)
+                vestedFraction = if elapsed >= totalDuration then 1.0
+                                 else elapsed / totalDuration
+                totalVested    = totalAmount * vestedFraction
+                withdrawable   = totalVested - withdrawn
+            return (if withdrawable < 0.0 then 0.0 else withdrawable)
+
+    choice VestingWithdraw : (ContractId VestingStream, ContractId GrowToken)
+      controller receiver
+      do
+        now <- getTime
+        assertMsg "Cliff not reached" (now >= cliffTime)
+        let totalDuration  = relTimeToSeconds (subTime vestingEnd cliffTime)
+            elapsed        = relTimeToSeconds (subTime now cliffTime)
+            vestedFraction = if elapsed >= totalDuration then 1.0
+                             else elapsed / totalDuration
+            totalVested    = totalAmount * vestedFraction
+            withdrawable   = totalVested - withdrawn
+        assertMsg "Nothing to withdraw" (withdrawable > 0.0)
+        token <- create GrowToken with
+                   owner    = receiver
+                   issuer   = sender
+                   amount   = withdrawable
+                   symbol   = "GROW"
+                   decimals = 10
+        newVest <- create this with withdrawn = withdrawn + withdrawable
+        return (newVest, token)
+
+    choice VestingStop : Decimal
+      controller sender
+      do
+        let unvested = totalAmount - withdrawn
+        if unvested > 0.0
+          then do
+            _ <- create GrowToken with
+                   owner    = sender
+                   issuer   = sender
+                   amount   = unvested
+                   symbol   = "GROW"
+                   decimals = 10
+            return ()
+          else return ()
+        return unvested
+
+template VestingFactory
+  with
+    admin      : Party
+    users      : [Party]
+    nextVestId : Int
+  where
+    signatory admin
+    observer  users
+
+    choice CreateVesting : (ContractId VestingFactory, ContractId VestingStream)
+      with
+        sender      : Party
+        receiver    : Party
+        cliffTime   : Time
+        vestingEnd  : Time
+        totalAmount : Decimal
+      controller sender
+      do
+        assertMsg "Sender not in authorized users" (sender `elem` users)
+        assertMsg "Cliff must be before vesting end" (cliffTime < vestingEnd)
+        assertMsg "Total amount must be positive"    (totalAmount > 0.0)
+        vest <- create VestingStream with
+          vestingId   = nextVestId
+          sender      = sender
+          receiver    = receiver
+          admin       = admin
+          cliffTime   = cliffTime
+          vestingEnd  = vestingEnd
+          totalAmount = totalAmount
+          withdrawn   = 0.0
+        newFactory <- create this with nextVestId = nextVestId + 1
+        return (newFactory, vest)

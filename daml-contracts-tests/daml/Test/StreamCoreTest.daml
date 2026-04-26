@@ -1,0 +1,191 @@
+module Test.StreamCoreTest where
+
+import Daml.Script
+import DA.Date
+import DA.Time
+import StreamCore
+
+testWithdrawCreatesToken : Script ()
+testWithdrawCreatesToken = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 1000.0
+
+  passTime (seconds 100)
+
+  (newStream, amount) <- submit bob do
+    exerciseCmd stream Withdraw
+
+  assertMsg "Should withdraw exactly 100 GROW" (amount == 100.0)
+
+  Some s <- queryContractId bob newStream
+  assertMsg "Stream contract must still exist" True
+  assertMsg "withdrawn must equal 100" (s.withdrawn == 100.0)
+
+testWithdrawCapsAtDeposit : Script ()
+testWithdrawCapsAtDeposit = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 50.0
+
+  passTime (seconds 200)
+
+  (_, amount) <- submit bob do
+    exerciseCmd stream Withdraw
+
+  assertMsg "Withdrawal capped at 50 GROW deposit" (amount == 50.0)
+
+testPauseResumeCycle : Script ()
+testPauseResumeCycle = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 1000.0
+
+  passTime (seconds 60)
+
+  paused <- submit alice do
+    exerciseCmd stream Pause
+
+  passTime (seconds 60)
+
+  resumed <- submit alice do
+    exerciseCmd paused Resume
+
+  passTime (seconds 40)
+
+  (_, amount) <- submit bob do
+    exerciseCmd resumed Withdraw
+
+  assertMsg "Post-resume window: 40s x 1 GROW/s = 40 GROW" (amount == 40.0)
+
+testStopRefundsSender : Script ()
+testStopRefundsSender = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 1000.0
+
+  passTime (seconds 100)
+
+  (finalAccrued, refund) <- submit alice do
+    exerciseCmd stream Stop
+
+  assertMsg "Bob should receive 100 GROW"        (finalAccrued == 100.0)
+  assertMsg "Alice should be refunded 900 GROW"  (refund       == 900.0)
+
+testTopUpExtendsStream : Script ()
+testTopUpExtendsStream = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 100.0
+
+  topped <- submit alice do
+    exerciseCmd stream TopUp with additionalDeposit = 200.0
+
+  passTime (seconds 300)
+
+  (_, amount) <- submit bob do
+    exerciseCmd topped Withdraw
+
+  assertMsg "Should withdraw full 300 GROW after top-up" (amount == 300.0)
+
+testUnauthorizedWithdrawFails : Script ()
+testUnauthorizedWithdrawFails = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+  carol <- allocateParty "Carol"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 1000.0
+
+  passTime (seconds 60)
+
+  submitMustFail carol do
+    exerciseCmd stream Withdraw

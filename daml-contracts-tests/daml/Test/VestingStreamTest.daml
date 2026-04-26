@@ -1,0 +1,144 @@
+module Test.VestingStreamTest where
+
+import Daml.Script
+import DA.Date
+import DA.Time
+import VestingStream
+import GrowToken
+
+testCliffBlocksEarlyWithdraw : Script ()
+testCliffBlocksEarlyWithdraw = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  let t0       = time (date 2025 Jan 1)  0 0 0
+      cliff    = time (date 2025 Apr 1)  0 0 0
+      vestEnd  = time (date 2026 Jan 1)  0 0 0
+
+  setTime t0
+
+  factory <- submit admin do
+    createCmd VestingFactory with
+      admin      = admin
+      users      = [alice, bob]
+      nextVestId = 1
+
+  (_, vest) <- submit alice do
+    exerciseCmd factory CreateVesting with
+      sender      = alice
+      receiver    = bob
+      cliffTime   = cliff
+      vestingEnd  = vestEnd
+      totalAmount = 12000.0
+
+  passTime (days 30)
+
+  submitMustFail bob do
+    exerciseCmd vest VestingWithdraw
+
+testLinearVestingAfterCliff : Script ()
+testLinearVestingAfterCliff = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  let t0      = time (date 2025 Jan 1) 0 0 0
+      cliff   = time (date 2025 Jan 1) 0 0 0
+      vestEnd = time (date 2025 Jan 1) 0 16 40
+
+  setTime t0
+
+  factory <- submit admin do
+    createCmd VestingFactory with
+      admin      = admin
+      users      = [alice, bob]
+      nextVestId = 1
+
+  (_, vest) <- submit alice do
+    exerciseCmd factory CreateVesting with
+      sender      = alice
+      receiver    = bob
+      cliffTime   = cliff
+      vestingEnd  = vestEnd
+      totalAmount = 1000.0
+
+  passTime (seconds 500)
+
+  (_, token) <- submit bob do
+    exerciseCmd vest VestingWithdraw
+
+  Some tok <- queryContractId bob token
+  assertMsg "500s / 1000s = 50% vested = 500 GROW" (tok.amount == 500.0)
+
+testFullVestingAtEnd : Script ()
+testFullVestingAtEnd = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  let t0      = time (date 2025 Jan 1) 0 0 0
+      cliff   = time (date 2025 Jan 1) 0 0 0
+      vestEnd = time (date 2025 Jan 1) 0 16 40
+
+  setTime t0
+
+  factory <- submit admin do
+    createCmd VestingFactory with
+      admin      = admin
+      users      = [alice, bob]
+      nextVestId = 1
+
+  (_, vest) <- submit alice do
+    exerciseCmd factory CreateVesting with
+      sender      = alice
+      receiver    = bob
+      cliffTime   = cliff
+      vestingEnd  = vestEnd
+      totalAmount = 1000.0
+
+  passTime (seconds 2000)
+
+  (_, token) <- submit bob do
+    exerciseCmd vest VestingWithdraw
+
+  Some tok <- queryContractId bob token
+  assertMsg "After vestingEnd, full 1000 GROW is withdrawable" (tok.amount == 1000.0)
+
+testVestingStopRefunds : Script ()
+testVestingStopRefunds = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  let t0      = time (date 2025 Jan 1) 0 0 0
+      cliff   = time (date 2025 Jan 1) 0 0 0
+      vestEnd = time (date 2025 Jan 1) 0 16 40
+
+  setTime t0
+
+  factory <- submit admin do
+    createCmd VestingFactory with
+      admin      = admin
+      users      = [alice, bob]
+      nextVestId = 1
+
+  (_, vest) <- submit alice do
+    exerciseCmd factory CreateVesting with
+      sender      = alice
+      receiver    = bob
+      cliffTime   = cliff
+      vestingEnd  = vestEnd
+      totalAmount = 1000.0
+
+  passTime (seconds 500)
+
+  (updatedVest, _) <- submit bob do
+    exerciseCmd vest VestingWithdraw
+
+  passTime (seconds 100)
+
+  refund <- submit alice do
+    exerciseCmd updatedVest VestingStop
+
+  assertMsg "Refund is 1000 - 500 = 500 GROW unvested" (refund == 500.0)

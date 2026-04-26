@@ -1,0 +1,223 @@
+-- daml/StreamPool.daml
+-- 1-to-N distribution pool (Canton-native GDA equivalent)
+-- Each member tracks their own lastUpdate, preventing cross-member accrual interference.
+module StreamPool where
+
+import DA.Time
+import GrowToken
+import StreamCore (StreamStatus(..), relTimeToSeconds)
+
+data MemberState = MemberState
+  with
+    party      : Party
+    units      : Decimal
+    withdrawn  : Decimal
+    lastUpdate : Time
+  deriving (Eq, Show)
+
+lookupMember : Party -> [MemberState] -> Optional MemberState
+lookupMember p = find (\m -> m.party == p)
+
+updateMember : Party -> (MemberState -> MemberState) -> [MemberState] -> [MemberState]
+updateMember p f = map (\m -> if m.party == p then f m else m)
+
+memberAccrued : MemberState -> Decimal -> Decimal -> Time -> Decimal
+memberAccrued ms totalRate totalUnits now =
+  let rate    = totalRate * (ms.units / totalUnits)
+      elapsed = relTimeToSeconds (subTime now ms.lastUpdate)
+  in rate * elapsed
+
+template StreamPool
+  with
+    poolId        : Int
+    admin         : Party
+    totalRate     : Decimal
+    memberStates  : [MemberState]
+    totalUnits    : Decimal
+    deposited     : Decimal
+    totalWithdrawn: Decimal
+    status        : StreamStatus
+  where
+    signatory admin
+    observer (map (\m -> m.party) memberStates)
+
+    ensure totalRate > 0.0
+        && deposited >= 0.0
+        && totalWithdrawn >= 0.0
+        && totalWithdrawn <= deposited
+        && totalUnits > 0.0
+
+    nonconsuming choice GetMemberAccrued : Decimal
+      with member : Party
+      controller member
+      do
+        now <- getTime
+        case lookupMember member memberStates of
+          None   -> return 0.0
+          Some ms ->
+            if status /= Active then return 0.0
+            else do
+              let accrued   = memberAccrued ms totalRate totalUnits now
+                  available = deposited - totalWithdrawn
+              return (if accrued > available then available else accrued)
+
+    choice WithdrawMember : (ContractId StreamPool, ContractId GrowToken)
+      with member : Party
+      controller member
+      do
+        assertMsg "Pool not active" (status == Active)
+        now <- getTime
+        case lookupMember member memberStates of
+          None    -> assertFail "Not a pool member"
+          Some ms -> do
+            let accrued      = memberAccrued ms totalRate totalUnits now
+                available    = deposited - totalWithdrawn
+                withdrawable = if accrued > available then available else accrued
+            assertMsg "Nothing to withdraw" (withdrawable > 0.0)
+            token <- create GrowToken with
+                       owner    = member
+                       issuer   = admin
+                       amount   = withdrawable
+                       symbol   = "GROW"
+                       decimals = 10
+            let updated = updateMember member
+                            (\m -> m with
+                              withdrawn  = m.withdrawn + withdrawable
+                              lastUpdate = now)
+                            memberStates
+            newPool <- create this with
+              memberStates   = updated
+              totalWithdrawn = totalWithdrawn + withdrawable
+            return (newPool, token)
+
+    choice TopUpPool : ContractId StreamPool
+      with additionalDeposit : Decimal
+      controller admin
+      do
+        assertMsg "Invalid deposit" (additionalDeposit > 0.0)
+        create this with deposited = deposited + additionalDeposit
+
+    choice AddMember : ContractId StreamPool
+      with
+        newMember : Party
+        units     : Decimal
+      controller admin
+      do
+        assertMsg "Units must be positive" (units > 0.0)
+        assertMsg "Member already exists" (lookupMember newMember memberStates == None)
+        now <- getTime
+        let newState = MemberState with
+              party      = newMember
+              units      = units
+              withdrawn  = 0.0
+              lastUpdate = now
+        create this with
+          memberStates = memberStates ++ [newState]
+          totalUnits   = totalUnits + units
+
+    choice UpdateMemberUnits : ContractId StreamPool
+      with
+        member   : Party
+        newUnits : Decimal
+      controller admin
+      do
+        assertMsg "Units must be non-negative" (newUnits >= 0.0)
+        case lookupMember member memberStates of
+          None    -> assertFail "Member not found"
+          Some ms -> do
+            now <- getTime
+            let accrued   = memberAccrued ms totalRate totalUnits now
+                oldUnits  = ms.units
+                updated   = updateMember member
+                              (\m -> m with
+                                units      = newUnits
+                                withdrawn  = m.withdrawn + accrued
+                                lastUpdate = now)
+                              memberStates
+                newTotal  = totalUnits - oldUnits + newUnits
+            assertMsg "Total units must remain positive" (newTotal > 0.0)
+            create this with
+              memberStates   = updated
+              totalUnits     = newTotal
+              totalWithdrawn = totalWithdrawn + accrued
+
+    choice PausePool : ContractId StreamPool
+      controller admin
+      do
+        assertMsg "Pool not active" (status == Active)
+        now <- getTime
+        let available = deposited - totalWithdrawn
+            settle m  =
+              let a       = min (memberAccrued m totalRate totalUnits now)
+                                (if available > 0.0 then available else 0.0)
+                  settled = m with withdrawn = m.withdrawn + a
+                  timed   = settled with lastUpdate = now
+              in (timed, a)
+            pairs             = map settle memberStates
+            updatedMembers    = map fst pairs
+            accruals          = map snd pairs
+            newTotalWithdrawn = foldl (+) 0.0 accruals
+        foldl (\acc (m, a) -> do
+                  acc
+                  if a > 0.0
+                    then do
+                      _ <- create GrowToken with
+                             owner    = m.party
+                             issuer   = admin
+                             amount   = a
+                             symbol   = "GROW"
+                             decimals = 10
+                      return ()
+                    else return ()
+               ) (return ()) (zip updatedMembers accruals)
+        create this with
+          status         = Paused
+          memberStates   = updatedMembers
+          totalWithdrawn = totalWithdrawn + newTotalWithdrawn
+
+    choice ResumePool : ContractId StreamPool
+      controller admin
+      do
+        assertMsg "Pool not paused" (status == Paused)
+        now <- getTime
+        let refreshed = map (\m -> m with lastUpdate = now) memberStates
+        create this with
+          status       = Active
+          memberStates = refreshed
+
+template PoolFactory
+  with
+    admin      : Party
+    nextPoolId : Int
+  where
+    signatory admin
+
+    choice CreatePool : (ContractId PoolFactory, ContractId StreamPool)
+      with
+        members   : [(Party, Decimal)]
+        totalRate : Decimal
+        deposit   : Decimal
+      controller admin
+      do
+        assertMsg "Need at least one member" (length members > 0)
+        assertMsg "Rate must be positive" (totalRate > 0.0)
+        assertMsg "Deposit must be positive" (deposit > 0.0)
+        let totalUnits = foldl (\acc (_, u) -> acc + u) 0.0 members
+        assertMsg "Total units must be positive" (totalUnits > 0.0)
+        now <- getTime
+        let states = map (\(p, u) -> MemberState with
+                            party      = p
+                            units      = u
+                            withdrawn  = 0.0
+                            lastUpdate = now) members
+        pool <- create StreamPool with
+          poolId         = nextPoolId
+          admin          = admin
+          totalRate      = totalRate
+          memberStates   = states
+          totalUnits     = totalUnits
+          deposited      = deposit
+          totalWithdrawn = 0.0
+          status         = Active
+        newFactory <- create this with nextPoolId = nextPoolId + 1
+        return (newFactory, pool)
