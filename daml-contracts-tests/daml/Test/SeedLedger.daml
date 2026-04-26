@@ -1,0 +1,114 @@
+module Test.SeedLedger where
+
+import Daml.Script
+import DA.Date
+import DA.Time
+import StreamCore
+import StreamPool
+import VestingStream
+import MilestoneStream
+import GrowToken
+
+seedLedger : Script ()
+seedLedger = script do
+
+  admin <- allocatePartyWithHint "Admin"  (PartyIdHint "Admin")
+  alice <- allocatePartyWithHint "Alice"  (PartyIdHint "Alice")
+  bob   <- allocatePartyWithHint "Bob"    (PartyIdHint "Bob")
+  carol <- allocatePartyWithHint "Carol"  (PartyIdHint "Carol")
+
+  -- ── Faucet tokens ──────────────────────────────────────────────────────────
+  aliceTok <- submit admin do
+    createCmd GrowToken with
+      owner = alice; issuer = admin; amount = 5000.0
+      symbol = "GROW"; decimals = 10
+
+  bobTok <- submit admin do
+    createCmd GrowToken with
+      owner = bob; issuer = admin; amount = 2000.0
+      symbol = "GROW"; decimals = 10
+
+  carolTok <- submit admin do
+    createCmd GrowToken with
+      owner = carol; issuer = admin; amount = 1000.0
+      symbol = "GROW"; decimals = 10
+
+  -- ── StreamFactory + two live streams ───────────────────────────────────────
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin   = admin
+      users   = [alice, bob, carol]
+      nextStreamId = 1
+
+  (factory2, stream1) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender       = alice
+      receiver     = bob
+      flowRate     = 1.0
+      initialDeposit = 1000.0
+
+  (_factory3, stream2) <- submit alice do
+    exerciseCmd factory2 CreateStream with
+      sender       = alice
+      receiver     = carol
+      flowRate     = 0.5
+      initialDeposit = 500.0
+
+  -- ── Withdraw from stream1 (Bob collects accrued GROW) ──────────────────────
+  (_, _) <- submit bob do
+    exerciseCmd stream1 Withdraw
+
+  -- ── Pause stream2 so Carol has a paused stream ───────────────────────────
+  _stream2p <- submit alice do exerciseCmd stream2 Pause
+
+  -- ── StreamPool: admin → [alice, carol] ────────────────────────────────────
+  poolFactory <- submit admin do
+    createCmd PoolFactory with
+      admin      = admin
+      nextPoolId = 1
+
+  (_, _pool) <- submit admin do
+    exerciseCmd poolFactory CreatePool with
+      members   = [(alice, 700.0), (carol, 300.0)]
+      totalRate = 10.0
+      deposit   = 10000.0
+
+  -- ── VestingStream: alice → bob (cliff in 7d, vesting over 1 yr) ──────────
+  let cliff   = time (date 2026 May 4) 0 0 0
+      vestEnd = time (date 2027 Apr 27) 0 0 0
+
+  vestFactory <- submit admin do
+    createCmd VestingFactory with
+      admin      = admin
+      users      = [alice, bob]
+      nextVestId = 1
+
+  (_, _vest) <- submit alice do
+    exerciseCmd vestFactory CreateVesting with
+      sender      = alice
+      receiver    = bob
+      cliffTime   = cliff
+      vestingEnd  = vestEnd
+      totalAmount = 12000.0
+
+  -- ── MilestoneStream: alice → carol ────────────────────────────────────────
+  msFactory <- submit admin do
+    createCmd MilestoneFactory with
+      admin         = admin
+      users         = [alice, carol]
+      nextMilestone = 1
+
+  let milestones =
+        [ Milestone with name = "Design";  amount = 200.0; done = False
+        , Milestone with name = "Build";   amount = 500.0; done = False
+        , Milestone with name = "Launch";  amount = 300.0; done = False
+        ]
+
+  (_, _ms) <- submit alice do
+    exerciseCmd msFactory CreateMilestoneStream with
+      sender     = alice
+      receiver   = carol
+      milestones = milestones
+      deposited  = 1000.0
+
+  pure ()
