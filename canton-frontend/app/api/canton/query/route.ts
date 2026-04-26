@@ -1,72 +1,88 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
 
 const CANTON_URL = process.env.CANTON_JSON_API_URL || 'http://localhost:7575';
 const NAMESPACE  = process.env.CANTON_NAMESPACE  ?? '';
 const PACKAGE_ID = process.env.CANTON_PACKAGE_ID ?? '';
 
-// Server-side HS256 JWT — secret MUST be configured via CANTON_AUTH_SECRET.
-// In production replace with an RS256 token from a proper OIDC provider.
-function generateToken(actAs: string[], readAs: string[]): string {
-  const secret = process.env.CANTON_AUTH_SECRET ?? 'change-me-in-production';
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-  const payload = Buffer.from(JSON.stringify({
-    'https://daml.com/ledger-api': {
-      applicationId: 'growstreams',
-      actAs,
-      readAs,
-    },
-  })).toString('base64url');
-  const sig = crypto
-    .createHmac('sha256', secret)
-    .update(`${header}.${payload}`)
-    .digest('base64url');
-  return `${header}.${payload}.${sig}`;
-}
-
-// Map display-name to server-configured party ID (from env vars).
-// Clients supply only a name; the actual party ID is never client-controlled.
 function partyForName(name: string): string {
   const map: Record<string, string> = {
     Admin: process.env.CANTON_ADMIN_PARTY ?? `Admin::${NAMESPACE}`,
     Alice: process.env.CANTON_ALICE_PARTY ?? `Alice::${NAMESPACE}`,
     Bob:   process.env.CANTON_BOB_PARTY   ?? `Bob::${NAMESPACE}`,
+    Carol: process.env.CANTON_CAROL_PARTY ?? `Carol::${NAMESPACE}`,
   };
   return map[name] ?? '';
 }
 
+function parseNdjson(raw: string): unknown[] {
+  const results: unknown[] = [];
+  for (const line of raw.trim().split('\n')) {
+    const l = line.trim();
+    if (!l) continue;
+    try {
+      const parsed = JSON.parse(l);
+      if (Array.isArray(parsed)) results.push(...parsed);
+      else results.push(parsed);
+    } catch { /* skip malformed lines */ }
+  }
+  return results;
+}
+
 export async function POST(req: NextRequest) {
-  const { party, templateId } = await req.json();
-  const partyId = partyForName(party);
-  const fullTemplateId = `${PACKAGE_ID}:${templateId}`;
-  if (!partyId) return NextResponse.json({ error: 'Unknown party' }, { status: 400 });
-  const readAs = [
-    process.env.CANTON_ALICE_PARTY ?? `Alice::${NAMESPACE}`,
-    process.env.CANTON_BOB_PARTY   ?? `Bob::${NAMESPACE}`,
-    process.env.CANTON_ADMIN_PARTY ?? `Admin::${NAMESPACE}`,
-  ];
-  const token = generateToken([partyId], readAs);
+  try {
+    const { party, templateId } = await req.json();
+    const partyId = partyForName(party);
+    if (!partyId) return NextResponse.json({ error: 'Unknown party' }, { status: 400 });
 
-  const filter = {
-    filtersByParty: {
-      [partyId]: {
-        cumulative: [
-          {
+    const ledgerEndRes = await fetch(`${CANTON_URL}/v2/state/ledger-end`);
+    const { offset } = await ledgerEndRes.json() as { offset: number };
+
+    const filterValue = templateId
+      ? {
+          cumulative: [{
             templateFilter: {
-              value: { templateId: fullTemplateId },
+              value: { templateId: `${PACKAGE_ID}:${templateId}` },
             },
-          },
-        ],
-      },
-    },
-  };
+          }],
+        }
+      : {};
 
-  const res = await fetch(`${CANTON_URL}/v2/state/active-contracts`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ filter }),
-  });
+    const body = {
+      filter: { filtersByParty: { [partyId]: filterValue } },
+      verbose: true,
+      activeAtOffset: offset,
+      userId: 'participant_admin',
+    };
 
-  const data = await res.json();
-  return NextResponse.json(data, { status: res.status });
+    const res = await fetch(`${CANTON_URL}/v2/state/active-contracts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const raw = await res.text();
+    const items = parseNdjson(raw);
+
+    const contracts = items.flatMap((item) => {
+      const c = item as Record<string, unknown>;
+      const entry = c.contractEntry as Record<string, unknown> | undefined;
+      if (!entry) return [];
+      const inner = Object.values(entry)[0] as Record<string, unknown> | undefined;
+      if (!inner) return [];
+      const ce = inner.createdEvent as Record<string, unknown> | undefined;
+      if (!ce?.contractId) return [];
+      const fullTpl = (ce.templateId as string) ?? '';
+      const shortName = fullTpl.split(':').pop() ?? fullTpl;
+      return [{
+        contractId: ce.contractId as string,
+        templateId: fullTpl,
+        shortName,
+        payload: ce.createArgument as Record<string, unknown>,
+      }];
+    });
+
+    return NextResponse.json({ result: contracts });
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
 }
