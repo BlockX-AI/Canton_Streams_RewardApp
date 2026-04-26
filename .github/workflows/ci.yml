@@ -10,48 +10,70 @@ jobs:
   test-daml:
     name: Test Daml Contracts
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install Daml SDK
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Canton SDK 3.4.0 (DPM)
         run: |
-          curl -sSL https://get.daml.com/ | sh
+          curl -sSL https://get.digitalasset.com/install/install.sh | sh -s -- --activate 3.4.0
           echo "$HOME/.daml/bin" >> $GITHUB_PATH
-      
-      - name: Build Daml contracts
-        run: |
-          cd daml-contracts
-          dpm build
-      
-      - name: Run Daml tests
-        run: |
-          cd daml-contracts
-          dpm test --project-root daml-contracts-tests
+
+      - name: Verify DPM
+        run: dpm version --active
+
+      - name: Build production DAR
+        run: dpm build --project-root daml-contracts
+
+      - name: Build test DAR
+        run: dpm build --project-root daml-contracts-tests
+
+      - name: Run contract tests
+        run: dpm test --project-root daml-contracts-tests
+
+      - name: Upload DAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: growstreams-dar
+          path: daml-contracts/.daml/dist/*.dar
+          retention-days: 7
 
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: canton-frontend/package-lock.json
-      
+
       - name: Install dependencies
-        run: |
-          cd canton-frontend
-          npm ci
-      
+        run: npm ci
+        working-directory: canton-frontend
+
       - name: Lint
-        run: |
-          cd canton-frontend
-          npm run lint
-      
+        run: npm run lint
+        working-directory: canton-frontend
+
       - name: Build
-        run: |
-          cd canton-frontend
-          npm run build
+        run: npm run build
+        working-directory: canton-frontend
+        env:
+          CANTON_JSON_API_URL: http://localhost:7575
+          CANTON_AUTH_SECRET: ci-dummy-secret
+          CANTON_PACKAGE_ID: 0000000000000000000000000000000000000000000000000000000000000000
+          CANTON_NAMESPACE: ci-namespace
+          CANTON_ADMIN_PARTY: Admin::ci-namespace
+          CANTON_ALICE_PARTY: Alice::ci-namespace
+          CANTON_BOB_PARTY: Bob::ci-namespace
