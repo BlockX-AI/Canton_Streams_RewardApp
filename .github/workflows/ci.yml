@@ -22,8 +22,13 @@ jobs:
 
       - name: Install Daml SDK 3.4.0
         run: |
-          curl -sSL https://get.daml.com/ | sh -s -- 3.4.0
+          curl -fsSL \
+            "https://github.com/digital-asset/daml/releases/download/v3.4.0/daml-sdk-3.4.0-linux.tar.gz" \
+            -o daml-sdk.tar.gz
+          tar xzf daml-sdk.tar.gz
+          ./daml-sdk-3.4.0/install.sh
           echo "$HOME/.daml/bin" >> $GITHUB_PATH
+          rm -f daml-sdk.tar.gz
 
       - name: Verify SDK
         run: daml version
