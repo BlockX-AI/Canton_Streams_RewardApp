@@ -20,22 +20,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Canton SDK 3.4.0 (DPM)
+      - name: Install Daml SDK 3.4.0
         run: |
-          curl -sSL https://get.digitalasset.com/install/install.sh | sh -s -- --activate 3.4.0
+          curl -sSL https://get.daml.com/ | sh -s -- 3.4.0
           echo "$HOME/.daml/bin" >> $GITHUB_PATH
 
-      - name: Verify DPM
-        run: dpm version --active
+      - name: Verify SDK
+        run: daml version
 
       - name: Build production DAR
-        run: dpm build --project-root daml-contracts
-
-      - name: Build test DAR
-        run: dpm build --project-root daml-contracts-tests
+        run: daml build
+        working-directory: daml-contracts
 
       - name: Run contract tests
-        run: dpm test --project-root daml-contracts-tests
+        run: daml test
+        working-directory: daml-contracts-tests
 
       - name: Upload DAR artifact
         uses: actions/upload-artifact@v4
