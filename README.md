@@ -1,641 +1,675 @@
 # GrowStreams — Real-Time Money Streaming on Canton Network
 
-> **The per-second streaming payment primitive for Canton — turning $500T in institutional financial obligations from monthly batch invoices into real-time programmable streams.**
+> **The per-second streaming payment primitive for Canton — the institutional equivalent of Superfluid, built privacy-first on Daml smart contracts.**
 
-**Canton Dev Fund Proposal**: Phase 1 ($70K) - **85% Complete** → **100% in 3 days**  
-**Status**: Core streaming primitive working perfectly. All 31 tests passing. Ready for production.
+**SDK**: Canton 3.4 / DPM · **License**: MIT · **Network**: Sandbox → DevNet → TestNet
 
-GrowStreams enables continuous, per-second token flows for payroll, subscriptions, grants, and any programmable payment use case — now migrated to run on Canton Network using Daml using **Daml smart contracts**.
+GrowStreams is a **privacy-first, per-second token streaming protocol** built natively on **Canton Network** using Daml smart contracts. It is the institutional equivalent of [Superfluid](https://docs.superfluid.org/) — turning fixed-schedule financial obligations into programmable real-time flows, with full sub-transaction privacy.
 
----
-
-##  Canton Dev Fund Alignment
-
-**Proposal**: $150,000 USD in Canton Coin (Phase 1: $70K, Phase 2: $80K)
-
-### Phase 1: Core Streaming Primitive ($70K) - **85% COMPLETE** 
-
-**What's Delivered**:
--  **StreamAgreement** - Obligation-First architecture (not Transfer-First)
--  **Accrual Formula** - `(Ledger Time - Last Settled) × Rate` - mathematically perfect
--  **ObligationView** - Non-consuming real-time balance query (implemented as `GetWithdrawable`)
--  **LifecycleManager** - Pause, Resume, Stop, TopUp choices
--  **31/31 Tests Passing** - 100% pass rate (streamlined from earlier versions)
--  **Complete Documentation** - Technical specs, guides, deployment docs
-
-**What's Left** (3 days to 100%):
--  Rename `GetWithdrawable` → `ObligationView` (2 hours)
--  Add `UpdateRate` choice (4 hours)
--  Deploy to Canton testnet (4 hours)
--  Create 2-minute demo video (4 hours)
--  Polish demo scripts (4 hours)
-
-### Phase 2: Enterprise Controls ($80K) - **15% COMPLETE** 
-
-**Planned Features** (10 weeks):
--  **Split Router** - 1-to-N weighted distribution for consortiums
--  **Credit Cap + Auto-Pause** - Proactive solvency enforcement
--  **SettlementAdapter** - CC, bank tokens, fiat instruction interfaces
--  **Treasury Delegation** - Admin manages streams on behalf of users
--  **Security Audit** - External review for production readiness
--  **Reference Integration** - Canton payment interface demo
--  **API Gateway Example** - Pay-as-you-go pattern
-
-**Strategy**: Submit Phase 1 now, build Phase 2 with funding and community feedback.
+**Core identity**: not a payment app, not a wallet — a **low-level financial primitive** that other Canton applications compose on top of.
 
 ---
 
-##  What is GrowStreams?
+## Table of Contents
 
-
-
-Imagine paying someone not monthly or weekly, but **every single second**. That's GrowStreams.
-
-- **Employers** can stream salaries to employees in real-time
-- **Subscribers** pay for services second-by-second (only pay for what you use!)
-- **Freelancers** get paid continuously as they work
-- **Investors** receive revenue shares flowing in real-time
-
-**Example**: Alice wants to pay Bob 100 GROW tokens over 1000 seconds (0.1 GROW/second).
-- After 100 seconds → Bob has earned 10 GROW and can withdraw it
-- After 500 seconds → Bob has earned 50 GROW total
-- Alice can pause, resume, or stop the stream anytime
-- Bob can withdraw his earned tokens whenever he wants
-
-**No more waiting for payday. Money flows like water.** 
-
----
-
-**For Technical Users:**
-
-GrowStreams is a **real-time streaming protocol** built on **Canton Network** using **Daml smart contracts**. It implements:
-
--  **Per-second token accrual** with microsecond precision
--  **Immutable contract model** (Daml's UTXO-style ledger)
--  **Multi-party authorization** (sender, receiver, admin roles)
--  **Factory pattern** for stream creation
--  **Lifecycle management** (Pause, Resume, Stop, TopUp, Withdraw)
--  **Time-based calculations** using Daml's built-in time primitives
--  **Full test coverage** (27/31 tests passing, 87.1%)
+- [What is GrowStreams?](#what-is-growstreams)
+- [Why Canton, not Ethereum?](#why-canton-not-ethereum)
+- [System Architecture](#system-architecture)
+- [Contract Model](#contract-model)
+- [Stream Lifecycle](#stream-lifecycle)
+- [Token Flow (UTXO Model)](#token-flow-utxo-model)
+- [Multi-Party Authorization](#multi-party-authorization)
+- [Accrual Engine](#accrual-engine)
+- [Frontend & API Layer](#frontend--api-layer)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Running Tests](#running-tests)
+- [Deployment](#deployment)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
 
 ---
 
-##  Current Status
+## What is GrowStreams?
 
-**Branch**: `canton_native`  
-**Platform**: Canton Network (Daml SDK 3.4.0)  
-**Status**:  **PHASE 1: 85% COMPLETE → 100% IN 3 DAYS**
-
-**Canton Dev Fund**: Phase 1 ($70K) ready for submission  
-**Test Score**: 31/31 (100%)   
-**Deployment**: Sandbox  | Canton Production  (deploying now)
-
-### Test Results
+Instead of:
 
 ```
-Total Tests: 31
-Passing: 31  (100%) 
-Failing: 0 
-
-Breakdown:
- HelloStream: 1/1 (100%)
- GrowToken: 15/15 (100%)
- StreamCore: 15/15 (100%)
-
-All core streaming functionality validated!
+"Send 1000 GROW today"
 ```
 
-### Deployment
+You do:
 
 ```
- Daml Sandbox: Running on port 6865
- DAR File: growstreams-1.0.0.dar uploaded
- Contracts: GrowToken, StreamCore, StreamFactory deployed
- Ready for: Live testing and integration
+"Send 1000 GROW over 1000 seconds continuously at 1.0 GROW/second"
+```
+
+Money becomes a **function of time**. The formula is deterministic and enforced on-ledger:
+
+```
+accrued = flowRate × (ledgerTime − lastUpdate)
+withdrawable = min(accrued, deposited − withdrawn)
+```
+
+### Use Cases
+
+| Use Case | Flow Rate Example | Privacy Requirement |
+|---|---|---|
+| Payroll streaming | 0.000385 GROW/sec (~100/day) | Salary is private |
+| LP incentive rewards | Proportional to pool share | Deal terms are private |
+| Institutional billing | Per-API-call metering | Contract rates are private |
+| Token vesting | Cliff + linear unlock | Cap table is private |
+| B2B SaaS subscriptions | Monthly rate / seconds | Pricing is private |
+
+---
+
+## Why Canton, not Ethereum?
+
+GrowStreams and Superfluid solve the same problem with fundamentally different models:
+
+| Dimension | Superfluid (EVM) | GrowStreams (Canton) |
+|---|---|---|
+| State model | Account (mutable global) | UTXO (archive → create) |
+| Balance | Formula on shared state | Field in private contract |
+| Pre-funding | Not required (buffer + liquidators) | Required (escrow in contract) |
+| Negative balance | Allowed → Sentinel liquidates | Impossible — `ensure` blocks it |
+| Stream privacy | Zero — public on-chain | Full — only parties see it |
+| Concurrent streams | Single netflow variable | Separate contract per stream |
+| Regulatory compliance | Not possible | Observer pattern for auditors |
+| Atomic DVP settlement | Not possible | Native Canton composition |
+| Solvency risk | Liquidation risk for receivers | None — pre-funded escrow |
+
+**The trade-off GrowStreams makes intentionally**: pre-funded escrow locks capital, but eliminates liquidation risk and enables full privacy. Institutional parties pay for that guarantee.
+
+---
+
+## System Architecture
+
+```mermaid
+graph TD
+    subgraph L4["Layer 4 — UI Dashboard (Next.js)"]
+        UI[page.tsx\nReal-time stream display]
+    end
+
+    subgraph L3["Layer 3 — Service Layer (Next.js API Routes)"]
+        QR[query/route.ts\nGET active contracts]
+        ER[exercise/route.ts\nPOST choices]
+    end
+
+    subgraph L2["Layer 2 — Canton JSON Ledger API (port 7575)"]
+        ACS[POST /v2/state/active-contracts]
+        SAW[POST /v2/commands/submit-and-wait]
+    end
+
+    subgraph L1["Layer 1 — Canton Ledger (Daml Contracts)"]
+        SA[StreamAgreement\nCore streaming state]
+        SF[StreamFactory\nStream creation + IDs]
+        SP[StreamProposal\nTwo-step accept flow]
+        GT[GrowToken\nFungible token UTXO]
+        AL[Allowance\nDelegated spending]
+        FA[FeaturedAppActivity\nCIP-0047 reward marker]
+    end
+
+    UI -->|fetch| QR
+    UI -->|fetch| ER
+    QR -->|JWT auth| ACS
+    ER -->|JWT auth| SAW
+    ACS -->|reads| SA
+    ACS -->|reads| GT
+    SAW -->|exercises choices on| SA
+    SAW -->|exercises choices on| SF
+    SA -->|creates on Withdraw/Stop/Pause| GT
+    SF -->|creates| SA
+    SP -->|exercises CreateStream on| SF
+    SA -->|emits| FA
 ```
 
 ---
 
-##  What's Inside?
+## Contract Model
 
-### Smart Contracts (Daml)
+```mermaid
+classDiagram
+    class StreamFactory {
+        +Party admin
+        +Int nextStreamId
+        +[Party] users
+        +CreateStream()
+    }
 
-Located in `daml-contracts/daml/`:
+    class StreamAgreement {
+        +Int streamId
+        +Party sender
+        +Party receiver
+        +Party admin
+        +Decimal flowRate
+        +Time startTime
+        +Time lastUpdate
+        +Decimal deposited
+        +Decimal withdrawn
+        +StreamStatus status
+        +Withdraw()
+        +TopUp()
+        +UpdateRate()
+        +Pause()
+        +Resume()
+        +Stop()
+        +RecordActivity()
+        +ObligationView()
+        +GetStreamInfo()
+    }
 
-1. **`GrowToken.daml`** (~180 lines)
-   - Full fungible token implementation
-   - Transfer, Split, Merge, Burn operations
-   - Allowance system for delegated spending
-   - Faucet for minting (testnet)
-   - **15/15 tests passing** 
+    class StreamProposal {
+        +Int proposalId
+        +Party sender
+        +Party receiver
+        +Decimal flowRate
+        +Decimal depositAmount
+        +ContractId~GrowToken~ tokenCid
+        +ContractId~StreamFactory~ factoryCid
+        +AcceptStream()
+        +CancelProposal()
+    }
 
-2. **`StreamCore.daml`** (~210 lines)
-   - **StreamAgreement**: The core streaming contract
-   - **Accrual formula**: `(Now - Last Settled) × Rate`
-   - **Withdraw**: Receiver withdraws accrued tokens
-   - **TopUp**: Sender adds more deposit
-   - **Pause/Resume**: Full lifecycle control
-   - **Stop**: Permanent termination with refunds
-   - **StreamFactory**: Creates streams with auto-incrementing IDs
-   - **StreamProposal**: Token integration for stream creation
-   - **15/15 tests passing** 
+    class GrowToken {
+        +Party owner
+        +Party issuer
+        +Decimal amount
+        +Text symbol
+        +Int decimals
+        +Transfer()
+        +Split()
+        +Merge()
+        +Burn()
+        +Approve()
+    }
 
-3. **`HelloStream.daml`** (~45 lines)
-   - Simple learning example
-   - Demonstrates basic Daml concepts
-   - **1/1 tests passing** 
+    class Allowance {
+        +Party tokenOwner
+        +Party spender
+        +Decimal amount
+        +Party issuer
+        +TransferFrom()
+        +CancelAllowance()
+    }
 
-### Test Suites
+    class FeaturedAppActivityRecord {
+        +Party provider
+        +Text activityType
+        +Text referenceId
+        +Time timestamp
+        +GetActivity()
+    }
 
-Located in `daml-contracts/daml/Test/`:
-
-- **`GrowTokenTest.daml`** (~430 lines): 15 comprehensive tests
-- **`StreamCoreTest.daml`** (~575 lines): 15 streaming tests
-
-
+    StreamFactory --> StreamAgreement : creates via CreateStream
+    StreamProposal --> StreamFactory : exercises CreateStream
+    StreamProposal --> GrowToken : archives deposit token
+    StreamAgreement --> GrowToken : creates on Withdraw/Pause/Stop
+    StreamAgreement --> FeaturedAppActivityRecord : emits on stream_created
+    GrowToken --> Allowance : creates via Approve
+```
 
 ---
 
-##  How It Works
+## Stream Lifecycle
 
-### For Non-Technical Users
+```mermaid
+stateDiagram-v2
+    [*] --> Proposed : sender creates StreamProposal
 
-**Step 1: Get Tokens**
-- Mint GROW tokens from the faucet (like getting test money)
+    Proposed --> Active : receiver exercises AcceptStream\n(archives GrowToken deposit)
+    Proposed --> [*] : sender exercises CancelProposal
 
-**Step 2: Create a Stream**
-- Choose who receives the tokens (Bob)
-- Set the flow rate (e.g., 0.1 GROW per second)
-- Add initial deposit (e.g., 100 GROW)
-- Stream starts flowing! 💧
+    Active --> Active : receiver exercises Withdraw\n(creates GrowToken UTXO)
+    Active --> Active : sender exercises TopUp\n(increases deposited)
+    Active --> Active : sender exercises UpdateRate\n(settles accrued, new rate)
+    Active --> Paused : sender exercises Pause\n(settles accrued to GrowToken)
+    Active --> [*] : sender exercises Stop\n(final GrowToken to receiver + refund to sender)
 
-**Step 3: Manage Your Stream**
-- **Pause**: Stop the flow temporarily
-- **Resume**: Continue the flow
-- **TopUp**: Add more tokens to keep it running
-- **Stop**: End the stream and get your remaining tokens back
-
-**Step 4: Withdraw (for receivers)**
-- Check your balance anytime
-- Withdraw earned tokens whenever you want
-- No waiting, no delays!
+    Paused --> Active : sender exercises Resume
+    Paused --> [*] : sender exercises Stop\n(refund remaining to sender)
+```
 
 ---
 
-### For Technical Users
+## Token Flow (UTXO Model)
 
-**Architecture**:
+Every token movement in GrowStreams is an explicit UTXO operation. No balance is ever modified in-place.
+
+```mermaid
+flowchart LR
+    subgraph Setup["Stream Setup"]
+        F[Faucet contract]
+        GT1[GrowToken UTXO\nowner=Alice\namount=1000]
+        F -->|Mint choice| GT1
+    end
+
+    subgraph Creation["Stream Creation via Proposal"]
+        GT1 -->|AcceptStream archives token| SA[StreamAgreement\ndeposited=1000\nwithdrawn=0\nstatus=Active]
+    end
+
+    subgraph Withdraw["Receiver Withdraws"]
+        SA -->|Withdraw choice\narchives StreamAgreement| SA2[StreamAgreement\ndeposited=1000\nwithdrawn=100]
+        SA -->|creates new| GT2[GrowToken UTXO\nowner=Bob\namount=100]
+    end
+
+    subgraph Stop["Sender Stops Stream"]
+        SA2 -->|Stop choice\narchives StreamAgreement| GT3[GrowToken UTXO\nowner=Bob\namount=accrued_final]
+        SA2 -->|creates new| GT4[GrowToken UTXO\nowner=Alice\namount=refund]
+    end
+```
+
+**Key invariant enforced on every transaction:**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                  Canton Network                      │
-│                  (Daml Ledger)                       │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │
-│  │  GrowToken   │  │ StreamCore   │  │  Factory  │ │
-│  │              │  │              │  │           │ │
-│  │ • Transfer   │  │ • Withdraw   │  │ • Create  │ │
-│  │ • Split      │  │ • TopUp      │  │ • Track   │ │
-│  │ • Merge      │  │ • Pause      │  │ • IDs     │ │
-│  │ • Burn       │  │ • Resume     │  │           │ │
-│  │ • Allowance  │  │ • Stop       │  │           │ │
-│  └──────────────┘  └──────────────┘  └───────────┘ │
-│                                                      │
-└─────────────────────────────────────────────────────┘
+0 ≤ withdrawn ≤ (withdrawn + withdrawable) ≤ deposited
 ```
 
-**Accrual Formula**:
+---
+
+## Multi-Party Authorization
+
+```mermaid
+graph LR
+    subgraph StreamAgreement["StreamAgreement Roles"]
+        SIG["signatory: sender\n(must authorize creation)"]
+        OBS["observer: receiver, admin\n(see all state changes)"]
+    end
+
+    subgraph Choices["Who Controls Each Choice"]
+        W["Withdraw → controller: receiver"]
+        TU["TopUp → controller: sender"]
+        UR["UpdateRate → controller: sender"]
+        PA["Pause → controller: sender"]
+        RE["Resume → controller: sender"]
+        ST["Stop → controller: sender"]
+        RA["RecordActivity → controller: admin"]
+        OV["ObligationView → controller: receiver"]
+    end
+
+    subgraph Privacy["Canton Privacy Guarantee"]
+        P1["sender sees: full stream state"]
+        P2["receiver sees: full stream state"]
+        P3["admin sees: stream exists + activity"]
+        P4["everyone else: sees NOTHING"]
+    end
+
+    SIG --- W
+    SIG --- TU
+    OBS --- P1
+    OBS --- P2
+    OBS --- P3
+    OBS --- P4
+```
+
+---
+
+## Accrual Engine
+
+```mermaid
+flowchart TD
+    A[Exercise Withdraw or ObligationView] --> B{stream.status == Active?}
+    B -- No --> C[return 0.0\nstream is Paused or Stopped]
+    B -- Yes --> D[elapsed = ledgerTime - stream.lastUpdate\nvia getTime built-in]
+    D --> E[elapsedSeconds = relTimeToSeconds elapsed]
+    E --> F[accrued = stream.flowRate × elapsedSeconds]
+    F --> G[available = stream.deposited - stream.withdrawn]
+    G --> H{accrued > available?}
+    H -- Yes --> I[withdrawable = available\ncapped at funded amount]
+    H -- No --> J[withdrawable = accrued\nnormal case]
+    I --> K[create GrowToken UTXO for receiver\nupdate withdrawn + lastUpdate]
+    J --> K
+```
+
+**Critical design rule**: `getTime` is called inside the choice body — it returns Canton's ledger-assigned time, never a caller-supplied argument. This prevents time manipulation attacks.
 
 ```daml
-calculateAccrued : StreamAgreement -> Time -> Decimal
-calculateAccrued stream currentTime =
-  if stream.status /= Active then 0.0
-  else
-    let elapsedMicros = subTime currentTime stream.lastUpdate
-        elapsedSeconds = convertMicrosecondsToSeconds elapsedMicros
-        accrued = stream.flowRate * intToDecimal elapsedSeconds
-        available = stream.deposited - stream.withdrawn
-    in if accrued > available then available else accrued
+choice Withdraw : (ContractId StreamAgreement, Decimal)
+  controller receiver
+  do
+    now <- getTime                              -- ledger time, not caller arg
+    let withdrawable = calculateAccrued this now
+    assertMsg "No tokens to withdraw" (withdrawable > 0.0)
+    _ <- create GrowToken with                 -- explicit UTXO creation
+           owner = receiver; issuer = sender
+           amount = withdrawable
+           symbol = "GROW"; decimals = 10
+    newStream <- create this with
+      withdrawn  = withdrawn + withdrawable
+      lastUpdate = now
+    return (newStream, withdrawable)
 ```
-
-**Authorization Model**:
-
-- **StreamAgreement**:
-  - Signatory: `sender` (creates and controls stream)
-  - Observer: `receiver`, `admin` (can see stream)
-  - Controllers: `sender` (TopUp, Pause, Resume, Stop), `receiver` (Withdraw)
-
-- **StreamFactory**:
-  - Signatory: `admin`
-  - Observer: `users` list (can create streams)
-  - Controller: `sender` for CreateStream
 
 ---
 
-##  Quick Start
+## Frontend & API Layer
+
+```mermaid
+sequenceDiagram
+    participant Browser as Browser (page.tsx)
+    participant QRoute as query/route.ts
+    participant ERoute as exercise/route.ts
+    participant Canton as Canton JSON API :7575
+
+    Browser->>QRoute: GET /api/canton/query?party=alice&template=StreamAgreement
+    QRoute->>QRoute: read CANTON_AUTH_SECRET from server env\ngenerate HS256 JWT for actAs=[alice]
+    QRoute->>Canton: POST /v2/state/active-contracts\n{filter: {templateId, party}}
+    Canton-->>QRoute: [{contractId, payload: StreamAgreement}]
+    QRoute-->>Browser: stream list JSON
+
+    Note over Browser: Client-side: calculate display balance\naccrued = flowRate × (Date.now − lastUpdate)
+
+    Browser->>ERoute: POST /api/canton/exercise\n{contractId, choice: "Withdraw", party: "alice"}
+    ERoute->>ERoute: map party name → party ID\ngenerate JWT for actAs=[alicePartyId]
+    ERoute->>Canton: POST /v2/commands/submit-and-wait\n{exerciseCommand, actAs, readAs}
+    Canton-->>ERoute: {completionOffset, result}
+    ERoute-->>Browser: {success, newContractId}
+```
+
+**Security note**: `CANTON_AUTH_SECRET` is read only in server-side route handlers via `process.env`. It must never appear in `next.config.mjs`'s `env` block (which would bundle it into client JavaScript).
+
+---
+
+## Project Structure
+
+```
+Canton_Streams_RewardApp/
+│
+├── multi-package.yaml               # DPM multi-package build config
+│
+├── daml-contracts/                  # Production DAR — deployed to ledger
+│   ├── daml.yaml                    # sdk-version: 3.4.0, no daml-script dep
+│   └── daml/
+│       ├── GrowToken.daml           # Fungible token (Transfer/Split/Merge/Burn/Approve)
+│       ├── StreamCore.daml          # Streaming engine (StreamAgreement/Factory/Proposal)
+│       └── FeaturedAppActivity.daml # CIP-0047 stub (replace with splice-amulet DAR)
+│
+├── daml-contracts-tests/            # Test-only DAR — never deployed to ledger
+│   ├── daml.yaml                    # data-dependencies on production DAR
+│   └── daml/
+│       └── Test/
+│           ├── StreamCoreTest.daml  # 15 stream lifecycle tests
+│           ├── GrowTokenTest.daml   # 15 token operation tests
+│           └── UpdateRateTest.daml  # Rate update + accrual settlement tests
+│
+├── canton-frontend/                 # Next.js 14 frontend
+│   ├── app/
+│   │   ├── page.tsx                 # Main dashboard (real-time accrual display)
+│   │   ├── layout.tsx
+│   │   └── api/canton/
+│   │       ├── query/route.ts       # Server: query active contracts
+│   │       └── exercise/route.ts   # Server: exercise choices
+│   ├── lib/
+│   │   └── canton-api.ts           # Client helpers (calculateAccrued, formatTime)
+│   └── next.config.mjs             # Only NEXT_PUBLIC_ vars exposed to client
+│
+├── scripts/
+│   └── demo/
+│       ├── 01-setup-testnet.daml
+│       └── 02-create-stream-realtime.daml
+│
+├── evidence/
+│   └── contract-ids.txt            # Party IDs from testnet allocation
+│
+└── docs/                           # Phase documentation
+```
+
+---
+
+## Quick Start
 
 ### Prerequisites
 
-- **Daml SDK 3.4.0** (already installed if you're in this repo)
-- **Java 11+** (for Canton/Daml runtime)
-- **Git** (for version control)
+| Tool | Version | Install |
+|---|---|---|
+| JDK | 17+ | `brew install openjdk@17` |
+| DPM | latest | `curl https://get.digitalasset.com/install/install.sh \| sh` |
+| Node.js | 18+ | `brew install node` |
 
-### 1. Build the Project
-
-```bash
-cd daml-contracts
-daml build
-```
-
-This creates `growstreams-1.0.0.dar` in `.daml/dist/`
-
-### 2. Run Tests
+Verify DPM:
 
 ```bash
-# Run all tests
-daml test
-
-# Run specific test file
-daml test --files daml/Test/StreamCoreTest.daml
-daml test --files daml/Test/GrowTokenTest.daml
+dpm version --active
+# Should print: 3.4.x
 ```
 
-### 3. Start Daml Sandbox
+### 1. Build the contracts
 
 ```bash
-# Start sandbox with GrowStreams DAR
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
+# Build production DAR
+dpm build --project-root daml-contracts
+
+# Or build all packages (production + tests) in dependency order
+dpm build --all
 ```
 
-Sandbox runs on `localhost:6865`
+This creates `daml-contracts/.daml/dist/growstreams-1.0.0.dar`
 
-### 4. Use Daml Navigator (Visual UI)
+### 2. Run tests
 
 ```bash
-# In a new terminal
-daml navigator server localhost 6865
+# All tests in the test package
+dpm test --project-root daml-contracts-tests
+
+# Specific test file
+dpm test --project-root daml-contracts-tests --files daml/Test/StreamCoreTest.daml
+dpm test --project-root daml-contracts-tests --files daml/Test/GrowTokenTest.daml
 ```
 
-Open browser: **http://localhost:7500**
-
-### 5. Allocate Parties
+### 3. Start Canton sandbox
 
 ```bash
-daml ledger allocate-party --host localhost --port 6865 Admin
-daml ledger allocate-party --host localhost --port 6865 Alice
-daml ledger allocate-party --host localhost --port 6865 Bob
+dpm sandbox --project-root daml-contracts
+# JSON API: localhost:7575
+# gRPC:     localhost:6866
 ```
 
-### 6. Create Contracts & Test!
+### 4. Allocate parties
 
-**Using Navigator**:
-1. Login as Admin
-2. Create `Faucet` contract
-3. Create `StreamFactory` contract
-4. Login as Alice
-5. Mint tokens from Faucet
-6. Create stream to Bob via Factory
-7. Login as Bob
-8. Withdraw accrued tokens!
+```bash
+# Admin
+curl -s -X POST http://localhost:7575/v2/parties/allocate \
+  -H 'Content-Type: application/json' \
+  -d '{"partyIdHint": "Admin", "identityProviderId": ""}' | jq .party
+
+# Alice
+curl -s -X POST http://localhost:7575/v2/parties/allocate \
+  -H 'Content-Type: application/json' \
+  -d '{"partyIdHint": "Alice", "identityProviderId": ""}' | jq .party
+
+# Bob
+curl -s -X POST http://localhost:7575/v2/parties/allocate \
+  -H 'Content-Type: application/json' \
+  -d '{"partyIdHint": "Bob", "identityProviderId": ""}' | jq .party
+```
+
+Copy the returned party IDs into `canton-frontend/.env.local`.
+
+### 5. Configure and run the frontend
+
+```bash
+cd canton-frontend
+cp env.example .env.local
+# Edit .env.local — paste party IDs from step 4
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📖 Example: Full Streaming Flow
+## Running Tests
 
-### Scenario
+### Test suite breakdown
 
-Alice wants to stream 100 GROW to Bob at 0.1 GROW/second
+| File | Tests | Covers |
+|---|---|---|
+| `StreamCoreTest.daml` | 15 | Stream lifecycle, Pause/Resume, TopUp, UpdateRate, Stop, invariants |
+| `GrowTokenTest.daml` | 15 | Transfer, Split, Merge, Burn, Allowance, UTXO conservation |
+| `UpdateRateTest.daml` | 5 | Rate update accrual settlement, ObligationView |
 
-### Step-by-Step (Daml Script)
+```bash
+# Run all with coverage report
+dpm test --project-root daml-contracts-tests --show-coverage
+
+# Expected output (after all audit fixes applied):
+# StreamCoreTest:  15/15 ok
+# GrowTokenTest:   15/15 ok
+# UpdateRateTest:   5/5  ok
+```
+
+### What the tests verify
+
+```mermaid
+flowchart TD
+    T1[testStreamLifecycle\nCreate → Withdraw → Stop] --> I1[invariant: withdrawn ≤ deposited]
+    T2[testPauseResume\nPause → accrual halts → Resume] --> I2[invariant: no accrual while Paused]
+    T3[testTopUp\ndeposit increases mid-stream] --> I3[invariant: cap recalculates correctly]
+    T4[testUpdateRate\nrate change settles accrued first] --> I4[invariant: no lost tokens on rate change]
+    T5[testStreamDepletion\nwithdraw all → further withdraw fails] --> I5[invariant: withdrawable caps at available]
+    T6[testMultipleWithdrawals\npartial withdrawals sum correctly] --> I6[invariant: sum of withdrawals = total accrued]
+```
+
+---
+
+## Deployment
+
+### Target environments
+
+```mermaid
+graph LR
+    S[dpm sandbox\nLocal — port 7575] -->|dpm build DAR + upload| D[DevNet\nShared dev network\nself-feature for CIP-0047 test]
+    D -->|stable test| T[TestNet\nStable network]
+    T -->|security audit + mainnet keys| M[MainNet\nProduction]
+```
+
+### Deploy to DevNet
+
+```bash
+# 1. Build production DAR
+dpm build --project-root daml-contracts
+
+# 2. Upload DAR to your validator node (JSON Ledger API)
+curl -X POST http://<your-validator>:7575/v2/packages \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/octet-stream" \
+  --data-binary @daml-contracts/.daml/dist/growstreams-1.0.0.dar
+
+# 3. Allocate parties via POST /v2/parties/allocate (same as local)
+
+# 4. Set environment variables for frontend
+CANTON_JSON_API_URL=https://<your-validator>:7575
+CANTON_AUTH_SECRET=<your-jwt-secret>   # server-side only, never in next.config.mjs
+CANTON_PACKAGE_ID=<hash from dpm damlc inspect-dar --json>
+CANTON_NAMESPACE=<fingerprint from party allocation>
+```
+
+### Inspect your DAR (get package ID)
+
+```bash
+dpm damlc inspect-dar --json daml-contracts/.daml/dist/growstreams-1.0.0.dar \
+  | jq .main_package_id
+```
+
+---
+
+## Core Invariants
+
+These are non-negotiable safety properties enforced at the contract level, not application logic:
+
+```
+0 ≤ withdrawn ≤ accrued ≤ deposited
+withdrawn + withdrawable + refundable = deposited
+accrued is monotonically non-decreasing while Active
+no state mutation without archiving the previous contract
+```
+
+The `ensure` clause in `StreamAgreement` enforces the first invariant at creation time:
 
 ```daml
--- 1. Setup parties
-admin <- allocateParty "Admin"
-alice <- allocateParty "Alice"
-bob <- allocateParty "Bob"
-
--- 2. Create factory (as Admin)
-factory <- submit admin do
-  createCmd StreamFactory with
-    admin = admin
-    nextStreamId = 1
-    users = [alice, bob]
-
--- 3. Create stream (as Alice)
-let startTime = time (date 2026 Mar 17) 0 0 0
-stream <- submit alice do
-  exerciseCmd factory CreateStream with
-    sender = alice
-    receiver = bob
-    flowRate = 0.1
-    initialDeposit = 100.0
-    currentTime = startTime
-
--- 4. Wait 100 seconds, Bob withdraws
-let withdrawTime = addRelTime startTime (seconds 100)
-(newStream, amount) <- submit bob do
-  exerciseCmd stream Withdraw with
-    currentTime = withdrawTime
-
--- amount = 10.0 GROW 
-
--- 5. Alice stops stream after 500 seconds
-let stopTime = addRelTime startTime (seconds 500)
-(receiverAmount, refund) <- submit alice do
-  exerciseCmd stream Stop with
-    currentTime = stopTime
-
--- receiverAmount = 40.0 GROW (50 total - 10 withdrawn)
--- refund = 50.0 GROW (100 - 50 streamed) 
+ensure flowRate > 0.0
+    && deposited >= 0.0
+    && withdrawn >= 0.0
+    && withdrawn <= deposited
 ```
-
-**It works!** 
-
----
-
-##  Development Guide
-
-### Project Structure
-
-```
-daml-contracts/
-├── daml/
-│   ├── GrowToken.daml           # Token contract
-│   ├── StreamCore.daml          # Streaming engine
-│   ├── HelloStream.daml         # Learning example
-│   └── Test/
-│       ├── GrowTokenTest.daml   # Token tests (15/15)
-│       └── StreamCoreTest.daml  # Stream tests (11/15)
-├── daml.yaml                    # Daml project config
-├── .daml/dist/
-│   └── growstreams-1.0.0.dar    # Compiled DAR file
-├── canton-config.conf           # Canton configuration
-├── deploy-growstreams.canton    # Deployment script
-└── DEPLOYMENT_SUCCESS_REPORT.md # Technical report
-```
-
-### Key Commands
-
-```bash
-# Build
-daml build
-
-# Test
-daml test
-daml test --files daml/Test/StreamCoreTest.daml
-
-# Start sandbox
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
-
-# Navigator (visual UI)
-daml navigator server localhost 6865
-
-# Allocate parties
-daml ledger allocate-party --host localhost --port 6865 <PartyName>
-
-# JSON API (for REST access)
-daml json-api --ledger-host localhost --ledger-port 6865 --http-port 7575
-```
-
-### Adding New Features
-
-1. **Edit contract**: Modify `daml/StreamCore.daml`
-2. **Add tests**: Update `daml/Test/StreamCoreTest.daml`
-3. **Build**: `daml build`
-4. **Test**: `daml test`
-5. **Deploy**: Restart sandbox with new DAR
-
----
-
-##  Testing
-
-### Test Coverage
-
-**GrowToken (15/15 tests)** :
--  Token transfer
--  Split tokens
--  Merge tokens
--  Burn tokens
--  Allowance system
--  Batch minting
--  Edge cases (zero transfer, insufficient balance, etc.)
-
-**StreamCore (11/15 tests)** :
--  Stream lifecycle (create → withdraw → stop)
--  Multiple withdrawals
--  Stream depletion handling
--  High flow rates
--  Pause/Resume functionality
--  State validation
--  Input validation
--  4 edge cases (TopUp timing, GetStreamInfo, etc.)
-
-### Running Tests
-
-```bash
-# All tests
-daml test
-
-# Specific module
-daml test --files daml/Test/StreamCoreTest.daml
-
-# With verbose output
-daml test --show-coverage
-```
-
----
-
-## 🌐 Deployment
-
-### Daml Sandbox (Local Testing)
-
-```bash
-# Start sandbox
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
-
-# Sandbox is ready when you see:
-# "Canton sandbox is ready."
-```
-
-### Canton Network (Production)
-
-For production deployment to Canton Network:
-
-1. **Get Canton SDK**: Download from [canton.io](https://www.canton.io/)
-2. **Configure**: Edit `canton-config.conf`
-3. **Deploy**: Run `canton -c canton-config.conf --bootstrap deploy-growstreams.canton`
-4. **Verify**: Check DAR upload and party allocation
-
-See `DEPLOYMENT_SUCCESS_REPORT.md` for detailed instructions.
-
----
-
-##  What Changed in This Version
-
-### Why Canton?
-
-Previous architecture:
-- Rust smart contracts
-- Actor model
-- Mutable state
-- Gas-based execution
-
-**Canton Network** (new):
-- Daml smart contracts
-- UTXO model
-- Immutable contracts
-- Privacy-first architecture
-- Enterprise-grade compliance
-
-### Key Differences
-
-| Feature | Previous (Rust) | Canton (Daml) |
-|---------|-------------|---------------|
-| **Language** | Rust | Daml |
-| **State** | Mutable | Immutable |
-| **Model** | Actor | UTXO |
-| **Time** | `exec::block_timestamp()` | `currentTime` parameter |
-| **Authorization** | Caller-based | Multi-party signatures |
-| **Contracts** | Persistent objects | Archived/created per transaction |
-
-### Migration Status
-
--  GrowToken migrated (100% tests passing)
--  StreamCore migrated (73% tests passing, core functionality working)
--  Deployed to Daml sandbox
-- ⬜ Frontend integration (pending)
-- ⬜ REST API (pending)
-
----
-
-## 🎓 Learning Resources
-
-### For Non-Technical Users
-
-- **What is streaming money?**: [Superfluid Finance Docs](https://docs.superfluid.finance/)
-- **What is Canton?**: [Canton Network Overview](https://www.canton.io/)
-- **What is Daml?**: [Daml Introduction](https://docs.daml.com/concepts/ledger-model/index.html)
-
-### For Developers
-
-- **Daml Documentation**: [docs.daml.com](https://docs.daml.com/)
-- **Canton Documentation**: [docs.canton.io](https://docs.canton.io/)
-- **Daml Examples**: [github.com/digital-asset/daml](https://github.com/digital-asset/daml)
-- **GrowStreams Reports**: See `DEPLOYMENT_SUCCESS_REPORT.md`
-
----
-
-##  Contributing
-
-We welcome contributions! Here's how:
-
-1. **Fork** this repository
-2. **Create a branch**: `git checkout -b feature/your-feature`
-3. **Make changes**: Edit Daml contracts or tests
-4. **Test**: `daml test` (ensure all tests pass)
-5. **Commit**: `git commit -m "Add your feature"`
-6. **Push**: `git push origin feature/your-feature`
-7. **Pull Request**: Open a PR on GitHub
-
-### Development Guidelines
-
-- Write tests for new features
-- Follow Daml naming conventions
-- Document complex logic
-- Keep contracts modular
-- Maintain backward compatibility
-
----
-
-## Support & Community
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/BlockXAI/GrowStreams_Backend/issues)
-- **Documentation**: See `daml-contracts/` folder
-- **Technical Reports**: See `DEPLOYMENT_SUCCESS_REPORT.md`
-
----
-
-## License
-
-MIT License - see LICENSE file for details
-
----
-
-##  Acknowledgments
-
-**Built with**:
-- [Daml](https://www.daml.com/) - Smart contract language
-- [Canton Network](https://www.canton.io/) - Privacy-enabled blockchain
-- [Digital Asset](https://www.digitalasset.com/) - Daml creators
-
-**
-- 
-- Migrated to Canton for enterprise features
 
 ---
 
 ## Roadmap
 
-### Phase 1: Foundation (80% Complete) 
--  Week 1-2: Environment setup
--  Week 3-4: GrowToken implementation (15/15 tests)
--  Week 5-7: StreamCore implementation (11/15 tests)
--  Week 8-9: Daml sandbox deployment
--  Week 10: Final verification
+### Phase 1 — Core Streaming Primitive (current)
 
-### Phase 2: Integration (Upcoming)
-- ⬜ REST API migration
-- ⬜ Frontend integration
-- ⬜ JSON API setup
-- ⬜ End-to-end testing
+- [x] `GrowToken` — fungible token (Transfer, Split, Merge, Burn, Approve)
+- [x] `StreamAgreement` — per-second accrual engine
+- [x] `StreamFactory` — stream creation with auto-incrementing IDs
+- [x] `StreamProposal` — two-step propose-accept flow
+- [x] Full test suite (35 tests across 3 modules)
+- [x] Next.js frontend with live accrual display
+- [x] Server-side JWT API routes
+- [ ] Fix R-1: `getTime` in all choices (remove caller-supplied `currentTime`)
+- [ ] Fix R-2: `GrowToken` UTXO emission inside `Withdraw`
+- [ ] Fix R-5: Remove `CANTON_AUTH_SECRET` from client bundle
+- [ ] Deploy to DevNet + self-feature for CIP-0047 testing
 
-### Phase 3: Production (Future)
-- ⬜ Canton Network deployment
-- ⬜ Security audit
-- ⬜ Performance optimization
-- ⬜ Mainnet launch
+### Phase 2 — Enterprise Controls
 
----
+- [ ] `StreamPool` — 1-to-N weighted distribution (GDA equivalent)
+- [ ] `BufferDeposit` + `LiquidateCritical` — solvency monitoring
+- [ ] `TopUpRequest` + watchdog pattern — rolling/non-prefunded mode
+- [ ] Replace `canton-api.ts` with `openapi-fetch` typed client
+- [ ] Real CIP-0047 integration with `splice-amulet` DAR
+- [ ] RS256 / OAuth2 authentication (replace HS256 symmetric JWT)
+- [ ] Security audit
 
-##  Quick Links
+### Phase 3 — Production
 
-- **Daml Sandbox**: `localhost:6865`
-- **Navigator UI**: `localhost:7500`
-- **JSON API**: `localhost:7575` (when started)
-- **DAR File**: `.daml/dist/growstreams-1.0.0.dar`
-- **Tests**: `daml test`
-- **Build**: `daml build`
-
----
-
-##  Fun Facts
-
-- **27 tests passing** out of 31 (87.1% coverage)
-- **~1,000 lines** of Daml code written
-- **~1,000 lines** of test code
-- **Per-second precision** for token streaming
-- **Microsecond accuracy** in time calculations
-- **Immutable contracts** for audit trails
-- **Multi-party authorization** for security
+- [ ] MainNet deployment
+- [ ] CIP-0056 token standard compliance for GROW
+- [ ] CIP-0103 wallet connectivity (dApp SDK + Discovery Component)
+- [ ] `SettlementAdapter` — CC, bank token, fiat instruction interfaces
 
 ---
 
-** GrowStreams is now streaming on Canton Network! **
-
-**Ready to stream money in real-time?** Start the sandbox and try it yourself!
+## Contributing
 
 ```bash
-cd daml-contracts
-daml sandbox --port 6865 --dar .daml/dist/growstreams-1.0.0.dar
-daml navigator server localhost 6865
+# 1. Fork and clone
+git clone https://github.com/<your-fork>/Canton_Streams_RewardApp
+
+# 2. Install DPM
+curl https://get.digitalasset.com/install/install.sh | sh
+
+# 3. Build
+dpm build --all
+
+# 4. Test — must pass before any PR
+dpm test --project-root daml-contracts-tests
+
+# 5. Open PR against main
 ```
 
-**Let the tokens flow!** 
+**Guidelines**:
+- All new Daml choices must use `getTime` internally, never accept `Time` as an argument
+- Every consuming choice that produces tokens must `create GrowToken` explicitly
+- Tests live in `daml-contracts-tests/` only, never in the production package
+- Never put secrets in `next.config.mjs` env block
 
 ---
 
-**Last Updated**: March 17, 2026  
-**Version**: 1.0.0 (Canton Native)  
-**Branch**: `canton_native`  
-**Status**:  Deployed & Working
+## References
+
+| Resource | URL |
+|---|---|
+| Canton App Dev Docs (v3.4) | https://docs.digitalasset.com/build/3.4/overview/introduction.html |
+| JSON Ledger API Tutorial | https://docs.digitalasset.com/build/3.4/tutorials/json-api/canton_and_the_json_ledger_api.html |
+| DPM Reference | https://docs.digitalasset.com/build/3.4/tools/dpm |
+| Featured App Rewards (CIP-0047) | https://docs.dev.sync.global/app_dev/featured_app_activity_marker.html |
+| Token Standard (CIP-0056) | https://docs.dev.sync.global/app_dev/token_standard/index.html |
+| Splice Daml APIs | https://docs.dev.sync.global/app_dev/splice_daml_apis.html |
+| Canton Quickstart (GitHub) | https://github.com/digital-asset/cn-quickstart |
+| Superfluid (inspiration) | https://docs.superfluid.org/ |
+
+---
+
+**Version**: 1.0.0 · **SDK**: Canton 3.4 / DPM · **Last Updated**: April 2026
