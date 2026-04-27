@@ -1,6 +1,6 @@
 'use strict';
 
-const { cantonUrl, userId, parties } = require('../config/localnet');
+const { cantonUrl, userId, parties, packageId } = require('../config/localnet');
 
 // ─── Raw HTTP helpers ─────────────────────────────────────────────────────────
 
@@ -39,6 +39,7 @@ async function listParties() {
 
 /**
  * Query active contracts visible to one party.
+ * templateFilter: short path e.g. 'StreamCore:StreamAgreement' — packageId is prepended.
  * Returns normalised array: [{ contractId, shortName, moduleName, templateId, payload }]
  */
 async function listContracts(partyName, templateFilter = null) {
@@ -47,8 +48,12 @@ async function listContracts(partyName, templateFilter = null) {
 
   const offset = await getLedgerEnd();
 
-  const filterValue = templateFilter
-    ? { cumulative: [{ templateFilter: { value: { templateId: templateFilter } } }] }
+  // Always use a template filter — without it we hit the 200-contract ACS limit
+  // when many GrowToken contracts accumulate from repeated test cycles.
+  // Canton v2 ACS filter shape: cumulative[].identifierFilter.templateFilter.value.templateId
+  const fullTplId   = templateFilter ? `${packageId}:${templateFilter}` : null;
+  const filterValue = fullTplId
+    ? { cumulative: [{ identifierFilter: { templateFilter: { value: { templateId: fullTplId } } } }] }
     : {};
 
   const body = {
@@ -58,12 +63,18 @@ async function listContracts(partyName, templateFilter = null) {
     userId,
   };
 
-  const r    = await fetch(`${cantonUrl}/v2/state/active-contracts`, {
+  const r   = await fetch(`${cantonUrl}/v2/state/active-contracts`, {
     method  : 'POST',
     headers : { 'Content-Type': 'application/json' },
     body    : JSON.stringify(body),
   });
-  const raw  = await r.text();
+  const raw = await r.text();
+
+  if (!r.ok) {
+    // 413 = too many results (hit ACS limit) — caller should pass a templateFilter
+    console.warn(`[cantonClient] listContracts(${partyName}) HTTP ${r.status}: ${raw.slice(0, 200)}`);
+    return [];
+  }
 
   const contracts = [];
   for (const line of raw.trim().split('\n')) {
@@ -158,9 +169,8 @@ async function create(actAsName, templatePath, createArguments) {
  * Aggregate GrowToken balances for a party.
  */
 async function getTokenBalance(partyName) {
-  const contracts = await listContracts(partyName);
+  const contracts = await listContracts(partyName, 'GrowToken:GrowToken');
   return contracts
-    .filter(c => c.shortName === 'GrowToken')
     .reduce((sum, c) => sum + (parseFloat(String(c.payload.amount)) || 0), 0);
 }
 

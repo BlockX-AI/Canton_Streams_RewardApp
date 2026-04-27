@@ -25,12 +25,12 @@ async function run(report) {
   report.section('UC6 — Milestone Escrow', 'Admin confirms deliverable → Carol receives GROW');
 
   // Must be visible to Admin (observer on MilestoneStream)
-  const contracts = await listContracts('Admin');
+  const contracts = await listContracts('Admin', 'MilestoneStream:MilestoneStream');
   const ms = contracts.find(c => c.shortName === 'MilestoneStream');
 
   if (!ms) {
     // also try from Alice's view (signatory)
-    const aliceContracts = await listContracts('Alice');
+    const aliceContracts = await listContracts('Alice', 'MilestoneStream:MilestoneStream');
     const msAlice = aliceContracts.find(c => c.shortName === 'MilestoneStream');
     if (!msAlice) return report.warn('No MilestoneStream found');
     return runWith(msAlice, report);

@@ -4,9 +4,12 @@
   "description": "Canton LocalNet integration tests for GrowStreams Daml contracts",
   "main": "index.js",
   "scripts": {
+    "seed":  "node seed.js",
     "smoke": "node index.js",
+    "test":  "node index.js --seed",
     "loop":  "node index.js --loop",
-    "soak":  "TEST_INTERVAL_MS=10000 node index.js --loop"
+    "soak":  "TEST_INTERVAL_MS=10000 node index.js --loop",
+    "full":  "TEST_INTERVAL_MS=10000 node index.js --seed --loop"
   },
   "engines": {
     "node": ">=18"

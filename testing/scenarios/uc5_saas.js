@@ -26,7 +26,7 @@ const { N, S }                    = require('../utils');
 async function run(report) {
   report.section('UC5 — B2B SaaS Subscription', 'Pause-when-idle  |  exact per-second billing');
 
-  const contracts = await listContracts('Alice');
+  const contracts = await listContracts('Alice', 'StreamCore:StreamAgreement');
   const stream = contracts.find(c =>
     c.shortName === 'StreamAgreement' && S(c.payload.streamId) === '1'
   );

@@ -22,7 +22,7 @@ const { N, S }                    = require('../utils');
 async function run(report) {
   report.section('UC2 — LP Incentive Rewards', 'Proportional pool share  |  10 GROW/s');
 
-  const contracts = await listContracts('Admin');
+  const contracts = await listContracts('Admin', 'StreamPool:StreamPool');
   const pool = contracts.find(c => c.shortName === 'StreamPool');
 
   if (!pool) return report.warn('No StreamPool found for Admin');
@@ -59,7 +59,7 @@ async function run(report) {
   }
 
   // Fetch fresh contract after any top-up / resume (contract ID changes)
-  const fresh = await listContracts('Admin');
+  const fresh = await listContracts('Admin', 'StreamPool:StreamPool');
   const freshPool = fresh.find(c => c.shortName === 'StreamPool') ?? pool;
 
   let allPass  = true;
@@ -93,7 +93,7 @@ async function run(report) {
     if (res.ok) {
       report.ok(`  GROW moved: ${accrued.toFixed(4)} GROW → ${mName} (proportional to ${share}% share)`);
       // Re-fetch pool — consuming choice created new contract ID
-      const refetched = await listContracts('Admin');
+      const refetched = await listContracts('Admin', 'StreamPool:StreamPool');
       const nextPool  = refetched.find(c => c.shortName === 'StreamPool');
       if (nextPool) currentPool = nextPool;
     } else {

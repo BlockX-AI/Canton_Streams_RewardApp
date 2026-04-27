@@ -24,7 +24,7 @@ const { N, S }                    = require('../utils');
 async function run(report) {
   report.section('UC4 — Token Vesting', 'Cliff + linear unlock  |  Alice→Bob  12,000 GROW');
 
-  const contracts = await listContracts('Alice');
+  const contracts = await listContracts('Alice', 'VestingStream:VestingStream');
   const vest = contracts.find(c => c.shortName === 'VestingStream');
 
   if (!vest) return report.warn('No VestingStream found');

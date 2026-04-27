@@ -23,7 +23,7 @@ const { N, S }                    = require('../utils');
 async function run(report) {
   report.section('UC3 — Institutional Billing', 'Per-session metering  |  0.5 GROW/s');
 
-  const aliceContracts = await listContracts('Alice');
+  const aliceContracts = await listContracts('Alice', 'StreamCore:StreamAgreement');
   const stream = aliceContracts.find(c =>
     c.shortName === 'StreamAgreement' && S(c.payload.streamId) === '2'
   );

@@ -24,7 +24,7 @@ async function run(report) {
   report.section('UC1 — Payroll Streaming', '0.000385–1.0 GROW/s  |  Withdraw anytime');
 
   // Always re-fetch: Withdraw consumes old contract → new contract ID
-  const aliceContracts = await listContracts('Alice');
+  const aliceContracts = await listContracts('Alice', 'StreamCore:StreamAgreement');
   const stream = aliceContracts.find(c =>
     c.shortName === 'StreamAgreement' && S(c.payload.streamId) === '1'
   );

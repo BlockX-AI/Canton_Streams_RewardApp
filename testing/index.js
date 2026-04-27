@@ -16,8 +16,9 @@ const { getVersion, getLedgerEnd } = require('./client/cantonClient');
 const { cantonUrl }                = require('./config/localnet');
 
 async function main() {
-  const args = process.argv.slice(2);
+  const args   = process.argv.slice(2);
   const isLoop = args.includes('--loop');
+  const doSeed = args.includes('--seed');
 
   // Preflight: verify Canton is reachable
   try {
@@ -26,8 +27,14 @@ async function main() {
     console.log(`\x1b[32m[PASS]\x1b[0m Canton reachable at ${cantonUrl}  |  version: ${JSON.stringify(v).slice(0, 60)}  |  offset: ${off}`);
   } catch (e) {
     console.error(`\x1b[31m[FAIL]\x1b[0m Cannot reach Canton at ${cantonUrl}: ${e.message}`);
-    console.error('  Ensure: dpm sandbox --json-api-port 7575 is running');
+    console.error('  Ensure: dpm sandbox is running (port 6864) or LocalNet (port 7575)');
     process.exit(1);
+  }
+
+  // Auto-seed all 6 use case contracts before running tests
+  if (doSeed) {
+    const { seedAll } = require('./seed');
+    await seedAll();
   }
 
   if (isLoop) {
