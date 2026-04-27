@@ -114,7 +114,7 @@ function DashboardTab({ contracts, now }: { contracts: CContract[]; now: Date })
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
                   <span className="text-sm text-gray-300">{c.shortName}</span>
-                  {c.payload.status && <StatusBadge status={S(c.payload.status)} />}
+                  {Boolean(c.payload.status) && <StatusBadge status={S(c.payload.status)} />}
                 </div>
                 <span className="text-xs text-gray-600 font-mono">{c.contractId.slice(0, 16)}…</span>
               </div>
@@ -284,7 +284,7 @@ function PoolTab({ contracts, party, onAction }: {
                     </div>
                     {isMe && S(p.status) === 'Active' && (
                       <button className={BTN('bg-purple-600/80 hover:bg-purple-500 text-white text-xs')}
-                        onClick={() => onAction('WithdrawMember', () => doExercise(party, 'StreamPool:StreamPool', c.contractId, 'WithdrawMember', { member: `${mName}::${S(m.party).split('::')[1]}` }))}>
+                        onClick={() => onAction('WithdrawMember', () => doExercise(party, 'StreamPool:StreamPool', c.contractId, 'WithdrawMember', { member: S(m.party) }))}>
                         <ArrowDownToLine className="w-3 h-3" /> Withdraw
                       </button>
                     )}
@@ -321,7 +321,7 @@ function VestingTab({ contracts, party, onAction }: {
         const pastCliff = now >= cliff;
         const vestFrac = end > cliff ? Math.min(Math.max((now - cliff) / (end - cliff), 0), 1) : 0;
         const vestedAmt = N(p.totalAmount) * vestFrac;
-        const claimed = N(p.totalWithdrawn ?? 0);
+        const claimed = N(p.withdrawn ?? 0);
         const claimable = vestedAmt - claimed;
         const receiver = shortParty(S(p.receiver));
 
@@ -358,7 +358,7 @@ function VestingTab({ contracts, party, onAction }: {
             </div>
             {party === receiver && pastCliff && claimable > 0.001 && (
               <button className={BTN('bg-blue-600/80 hover:bg-blue-500 text-white')}
-                onClick={() => onAction('ClaimVested', () => doExercise(party, 'VestingStream:VestingStream', c.contractId, 'ClaimVested'))}>
+                onClick={() => onAction('VestingWithdraw', () => doExercise(party, 'VestingStream:VestingStream', c.contractId, 'VestingWithdraw'))}>
                 <ArrowDownToLine className="w-3.5 h-3.5" /> Claim {fmtGROW(claimable)} GROW
               </button>
             )}
@@ -421,17 +421,14 @@ function MilestonesTab({ contracts, party, onAction }: {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {party === sender && !m.done && (
+                    {party === 'Admin' && !m.done && (
                       <button className={BTN('bg-amber-600/70 hover:bg-amber-500 text-white text-xs')}
-                        onClick={() => onAction('Release', () => doExercise(party, 'MilestoneStream:MilestoneStream', c.contractId, 'ReleaseMilestone', { milestoneIndex: i }))}>
-                        Release
+                        onClick={() => onAction('ConfirmMilestone', () => doExercise('Admin', 'MilestoneStream:MilestoneStream', c.contractId, 'ConfirmMilestone', { milestoneName: S(m.name) }))}>
+                        Confirm
                       </button>
                     )}
-                    {party === receiver && m.done && (
-                      <button className={BTN('bg-emerald-600/70 hover:bg-emerald-500 text-white text-xs')}
-                        onClick={() => onAction('Claim', () => doExercise(party, 'MilestoneStream:MilestoneStream', c.contractId, 'ClaimMilestone', { milestoneIndex: i }))}>
-                        Claim
-                      </button>
+                    {m.done === true && (
+                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Token sent</span>
                     )}
                   </div>
                 </div>

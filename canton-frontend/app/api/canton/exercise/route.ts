@@ -32,20 +32,18 @@ export async function POST(req: NextRequest) {
     const commandId = `grow-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     const body = {
-      commands: {
-        commands: [{
-          ExerciseCommand: {
-            templateId: `${PACKAGE_ID}:${templateId}`,
-            contractId,
-            choice,
-            choiceArgument: argument ?? {},
-          },
-        }],
-        commandId,
-        userId: 'participant_admin',
-        actAs: [partyId],
-        readAs: allPartyIds(),
-      },
+      commands: [{
+        ExerciseCommand: {
+          templateId: `${PACKAGE_ID}:${templateId}`,
+          contractId,
+          choice,
+          choiceArgument: argument ?? {},
+        },
+      }],
+      commandId,
+      userId: 'participant_admin',
+      actAs: [partyId],
+      readAs: allPartyIds(),
     };
 
     const res = await fetch(`${CANTON_URL}/v2/commands/submit-and-wait`, {

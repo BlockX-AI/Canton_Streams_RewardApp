@@ -35,3 +35,20 @@ frontend/.git.backup/
 
 # Deployment state (contains program IDs, safe to commit selectively)
 # deploy-state.json
+
+# Python / Backend
+backend/.venv/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/.mypy_cache/
+backend/*.egg-info/
+backend/dist/
+backend/build/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+

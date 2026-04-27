@@ -114,20 +114,18 @@ async function exercise(actAsName, templatePath, contractId, choice, choiceArgum
   const readAs   = Object.values(PARTY);
   const commandId = `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const body = {
-    commands: {
-      commands: [{
-        ExerciseCommand: {
-          templateId    : `${PKG}:${templatePath}`,
-          contractId,
-          choice,
-          choiceArgument,
-        },
-      }],
-      commandId,
-      userId : 'participant_admin',
-      actAs  : [actAs],
-      readAs,
-    },
+    commands: [{
+      ExerciseCommand: {
+        templateId    : `${PKG}:${templatePath}`,
+        contractId,
+        choice,
+        choiceArgument,
+      },
+    }],
+    commandId,
+    userId : 'participant_admin',
+    actAs  : [actAs],
+    readAs,
   };
   const r = await fetch(`${CANTON_URL}/v2/commands/submit-and-wait`, {
     method  : 'POST',
