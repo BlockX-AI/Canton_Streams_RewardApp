@@ -206,7 +206,9 @@ jobs:
 
       - name: Start dpm sandbox (port 6864 — bare sandbox, not LocalNet)
         run: |
-          nohup dpm sandbox > /tmp/sandbox.log 2>&1 &
+          nohup dpm sandbox \
+            --json-api-port 6864 \
+            --ledger-api-port 6865 > /tmp/sandbox.log 2>&1 &
           echo "SANDBOX_PID=$!" >> $GITHUB_ENV
 
       - name: Wait for sandbox ready
@@ -233,10 +235,9 @@ jobs:
 
       - name: Extract package ID from DAR
         run: |
-          PKG_ID=$(dpm damlc inspect-dar --json daml-contracts/.daml/dist/growstreams-1.0.0.dar \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['main_package_id'])")
+          PKG_ID=$(python3 -c 'import zipfile,re; z=zipfile.ZipFile("daml-contracts/.daml/dist/growstreams-1.0.0.dar"); m=next((re.search(r"-([0-9a-f]{64})/",n) for n in z.namelist() if re.search(r"-([0-9a-f]{64})/",n)),None); print(m.group(1) if m else "")')
           echo "CANTON_PACKAGE_ID=$PKG_ID" >> $GITHUB_ENV
-          echo "✓ Package ID: $PKG_ID"
+          echo "Package ID: $PKG_ID"
 
       - name: Allocate parties (POST /v2/parties — not /v2/parties/allocate)
         run: |
