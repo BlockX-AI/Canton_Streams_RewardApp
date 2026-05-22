@@ -27,7 +27,7 @@ testPoolDistribution = script do
 
   passTime (seconds 100)
 
-  (newPool, aliceToken) <- submit alice do
+  (newPool, aliceToken) <- submitMulti [alice, admin] [] do
     exerciseCmd pool WithdrawMember with member = alice
 
   Some aliceTok <- queryContractId alice aliceToken
@@ -35,7 +35,7 @@ testPoolDistribution = script do
 
   passTime (seconds 100)
 
-  (_, bobToken) <- submit bob do
+  (_, bobToken) <- submitMulti [bob, admin] [] do
     exerciseCmd newPool WithdrawMember with member = bob
 
   Some bobTok <- queryContractId bob bobToken
@@ -62,12 +62,12 @@ testPoolIndependentMemberTimers = script do
 
   passTime (seconds 50)
 
-  (midPool, _) <- submit alice do
+  (midPool, _) <- submitMulti [alice, admin] [] do
     exerciseCmd pool WithdrawMember with member = alice
 
   passTime (seconds 50)
 
-  (_, aliceToken2) <- submit alice do
+  (_, aliceToken2) <- submitMulti [alice, admin] [] do
     exerciseCmd midPool WithdrawMember with member = alice
 
   Some aliceTok <- queryContractId alice aliceToken2
@@ -101,7 +101,7 @@ testPoolAddMember = script do
 
   passTime (seconds 100)
 
-  (_, carolToken) <- submit carol do
+  (_, carolToken) <- submitMulti [carol, admin] [] do
     exerciseCmd poolWithCarol WithdrawMember with member = carol
 
   Some carolTok <- queryContractId carol carolToken
@@ -132,7 +132,7 @@ testPoolPauseResume = script do
   resumed <- submit admin do exerciseCmd paused ResumePool
   passTime (seconds 100)
 
-  (_, token) <- submit alice do
+  (_, token) <- submitMulti [alice, admin] [] do
     exerciseCmd resumed WithdrawMember with member = alice
 
   Some tok <- queryContractId alice token

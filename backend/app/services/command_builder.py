@@ -21,10 +21,17 @@ from app.utils.template_ids import TemplateIds, ALLOWED_CHOICES
 
 
 class CommandBuilder:
-    def __init__(self, package_id: str, user_id: str, all_party_ids: list[str]) -> None:
+    def __init__(
+        self,
+        package_id: str,
+        user_id: str,
+        all_party_ids: list[str],
+        admin_party_id: str = "",
+    ) -> None:
         self._pkg = package_id
         self._user_id = user_id
         self._read_as = all_party_ids
+        self._admin_party_id = admin_party_id
         self.tpl = TemplateIds(package_id)
 
     def _full_template_id(self, template_path: str) -> str:
@@ -44,11 +51,12 @@ class CommandBuilder:
         contract_id: str,
         choice: str,
         choice_argument: dict[str, Any],
-        act_as_party_id: str,
+        act_as_party_id: str | list[str],
         request_id: str = "",
     ) -> dict[str, Any]:
         self._validate_choice(template_path, choice)
         command_id = deterministic_command_id(contract_id, choice, choice_argument, request_id)
+        act_as = act_as_party_id if isinstance(act_as_party_id, list) else [act_as_party_id]
         return {
             "commands": [{
                 "ExerciseCommand": {
@@ -60,9 +68,14 @@ class CommandBuilder:
             }],
             "commandId": command_id,
             "userId": self._user_id,
-            "actAs": [act_as_party_id],
+            "actAs": act_as,
             "readAs": self._read_as,
         }
+
+    def _with_admin(self, party_id: str) -> list[str]:
+        if not self._admin_party_id or party_id == self._admin_party_id:
+            return [party_id]
+        return [party_id, self._admin_party_id]
 
     def create_payload(
         self,
@@ -87,12 +100,12 @@ class CommandBuilder:
 
     def stream_withdraw(self, contract_id: str, receiver_party_id: str, request_id: str = "") -> dict[str, Any]:
         return self.exercise_payload(
-            "StreamCore:StreamAgreement", contract_id, "Withdraw", {}, receiver_party_id, request_id
+            "StreamCore:StreamAgreement", contract_id, "Withdraw", {}, self._with_admin(receiver_party_id), request_id
         )
 
     def stream_pause(self, contract_id: str, sender_party_id: str, request_id: str = "") -> dict[str, Any]:
         return self.exercise_payload(
-            "StreamCore:StreamAgreement", contract_id, "Pause", {}, sender_party_id, request_id
+            "StreamCore:StreamAgreement", contract_id, "Pause", {}, self._with_admin(sender_party_id), request_id
         )
 
     def stream_resume(self, contract_id: str, sender_party_id: str, request_id: str = "") -> dict[str, Any]:
@@ -102,7 +115,7 @@ class CommandBuilder:
 
     def stream_stop(self, contract_id: str, sender_party_id: str, request_id: str = "") -> dict[str, Any]:
         return self.exercise_payload(
-            "StreamCore:StreamAgreement", contract_id, "Stop", {}, sender_party_id, request_id
+            "StreamCore:StreamAgreement", contract_id, "Stop", {}, self._with_admin(sender_party_id), request_id
         )
 
     def stream_top_up(self, contract_id: str, amount: Decimal, sender_party_id: str, request_id: str = "") -> dict[str, Any]:
@@ -121,7 +134,7 @@ class CommandBuilder:
             contract_id,
             "WithdrawMember",
             {"member": member_party_id},
-            member_party_id,
+            self._with_admin(member_party_id),
             request_id,
         )
 
@@ -145,14 +158,54 @@ class CommandBuilder:
             "StreamPool:StreamPool", contract_id, "ResumePool", {}, admin_party_id, request_id
         )
 
+    def pool_add_member(
+        self,
+        contract_id: str,
+        new_member: str,
+        units: Decimal,
+        admin_party_id: str,
+        request_id: str = "",
+    ) -> dict[str, Any]:
+        return self.exercise_payload(
+            "StreamPool:StreamPool",
+            contract_id,
+            "AddMember",
+            {"newMember": new_member, "units": str(units)},
+            admin_party_id,
+            request_id,
+        )
+
+    def stream_create(
+        self,
+        factory_contract_id: str,
+        sender: str,
+        receiver: str,
+        flow_rate: Decimal,
+        initial_deposit: Decimal,
+        request_id: str = "",
+    ) -> dict[str, Any]:
+        return self.exercise_payload(
+            "StreamCore:StreamFactory",
+            factory_contract_id,
+            "CreateStream",
+            {
+                "sender": sender,
+                "receiver": receiver,
+                "flowRate": str(flow_rate),
+                "initialDeposit": str(initial_deposit),
+            },
+            sender,
+            request_id,
+        )
+
     def vesting_withdraw(self, contract_id: str, receiver_party_id: str, request_id: str = "") -> dict[str, Any]:
         return self.exercise_payload(
-            "VestingStream:VestingStream", contract_id, "VestingWithdraw", {}, receiver_party_id, request_id
+            "VestingStream:VestingStream", contract_id, "VestingWithdraw", {}, self._with_admin(receiver_party_id), request_id
         )
 
     def vesting_stop(self, contract_id: str, sender_party_id: str, request_id: str = "") -> dict[str, Any]:
         return self.exercise_payload(
-            "VestingStream:VestingStream", contract_id, "VestingStop", {}, sender_party_id, request_id
+            "VestingStream:VestingStream", contract_id, "VestingStop", {}, self._with_admin(sender_party_id), request_id
         )
 
     def milestone_confirm(
@@ -173,7 +226,7 @@ class CommandBuilder:
             contract_id,
             "RefundRemaining",
             {},
-            sender_party_id,
+            self._with_admin(sender_party_id),
             request_id,
         )
 

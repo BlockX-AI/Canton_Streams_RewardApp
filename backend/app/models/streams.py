@@ -23,6 +23,7 @@ class StreamView(BaseModel):
 
 
 class CreatePayrollStreamRequest(BaseModel):
+    factory_contract_id: str
     sender_party: str
     receiver_party: str
     flow_rate: Decimal

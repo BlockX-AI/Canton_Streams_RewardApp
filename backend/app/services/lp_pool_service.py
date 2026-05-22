@@ -74,3 +74,22 @@ class LPPoolService:
     ) -> dict:
         payload = self._cmd.pool_top_up(contract_id, amount, admin_party_id, request_id)
         return await self._client.submit_and_wait(payload)
+
+    async def pause(self, contract_id: str, admin_party_id: str, request_id: str = "") -> dict:
+        payload = self._cmd.pool_pause(contract_id, admin_party_id, request_id)
+        return await self._client.submit_and_wait(payload)
+
+    async def resume(self, contract_id: str, admin_party_id: str, request_id: str = "") -> dict:
+        payload = self._cmd.pool_resume(contract_id, admin_party_id, request_id)
+        return await self._client.submit_and_wait(payload)
+
+    async def add_member(
+        self,
+        contract_id: str,
+        new_member: str,
+        units: Decimal,
+        admin_party_id: str,
+        request_id: str = "",
+    ) -> dict:
+        payload = self._cmd.pool_add_member(contract_id, new_member, units, admin_party_id, request_id)
+        return await self._client.submit_and_wait(payload)

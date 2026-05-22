@@ -5,7 +5,7 @@ import DA.Date
 import DA.Time
 import DA.Optional
 import MilestoneStream
-import GrowToken
+import StreamCore (CCSettlement(..))
 
 testMilestoneHappyPath : Script ()
 testMilestoneHappyPath = script do

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     canton_ledger_api_url: str = "http://localhost:7575"
     canton_user_id: str = "participant_admin"
-    canton_package_id: str = "ede21c7dd468efab3df48ff5638d165bd6a82f551f608ae19dbfecd21c3c6d84"
+    canton_package_id: str = "054d83ae7849878d487d4522881260c5aa599c4c25244040232251cd0c3b5b9c"
     canton_timeout_seconds: float = 30.0
     canton_namespace: str = ""
 

@@ -23,10 +23,13 @@ Everything is live and connected. All tasks from the original blueprint are comp
 | Frontend running on `localhost:3000` | ✅ Done |
 | Dashboard page (`/dashboard`) with DevNet status | ✅ Done |
 | API utility (`lib/api.ts`) centralised | ✅ Done |
-| Daml contracts compiled → `growstreams-1.0.0.dar` | ✅ Done |
+| Daml contracts compiled → `growstreams-featured-1.0.0.dar` | ✅ Done |
 | DAR uploaded to DevNet via `/canton/packages/upload` | ✅ Done |
-| Contracts CC-native — `GrowToken` replaced with `CCSettlement` (CIP-56) | ✅ Done |
-| Mandatory `FeaturedAppActivityRecord` on every settlement (CIP-0047) | ✅ Done |
+| Contracts CC-native — `CCSettlement` (CIP-56) on all money-movement choices across all 3 stream types | ✅ Done |
+| Mandatory `FeaturedAppActivityRecord` on every settlement in all contracts (CIP-0047) | ✅ Done |
+| VestingStream: GrowToken → CCSettlement + FeaturedAppActivity on VestingWithdraw + VestingStop | ✅ Done |
+| MilestoneStream: GrowToken → CCSettlement + FeaturedAppActivity on Confirm/Refund/ForceRefund | ✅ Done |
+| StreamPool.PausePool: per-member FeaturedAppActivity records in settlement loop | ✅ Done |
 | Canton wallet integration — `useCantonWallet` + `WalletModal` (CIP-103) | ✅ Done |
 | `@canton-network/wallet-sdk` installed and wired | ✅ Done |
 | All 33 Daml tests passing | ✅ Done |
@@ -95,7 +98,7 @@ All settings loaded from `.env`:
 |---|---|---|
 | `CANTON_LEDGER_API_URL` | `http://100.49.52.241:7575` | DevNet HTTP JSON API |
 | `CANTON_USER_ID` | `GINIE-VALIDATOR` | Participant user |
-| `CANTON_PACKAGE_ID` | `ede21c7dd468efab3df48ff5638d165bd6a82f551f608ae19dbfecd21c3c6d84` | Daml package hash |
+| `CANTON_PACKAGE_ID` | `054d83ae7849878d487d4522881260c5aa599c4c25244040232251cd0c3b5b9c` | Daml package hash |
 | `CANTON_ADMIN_PARTY` | `PAR::GINIE-VALIDATOR::1220f42c...` | Main party on DevNet |
 | `APP_ENV` | `devnet` | Environment flag |
 | `DATABASE_URL` | _(empty)_ | DB disabled → demo data active |
@@ -123,7 +126,7 @@ GET  /canton/ledger-end           — Current ledger offset
 GET  /canton/packages             — List deployed package IDs
 POST /canton/packages/upload      — Upload a .dar file to DevNet
 ```
-Admin-level endpoints. `/canton/packages/upload` is used to push a compiled `.dar` to the DevNet ledger. Confirmed: `growstreams-1.0.0.dar` uploaded successfully (HTTP 200).
+Admin-level endpoints. `/canton/packages/upload` is used to push a compiled `.dar` to the DevNet ledger. Confirmed: `growstreams-featured-1.0.0.dar` uploaded successfully (HTTP 200).
 
 ---
 
@@ -159,6 +162,7 @@ POST /tokens/transfer       — Transfer between parties
 
 #### `/streams` — Core Streaming Protocol
 ```
+POST /streams                        — Create a new stream via StreamFactory
 GET  /streams?party=...              — List all streams for a party
 GET  /streams/{contract_id}?party=   — Get single stream state
 POST /streams/{contract_id}/withdraw — Claim all accrued CC
@@ -173,14 +177,19 @@ accrued = (ledger_time_now − last_settled) × rate_per_second
 ```
 `Withdraw` executes the Daml `Withdraw` choice: creates a `CCSettlement` record + `FeaturedAppActivityRecord`, then updates `lastSettled = now`.
 
+`POST /streams` body: `{factory_contract_id, sender_party, receiver_party, flow_rate, initial_deposit}`
+
 ---
 
-#### `/lp_pools` — Pool Streaming (1-to-N Distribution)
+#### `/lp-pools` — Pool Streaming (1-to-N Distribution)
 ```
-GET  /lp_pools?party=...        — List StreamPool contracts
-POST /lp_pools/{id}/distribute  — Distribute CC proportionally to members
+GET  /lp-pools?party=...               — List StreamPool contracts
+POST /lp-pools/{id}/withdraw-share     — Member withdraws their accrued CC share
+POST /lp-pools/{id}/pause             — Admin pauses pool + settles all members
+POST /lp-pools/{id}/resume            — Admin resumes paused pool
+POST /lp-pools/{id}/add-member        — Admin adds a new member with unit weight
 ```
-One sender → many recipients, each weighted by `units` share. Used for campaign reward pools.
+One sender → many recipients, each weighted by `units` share. Per-member `lastUpdate` timestamps prevent cross-member interference. `PausePool` now creates `FeaturedAppActivityRecord` for every settled member.
 
 ---
 
@@ -195,11 +204,11 @@ Streams for node fees and SaaS subscriptions. Pause when inactive, resume on act
 
 #### `/vesting` — VestingStream Contracts
 ```
-GET  /vesting?party=...     — List vesting schedules
-POST /vesting               — Create vesting stream (cliff + linear)
-POST /vesting/{id}/claim    — Claim vested CC
+GET  /vesting?party=...         — List vesting schedules
+POST /vesting/{id}/withdraw     — Claim linearly vested CC (creates CCSettlement + FeaturedAppActivity)
+POST /vesting/{id}/stop         — Sender cancels vesting, reclaims unvested CC (creates CCSettlement + FeaturedAppActivity)
 ```
-Maps to `VestingStream.daml`. Cliff time blocks early withdrawal; linear unlock after cliff.
+Maps to `VestingStream.daml`. Cliff time enforces early-withdrawal block; linear unlock after cliff. Both `VestingWithdraw` and `VestingStop` now emit `CCSettlement` + `FeaturedAppActivityRecord` (fixed from GrowToken stub).
 
 ---
 
@@ -216,10 +225,11 @@ POST /subscriptions/{id}/cancel — Cancel
 #### `/milestones` — Milestone-Based Streams
 ```
 GET  /milestones?party=...         — List milestone streams
-POST /milestones                   — Create milestone stream
-POST /milestones/{id}/confirm      — Admin confirms milestone → CC releases
+POST /milestones/{id}/confirm      — Admin confirms milestone → CCSettlement + FeaturedAppActivity
+POST /milestones/{id}/release      — Sender claims remaining deposit (all milestones done)
+POST /milestones/{id}/cancel       — Force refund by sender + admin co-auth
 ```
-Maps to `MilestoneStream.daml`. Admin confirms a deliverable; its tranche releases automatically via Daml choice.
+Maps to `MilestoneStream.daml`. All three money-movement choices now emit `CCSettlement` + `FeaturedAppActivityRecord`. Fixed from GrowToken stub — the Canton DVP pattern is now complete.
 
 ---
 
@@ -248,6 +258,20 @@ GET /leaderboard?track=OSS   — Filter by track type
 GET /leaderboard/stats       — Aggregate stats
 ```
 Demo stats: 336 participants · 53,380 total XP · 40,000 CC pool · 1,247 contributions.
+
+---
+
+#### `/rewards` — Featured App Activity & CC Revenue Projections
+```
+GET /rewards/activity?party=...                    — List all FeaturedAppActivityRecord contracts
+GET /rewards/summary?party=...&monthly_txn_estimate=N — CC revenue projection
+```
+Queries `FeaturedAppActivityRecord` contracts from the Canton ledger. `/rewards/summary` computes:
+- `network_share_pct` = your txns ÷ 40M network txns/month
+- `estimated_monthly_cc` = share × 516M CC rewards pool
+- `estimated_monthly_usd` = CC × $0.1546
+
+`featured_app_ready: false` until splice-amulet.dar is wired and Tokenomics Committee approval received.
 
 ---
 
@@ -505,8 +529,8 @@ Seven contracts in `daml-contracts/daml/`:
 | `StreamFactory` | Creates `StreamAgreement` with auto IDs | — |
 | `StreamProposal` | Two-party propose-accept flow | No token deposit required |
 | `StreamPool` | 1-to-N weighted CC distribution | `CCSettlement` on WithdrawMember / PausePool |
-| `VestingStream` | Cliff + linear unlock | Uses stream accrual |
-| `MilestoneStream` | Admin-confirmed tranche release | Direct CC on confirm |
+| `VestingStream` | Cliff + linear unlock | `CCSettlement` on VestingWithdraw + VestingStop |
+| `MilestoneStream` | Admin-confirmed tranche release | `CCSettlement` on ConfirmMilestone, RefundRemaining, ForceRefund |
 | `FeaturedAppActivityRecord` | CIP-0047 activity marker | Created on every settlement |
 | `CCSettlement` | CIP-56 placeholder settlement record | Created on every money movement |
 
@@ -541,9 +565,14 @@ Created automatically on **every** settlement event:
 | `StreamAgreement.Stop` | `stream_stop_final` |
 | `StreamFactory.CreateStream` | `stream_created` |
 | `StreamPool.WithdrawMember` | `pool_withdraw` |
-| `StreamPool.PausePool` | `pool_pause_settle` |
+| `StreamPool.PausePool` | `pool_pause_settle` (one record per settled member) |
+| `VestingStream.VestingWithdraw` | `vesting_withdraw` |
+| `VestingStream.VestingStop` | `vesting_stop` |
+| `MilestoneStream.ConfirmMilestone` | `milestone_confirm` |
+| `MilestoneStream.RefundRemaining` | `milestone_refund` |
+| `MilestoneStream.ForceRefund` | `milestone_force_refund` |
 
-Provider = `sender` (stream initiator) earns CC rewards from DSO per round.
+**Authorization note:** Provider = `admin` where admin is controller/signatory (MilestoneStream choices, StreamPool choices, StreamFactory). Provider = `sender` where sender is the available signatory (StreamAgreement choices, VestingStream choices). When `splice-amulet.dar` is wired, all providers should be the GrowStreams admin operator party.
 
 ### 5.3 Accrual Formula
 
@@ -590,17 +619,17 @@ export PATH="$HOME/.dpm/bin:$PATH" && dpm test
 cd Canton_Streams_RewardApp/daml-contracts
 export PATH="$HOME/.dpm/bin:$PATH"
 dpm build
-# → .daml/dist/growstreams-1.0.0.dar
+# → .daml/dist/growstreams-featured-1.0.0.dar
 ```
 
 ### Upload to DevNet
 ```bash
 curl -X POST http://localhost:8000/canton/packages/upload \
-  -F "file=@.daml/dist/growstreams-1.0.0.dar"
+  -F "file=@.daml/dist/growstreams-featured-1.0.0.dar"
 # → {"ok": true, "result": {}}
 ```
 
-**Status:** `growstreams-1.0.0.dar` is uploaded to DevNet GINIE-VALIDATOR as of May 22 2026.
+**Status:** `growstreams-featured-1.0.0.dar` is uploaded to DevNet GINIE-VALIDATOR as of May 23 2026. It is deployed under a new package name because Canton package upgrade checks do not allow changing existing choice return types.
 
 ### Verify packages on ledger
 ```bash
@@ -613,10 +642,12 @@ curl http://localhost:8000/canton/packages
 
 | Item | Why |
 |---|---|
+| **Apply for Featured App status** | Email `operations@sync.global` — DevNet is live, self-feature through wallet UI to test reward mechanics immediately |
 | Deploy to Canton **TestNet** | Get a public contract ID for grant milestone submission |
-| Replace `CCSettlement` with `Splice.Amulet` | When DA publishes `splice-amulet.dar` on the DPM registry |
+| Replace `CCSettlement` with `Splice.Amulet` | When DA publishes `splice-amulet.dar` via DPM — replace stub in all contracts |
 | Connect PostgreSQL | Switch from demo data to real persistent participant + XP storage |
 | Wallet test with real extension | Verify `SDK.create({ ledgerProvider: window.canton })` end-to-end once Bron/Nightly supports DevNet |
+| Rebuild + re-upload DAR | Contract changes require `dpm build` → `POST /canton/packages/upload` → re-create factory contracts |
 
 ---
 
@@ -668,7 +699,9 @@ http://localhost:8000/docs
 | `backend/app/main.py` | FastAPI app, lifespan, CORS, error handlers, router registration |
 | `backend/app/config.py` | All settings from `.env` (DevNet credentials, CORS, DB) |
 | `backend/app/clients/canton_client.py` | `httpx` Canton Ledger API client |
-| `backend/app/routes/*.py` | 14 route modules |
+| `backend/app/routes/*.py` | 15 route modules (added `rewards.py`) |
+| `backend/app/services/rewards_service.py` | FeaturedAppActivity query + CC revenue projection |
+| `backend/app/models/rewards.py` | `ActivityRecordView`, `RewardsSummaryView` Pydantic models |
 | `canton-frontend/app/page.tsx` | Landing page assembly |
 | `canton-frontend/app/dashboard/page.tsx` | DevNet dashboard (streams, wallet, stats) |
 | `canton-frontend/app/campaigns/page.tsx` | Campaign browser |
@@ -687,7 +720,7 @@ http://localhost:8000/docs
 | `daml-contracts/daml/GrowToken.daml` | GROW engagement token (engagement layer only) |
 | `daml-contracts/daml/VestingStream.daml` | Cliff + linear vesting |
 | `daml-contracts/daml/MilestoneStream.daml` | Admin-confirmed milestone tranches |
-| `daml-contracts/.daml/dist/growstreams-1.0.0.dar` | Compiled DAR — uploaded to DevNet |
+| `daml-contracts/.daml/dist/growstreams-featured-1.0.0.dar` | Compiled DAR — uploaded to DevNet |
 | `.env` | DevNet credentials (backend config) |
 | `multi-package.yaml` | DPM multi-package project definition |
 
@@ -700,7 +733,7 @@ http://localhost:8000/docs
 | Ledger API (HTTP JSON) | `http://100.49.52.241:7575` |
 | Ledger API (gRPC) | `100.49.52.241:5001` |
 | Validator party | `PAR::GINIE-VALIDATOR::1220f42cead6c3bf0443af1f0e51ee250afb48ee528756945ee2733cbfef62c10986` |
-| Canton package ID | `ede21c7dd468efab3df48ff5638d165bd6a82f551f608ae19dbfecd21c3c6d84` |
+| Canton package ID | `054d83ae7849878d487d4522881260c5aa599c4c25244040232251cd0c3b5b9c` |
 | Cantonscan explorer | `https://scan.sv-2.dev.global.canton.network.digitalasset.com` |
 | Daml SDK | 3.4.11 |
 | Backend | `http://localhost:8000` |
@@ -708,4 +741,4 @@ http://localhost:8000/docs
 
 ---
 
-*Last updated: May 22, 2026 — DevNet fully connected · DAR deployed · CC-native contracts · FeaturedAppActivity mandatory · Canton wallet integrated · 33/33 tests passing.*
+*Last updated: May 23, 2026 — All contract GrowToken stubs removed · CCSettlement on all 3 stream types · FeaturedAppActivity mandatory on all 13 settlement events · StreamPool PausePool per-member activity · New API endpoints: POST /streams, POST /vesting/{id}/stop, POST /lp-pools/{id}/pause, POST /lp-pools/{id}/resume, POST /lp-pools/{id}/add-member, GET /rewards/activity, GET /rewards/summary · Ready for Featured App application + TestNet.*

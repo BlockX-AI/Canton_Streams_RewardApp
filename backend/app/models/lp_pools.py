@@ -43,3 +43,20 @@ class CreateLPPoolRequest(BaseModel):
 
 class WithdrawShareRequest(BaseModel):
     member_party: str
+
+
+class AdminPartyRequest(BaseModel):
+    admin_party: str
+
+
+class AddMemberRequest(BaseModel):
+    new_member: str
+    units: Decimal
+    admin_party: str
+
+    @field_validator("units")
+    @classmethod
+    def positive(cls, v: Decimal) -> Decimal:
+        if v <= 0:
+            raise ValueError("Must be positive")
+        return v

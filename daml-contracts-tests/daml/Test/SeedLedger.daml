@@ -49,11 +49,11 @@ seedLedger = script do
   passTime (seconds 3600)
 
   -- ── Withdraw from stream1 (Bob collects accrued CC) ────────────────────────
-  (_, _) <- submit bob do
+  (_, _) <- submitMulti [bob, admin] [] do
     exerciseCmd stream1 Withdraw
 
   -- ── Pause stream2 so Carol has a paused stream ───────────────────────────
-  _stream2p <- submit alice do exerciseCmd stream2 Pause
+  _stream2p <- submitMulti [alice, admin] [] do exerciseCmd stream2 Pause
 
   -- ── StreamPool: admin → [alice, carol] ────────────────────────────────────
   poolFactory <- submit admin do

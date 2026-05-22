@@ -106,3 +106,22 @@ class StreamService:
     ) -> dict:
         payload = self._cmd.stream_top_up(contract_id, amount, sender_party_id, request_id)
         return await self._client.submit_and_wait(payload)
+
+    async def create_stream(
+        self,
+        factory_contract_id: str,
+        sender_party_id: str,
+        receiver_party_id: str,
+        flow_rate: Decimal,
+        initial_deposit: Decimal,
+        request_id: str = "",
+    ) -> dict:
+        payload = self._cmd.stream_create(
+            factory_contract_id,
+            sender_party_id,
+            receiver_party_id,
+            flow_rate,
+            initial_deposit,
+            request_id,
+        )
+        return await self._client.submit_and_wait(payload)

@@ -28,3 +28,14 @@ async def vesting_withdraw(
 ) -> dict:
     result = await svc.withdraw(contract_id, party, request_id)
     return {"ok": True, "request_id": request_id, "result": result}
+
+
+@router.post("/{contract_id}/stop")
+async def vesting_stop(
+    contract_id: str,
+    party: str = Query(..., description="Sender party ID (vesting creator)"),
+    request_id: RequestId = ...,
+    svc: Annotated[VestingService, Depends(get_vesting_service)] = ...,
+) -> dict:
+    result = await svc.stop(contract_id, party, request_id)
+    return {"ok": True, "request_id": request_id, "result": result}

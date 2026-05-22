@@ -60,3 +60,9 @@ class VestingService:
     ) -> dict:
         payload = self._cmd.vesting_withdraw(contract_id, receiver_party_id, request_id)
         return await self._client.submit_and_wait(payload)
+
+    async def stop(
+        self, contract_id: str, sender_party_id: str, request_id: str = ""
+    ) -> dict:
+        payload = self._cmd.vesting_stop(contract_id, sender_party_id, request_id)
+        return await self._client.submit_and_wait(payload)

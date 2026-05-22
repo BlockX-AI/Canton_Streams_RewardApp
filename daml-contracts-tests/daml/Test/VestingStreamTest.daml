@@ -3,8 +3,8 @@ module Test.VestingStreamTest where
 import Daml.Script
 import DA.Date
 import DA.Time
+import StreamCore (CCSettlement(..))
 import VestingStream
-import GrowToken
 
 testCliffBlocksEarlyWithdraw : Script ()
 testCliffBlocksEarlyWithdraw = script do
@@ -65,7 +65,7 @@ testLinearVestingAfterCliff = script do
 
   passTime (seconds 500)
 
-  (_, token) <- submit bob do
+  (_, token) <- submitMulti [bob, admin] [] do
     exerciseCmd vest VestingWithdraw
 
   Some tok <- queryContractId bob token
@@ -99,7 +99,7 @@ testFullVestingAtEnd = script do
 
   passTime (seconds 2000)
 
-  (_, token) <- submit bob do
+  (_, token) <- submitMulti [bob, admin] [] do
     exerciseCmd vest VestingWithdraw
 
   Some tok <- queryContractId bob token
@@ -133,12 +133,12 @@ testVestingStopRefunds = script do
 
   passTime (seconds 500)
 
-  (updatedVest, _) <- submit bob do
+  (updatedVest, _) <- submitMulti [bob, admin] [] do
     exerciseCmd vest VestingWithdraw
 
   passTime (seconds 100)
 
-  refund <- submit alice do
+  refund <- submitMulti [alice, admin] [] do
     exerciseCmd updatedVest VestingStop
 
   assertMsg "Refund is 1000 - 500 = 500 GROW unvested" (refund == 500.0)

@@ -28,7 +28,7 @@ testUpdateRateSettlesAccrual = script do
 
   passTime (seconds 100)
 
-  updatedStream <- submit alice do
+  updatedStream <- submitMulti [alice, admin] [] do
     exerciseCmd stream UpdateRate with newRate = 0.2
 
   settledContracts <- query @CCSettlement bob
@@ -38,7 +38,7 @@ testUpdateRateSettlesAccrual = script do
 
   passTime (seconds 100)
 
-  (_, amount) <- submit bob do exerciseCmd updatedStream Withdraw
+  (_, amount) <- submitMulti [bob, admin] [] do exerciseCmd updatedStream Withdraw
 
   assertMsg "Withdraw after rate change = 20 GROW (100s x 0.2)" (amount == 20.0)
 
@@ -99,5 +99,5 @@ testGetWithdrawableIsConsistentWithWithdraw = script do
   queryResult <- submit bob do exerciseCmd stream GetWithdrawable
   assertMsg "GetWithdrawable = 100 GROW" (queryResult == 100.0)
 
-  (_, actualAmount) <- submit bob do exerciseCmd stream Withdraw
+  (_, actualAmount) <- submitMulti [bob, admin] [] do exerciseCmd stream Withdraw
   assertMsg "Actual withdraw matches query" (actualAmount == 100.0)

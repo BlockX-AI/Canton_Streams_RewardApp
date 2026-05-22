@@ -35,6 +35,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         package_id=settings.canton_package_id,
         user_id=settings.canton_user_id,
         all_party_ids=settings.all_party_ids(),
+        admin_party_id=settings.canton_admin_party,
     )
     app.state.canton_client = client
     app.state.command_builder = cmd
@@ -126,6 +127,7 @@ from app.routes import (  # noqa: E402
     milestones,
     parties,
     participants,
+    rewards,
     streams,
     subscriptions,
     tokens,
@@ -145,4 +147,5 @@ app.include_router(subscriptions.router)
 app.include_router(milestones.router)
 app.include_router(campaigns.router)
 app.include_router(leaderboard.router)
+app.include_router(rewards.router)
 app.include_router(demo.router)

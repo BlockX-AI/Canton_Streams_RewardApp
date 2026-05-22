@@ -7,4 +7,4 @@ dependencies:
   - daml-stdlib
   - daml-script
 data-dependencies:
-  - ../daml-contracts/.daml/dist/growstreams-1.0.0.dar
+  - ../daml-contracts/.daml/dist/growstreams-featured-1.0.0.dar

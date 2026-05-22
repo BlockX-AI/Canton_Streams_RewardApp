@@ -5,10 +5,27 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from app.dependencies import RequestId, get_stream_service
-from app.models.streams import StreamView, TopUpRequest, WithdrawResponse
+from app.models.streams import CreatePayrollStreamRequest, StreamView, TopUpRequest, WithdrawResponse
 from app.services.stream_service import StreamService
 
 router = APIRouter(prefix="/streams", tags=["streams"])
+
+
+@router.post("", status_code=201)
+async def create_stream(
+    body: CreatePayrollStreamRequest,
+    request_id: RequestId = ...,
+    svc: Annotated[StreamService, Depends(get_stream_service)] = ...,
+) -> dict:
+    result = await svc.create_stream(
+        body.factory_contract_id,
+        body.sender_party,
+        body.receiver_party,
+        body.flow_rate,
+        body.initial_deposit,
+        request_id,
+    )
+    return {"ok": True, "request_id": request_id, "result": result}
 
 
 @router.get("", response_model=list[StreamView])

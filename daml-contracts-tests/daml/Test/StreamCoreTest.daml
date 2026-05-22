@@ -28,7 +28,7 @@ testWithdrawCreatesToken = script do
 
   passTime (seconds 100)
 
-  (newStream, amount) <- submit bob do
+  (newStream, amount) <- submitMulti [bob, admin] [] do
     exerciseCmd stream Withdraw
 
   assertMsg "Should withdraw exactly 100 GROW" (amount == 100.0)
@@ -60,7 +60,7 @@ testWithdrawCapsAtDeposit = script do
 
   passTime (seconds 200)
 
-  (_, amount) <- submit bob do
+  (_, amount) <- submitMulti [bob, admin] [] do
     exerciseCmd stream Withdraw
 
   assertMsg "Withdrawal capped at 50 GROW deposit" (amount == 50.0)
@@ -88,7 +88,7 @@ testPauseResumeCycle = script do
 
   passTime (seconds 60)
 
-  paused <- submit alice do
+  paused <- submitMulti [alice, admin] [] do
     exerciseCmd stream Pause
 
   passTime (seconds 60)
@@ -98,7 +98,7 @@ testPauseResumeCycle = script do
 
   passTime (seconds 40)
 
-  (_, amount) <- submit bob do
+  (_, amount) <- submitMulti [bob, admin] [] do
     exerciseCmd resumed Withdraw
 
   assertMsg "Post-resume window: 40s x 1 GROW/s = 40 GROW" (amount == 40.0)
@@ -126,7 +126,7 @@ testStopRefundsSender = script do
 
   passTime (seconds 100)
 
-  (finalAccrued, refund) <- submit alice do
+  (finalAccrued, refund) <- submitMulti [alice, admin] [] do
     exerciseCmd stream Stop
 
   assertMsg "Bob should receive 100 GROW"        (finalAccrued == 100.0)
@@ -158,7 +158,7 @@ testTopUpExtendsStream = script do
 
   passTime (seconds 300)
 
-  (_, amount) <- submit bob do
+  (_, amount) <- submitMulti [bob, admin] [] do
     exerciseCmd topped Withdraw
 
   assertMsg "Should withdraw full 300 GROW after top-up" (amount == 300.0)
