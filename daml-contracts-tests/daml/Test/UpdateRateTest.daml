@@ -4,7 +4,6 @@ import Daml.Script
 import DA.Date
 import DA.Time
 import StreamCore
-import GrowToken
 
 testUpdateRateSettlesAccrual : Script ()
 testUpdateRateSettlesAccrual = script do
@@ -32,9 +31,9 @@ testUpdateRateSettlesAccrual = script do
   updatedStream <- submit alice do
     exerciseCmd stream UpdateRate with newRate = 0.2
 
-  settledTokens <- query @GrowToken bob
-  assertMsg "UpdateRate must create 1 GrowToken for Bob" (length settledTokens == 1)
-  let [(_, st)] = settledTokens
+  settledContracts <- query @CCSettlement bob
+  assertMsg "UpdateRate must create 1 CCSettlement for Bob" (length settledContracts == 1)
+  let [(_, st)] = settledContracts
   assertMsg "Settled amount = 10 GROW (100s x 0.1)" (st.amount == 10.0)
 
   passTime (seconds 100)

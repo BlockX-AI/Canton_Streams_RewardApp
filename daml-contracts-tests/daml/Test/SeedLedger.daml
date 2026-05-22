@@ -18,20 +18,11 @@ seedLedger = script do
   carol <- allocatePartyWithHint "Carol"  (PartyIdHint "Carol")
 
   -- ── Faucet tokens ──────────────────────────────────────────────────────────
-  aliceTok <- submit admin do
-    createCmd GrowToken with
-      owner = alice; issuer = admin; amount = 5000.0
-      symbol = "GROW"; decimals = 10
+  faucet <- submit admin do createCmd Faucet with admin = admin
 
-  bobTok <- submit admin do
-    createCmd GrowToken with
-      owner = bob; issuer = admin; amount = 2000.0
-      symbol = "GROW"; decimals = 10
-
-  carolTok <- submit admin do
-    createCmd GrowToken with
-      owner = carol; issuer = admin; amount = 1000.0
-      symbol = "GROW"; decimals = 10
+  _aliceTok <- submit admin do exerciseCmd faucet Mint with recipient = alice; amount = 5000.0
+  _bobTok   <- submit admin do exerciseCmd faucet Mint with recipient = bob;   amount = 2000.0
+  _carolTok <- submit admin do exerciseCmd faucet Mint with recipient = carol;  amount = 1000.0
 
   -- ── StreamFactory + two live streams ───────────────────────────────────────
   factory <- submit admin do
@@ -54,7 +45,10 @@ seedLedger = script do
       flowRate     = 0.5
       initialDeposit = 500.0
 
-  -- ── Withdraw from stream1 (Bob collects accrued GROW) ──────────────────────
+  -- ── Advance time so streams accrue before withdrawing ─────────────────────
+  passTime (seconds 3600)
+
+  -- ── Withdraw from stream1 (Bob collects accrued CC) ────────────────────────
   (_, _) <- submit bob do
     exerciseCmd stream1 Withdraw
 

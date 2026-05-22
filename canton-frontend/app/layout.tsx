@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/providers";
+import { SkipToContent } from "@/components/skip-to-content";
+import { baseMetadata } from "@/lib/metadata";
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
-export const metadata: Metadata = {
-  title: "GrowStreams on Canton",
-  description: "Real-time token streaming on Canton Network - Canton Dev Fund Demo",
-};
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = baseMetadata;
 
 export default function RootLayout({
   children,
@@ -15,8 +23,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+      >
+        <Providers>
+          <SkipToContent />
+          <main id="main-content">{children}</main>
+        </Providers>
+      </body>
     </html>
   );
 }

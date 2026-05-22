@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 
 from app.clients.canton_client import CantonClient
 from app.config import settings
+from app.db import close_pool, get_pool
 from app.models.common import APIError, ErrorResponse
 from app.services.command_builder import CommandBuilder
 from app.utils.errors import CantonError, CantonUnavailableError, ContractNotFoundError
@@ -38,9 +39,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.canton_client = client
     app.state.command_builder = cmd
     log.info("Canton client ready. Known parties: %s", list(settings.known_parties().keys()))
+
+    # Initialize database pool if DATABASE_URL is set
+    if settings.database_url:
+        try:
+            await get_pool()
+            log.info("Database pool initialized")
+        except Exception as e:
+            log.warning("Database pool initialization failed: %s", e)
+
     yield
     log.info("Shutting down — closing Canton HTTP client")
     await client.aclose()
+    await close_pool()
 
 
 app = FastAPI(
@@ -106,12 +117,15 @@ async def generic_handler(request: Request, exc: Exception) -> JSONResponse:
 
 from app.routes import (  # noqa: E402
     billing,
+    campaigns,
     canton,
     demo,
     health,
+    leaderboard,
     lp_pools,
     milestones,
     parties,
+    participants,
     streams,
     subscriptions,
     tokens,
@@ -121,6 +135,7 @@ from app.routes import (  # noqa: E402
 app.include_router(health.router)
 app.include_router(canton.router)
 app.include_router(parties.router)
+app.include_router(participants.router)
 app.include_router(tokens.router)
 app.include_router(streams.router)
 app.include_router(lp_pools.router)
@@ -128,4 +143,6 @@ app.include_router(billing.router)
 app.include_router(vesting.router)
 app.include_router(subscriptions.router)
 app.include_router(milestones.router)
+app.include_router(campaigns.router)
+app.include_router(leaderboard.router)
 app.include_router(demo.router)

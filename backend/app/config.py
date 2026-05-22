@@ -27,14 +27,16 @@ class Settings(BaseSettings):
     enable_admin_endpoints: bool = True
     enable_demo_endpoints: bool = True
 
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: str = "http://localhost:3000,http://localhost:5173,http://192.168.1.4:3000"
 
-    @field_validator("cors_origins", mode="before")
+    database_url: str = ""
+    database_pool_size: int = 10
+    database_max_overflow: int = 20
+
+    @field_validator("cors_origins", mode="after")
     @classmethod
-    def split_cors(cls, v: str | list[str]) -> list[str]:
-        if isinstance(v, str):
-            return [o.strip() for o in v.split(",") if o.strip()]
-        return v
+    def split_cors(cls, v: str) -> list[str]:
+        return [o.strip() for o in v.split(",") if o.strip()]
 
     def known_parties(self) -> dict[str, str]:
         parties: dict[str, str] = {}

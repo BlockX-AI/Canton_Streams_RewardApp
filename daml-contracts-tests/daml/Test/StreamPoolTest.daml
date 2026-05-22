@@ -4,7 +4,7 @@ import Daml.Script
 import DA.Date
 import DA.Time
 import StreamPool
-import GrowToken (GrowToken)
+import StreamCore (CCSettlement)
 
 testPoolDistribution : Script ()
 testPoolDistribution = script do
@@ -138,6 +138,6 @@ testPoolPauseResume = script do
   Some tok <- queryContractId alice token
   assertMsg "Post-resume window: 100s x 10 GROW/s = 1000 GROW" (tok.amount == 1000.0)
 
-  allTokens <- query @GrowToken alice
-  let total = foldl (\acc (_, t) -> acc + t.amount) 0.0 allTokens
+  allSettlements <- query @CCSettlement alice
+  let total = foldl (\acc (_, s) -> acc + s.amount) 0.0 allSettlements
   assertMsg "Total received (pause + resume) = 2000 GROW" (total == 2000.0)
