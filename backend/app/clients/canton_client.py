@@ -18,17 +18,35 @@ log = logging.getLogger(__name__)
 
 
 class CantonClient:
-    def __init__(self, base_url: str, user_id: str, timeout: float = 30.0) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        user_id: str,
+        timeout: float = 30.0,
+        validator_api_url: str = "",
+        admin_token: str = "",
+        namespace: str = "",
+    ) -> None:
         self._base_url = base_url.rstrip("/")
         self.user_id = user_id
+        self.namespace = namespace
         self._client = httpx.AsyncClient(
             base_url=self._base_url,
             timeout=httpx.Timeout(timeout),
             headers={"Content-Type": "application/json"},
         )
+        self._validator_url = validator_api_url.rstrip("/") if validator_api_url else ""
+        self._admin_token = admin_token
+        self._validator_client = httpx.AsyncClient(
+            base_url=self._validator_url or self._base_url,
+            timeout=httpx.Timeout(timeout),
+            headers={"Content-Type": "application/json"},
+        ) if validator_api_url else None
 
     async def aclose(self) -> None:
         await self._client.aclose()
+        if self._validator_client:
+            await self._validator_client.aclose()
 
     def _raise_for_canton_error(self, r: httpx.Response) -> None:
         if r.status_code < 400:
@@ -103,13 +121,63 @@ class CantonClient:
         )
         return await self._post_json("/v2/commands/submit-and-wait", payload)
 
-    async def allocate_party(self, display_name: str, party_id_hint: str | None = None) -> dict[str, Any]:
+    async def allocate_party(self, party_id_hint: str, annotations: dict[str, str] | None = None) -> dict[str, Any]:
         payload: dict[str, Any] = {
-            "partyIdHint": party_id_hint or display_name,
-            "displayName": display_name,
+            "partyIdHint": party_id_hint,
             "userId": self.user_id,
         }
+        if annotations:
+            payload["annotations"] = annotations
         return await self._post_json("/v2/parties", payload)
+
+    async def create_validator_user(self, name: str, party_hint: str) -> str:
+        """
+        Create a Splice wallet user and allocate a Canton party in one step.
+        Returns the fully-qualified party_id: '<party_hint>::<namespace>'
+        If the party already exists, returns the pre-existing party_id.
+        """
+        if not self.namespace:
+            raise RuntimeError("canton_namespace is not configured — cannot build party_id")
+        party_id = f"{party_hint}::{self.namespace}"
+        payload: dict[str, Any] = {
+            "name": name,
+            "party_id": party_id,
+            "createPartyIfMissing": True,
+        }
+        log.info("Creating Splice validator user: name=%s party_id=%s", name, party_id)
+        if self._validator_client and self._admin_token:
+            try:
+                r = await self._validator_client.post(
+                    "/api/validator/v0/admin/users",
+                    json=payload,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {self._admin_token}",
+                    },
+                )
+                if r.status_code < 400:
+                    log.info("Splice validator user created: %s -> %s", name, party_id)
+                    return party_id
+                if r.status_code == 409 or "already exists" in r.text.lower():
+                    log.info("Splice validator user already exists, returning existing party_id: %s", party_id)
+                    return party_id
+                log.warning("Splice API returned %s: %s — falling back to /v2/parties", r.status_code, r.text[:200])
+            except (httpx.ConnectError, httpx.TimeoutException) as exc:
+                log.warning("Splice API unreachable (%s) — falling back to /v2/parties", exc)
+        try:
+            result = await self.allocate_party(
+                party_id_hint=party_hint,
+                annotations={"x_handle": name},
+            )
+            allocated = result.get("partyDetails", {}).get("party") or result.get("party") or party_id
+            log.info("Party allocated via JSON API: %s", allocated)
+            return allocated
+        except Exception as exc:
+            err_str = str(exc).lower()
+            if "already exists" in err_str or "invalid_argument" in err_str:
+                log.info("Party already exists on ledger, reusing party_id: %s", party_id)
+                return party_id
+            raise
 
     async def query_active_contracts_raw(
         self,
