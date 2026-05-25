@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -7,6 +8,8 @@ from uuid import UUID
 from app.db import execute, fetch, fetch_all, fetch_val
 from app.models.xp import XPEvent, XPAward, LeaderboardStats
 from app.services.campaign_service import award_campaign_xp
+
+log = logging.getLogger(__name__)
 
 
 ONE_TIME_REASONS = ["INITIAL_AWARD", "MERGE_BONUS", "VIRAL_BONUS", "RESHARE_BONUS"]
@@ -62,14 +65,14 @@ async def award_xp(data: XPAward) -> XPEvent | None:
         try:
             await award_campaign_xp(data.campaign_id, data.wallet, data.xp_delta)
         except Exception as e:
-            print(f"[xp] Campaign XP award failed for {data.wallet} in {data.campaign_id}: {e}")
+            log.error("Campaign XP award failed wallet=%s campaign=%s: %s", data.wallet, data.campaign_id, e)
 
     # Award referral bonus (skip if this is a referral bonus to avoid recursion)
     if data.reason != "REFERRAL_BONUS" and data.xp_delta > 0:
         try:
             await award_referral_bonus(data.wallet, data.xp_delta, data.contribution_id)
         except Exception as e:
-            print(f"[xp] Referral bonus failed for {data.wallet}: {e}")
+            log.error("Referral bonus failed wallet=%s: %s", data.wallet, e)
 
     return _row_to_xp_event(row)
 
@@ -254,6 +257,6 @@ def _row_to_xp_event(row: dict[str, Any]) -> XPEvent:
         xp_delta=row["xp_delta"],
         reason=row["reason"],
         contribution_id=row["contribution_id"],
-        campaign_id=UUID(row["campaign_id"]) if row["campaign_id"] else None,
+        campaign_id=UUID(str(row["campaign_id"])) if row["campaign_id"] else None,
         created_at=row["created_at"],
     )

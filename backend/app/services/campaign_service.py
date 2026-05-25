@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from decimal import Decimal
 from typing import Any
@@ -14,11 +15,15 @@ from app.models.campaigns import (
     CampaignLeaderboard,
     CampaignParticipant,
     CampaignPayoutPreview,
+    CampaignPayoutResult,
     CampaignStatus,
     LeaderboardEntry,
     PayoutPreview,
+    PayoutRecord,
     TrackType,
 )
+
+log = logging.getLogger(__name__)
 
 
 async def create_campaign(data: CampaignCreate) -> Campaign:
@@ -384,9 +389,170 @@ async def get_campaign_payout_preview(campaign_id: UUID) -> CampaignPayoutPrevie
     )
 
 
+async def payout_campaign(
+    campaign_id: UUID,
+    lp_pool_contract_id: str,
+    lp_pool_service: Any,
+) -> CampaignPayoutResult:
+    """
+    Execute XP-to-CC payout pipeline for a ended campaign.
+    Steps:
+      1. Mark campaign as SETTLING
+      2. Fetch all participants + their XP
+      3. Calculate each participant's CC share = participant_xp / total_xp * pool_amount
+      4. Call StreamPool.WithdrawMember() for each via lp_pool_service
+      5. Record result in campaign_payouts table
+      6. Mark campaign CLOSED
+    """
+    campaign = await fetch("SELECT * FROM campaigns WHERE id = $1", campaign_id)
+    if not campaign:
+        raise ValueError("Campaign not found")
+    if campaign["status"] not in (CampaignStatus.ACTIVE.value, CampaignStatus.ENDED.value):
+        raise ValueError(f"Campaign must be ACTIVE or ENDED to payout, current: {campaign['status']}")
+
+    now = datetime.utcnow()
+
+    # Mark as SETTLING
+    await execute(
+        "UPDATE campaigns SET status = 'SETTLING', ended_at = $1, updated_at = $1 WHERE id = $2",
+        now,
+        campaign_id,
+    )
+
+    # Fetch all participants with XP
+    rows = await fetch_all(
+        """
+        SELECT cp.wallet, cp.campaign_xp,
+               p.display_name, p.github_handle, p.x_handle
+        FROM campaign_participants cp
+        JOIN participants p ON p.wallet = cp.wallet
+        WHERE cp.campaign_id = $1 AND cp.campaign_xp > 0
+        ORDER BY cp.campaign_xp DESC
+        """,
+        campaign_id,
+    )
+
+    if not rows:
+        await execute(
+            "UPDATE campaigns SET status = 'CLOSED', updated_at = NOW() WHERE id = $1",
+            campaign_id,
+        )
+        return CampaignPayoutResult(
+            campaign_id=campaign_id,
+            title=campaign["title"],
+            pool_amount=Decimal(campaign["pool_amount"]),
+            total_distributed=Decimal("0"),
+            total_participants=0,
+            successful=0,
+            failed=0,
+            skipped=0,
+            executed_at=now,
+            payouts=[],
+        )
+
+    total_xp = sum(r["campaign_xp"] for r in rows)
+    pool_amount = Decimal(campaign["pool_amount"])
+    minimum_payout = Decimal("1.0")
+    results: list[PayoutRecord] = []
+    total_distributed = Decimal("0")
+    successful = 0
+    failed = 0
+    skipped = 0
+
+    for row in rows:
+        xp_share = Decimal(str(row["campaign_xp"])) / Decimal(str(total_xp)) if total_xp > 0 else Decimal("0")
+        cc_amount = xp_share * pool_amount
+        display = row["display_name"] or row["github_handle"] or row["x_handle"] or row["wallet"]
+
+        if cc_amount < minimum_payout:
+            results.append(PayoutRecord(
+                wallet=row["wallet"],
+                display_name=display,
+                xp_share=xp_share,
+                cc_amount=cc_amount,
+                status="BELOW_MINIMUM",
+            ))
+            skipped += 1
+            continue
+
+        tx_hash: str | None = None
+        status_str = "EXECUTED"
+        error_msg: str | None = None
+
+        try:
+            result = await lp_pool_service.withdraw_share(
+                contract_id=lp_pool_contract_id,
+                member_party_id=row["wallet"],
+            )
+            tx_hash = result.get("updateId") or result.get("transactionId") or result.get("commandId")
+            total_distributed += cc_amount
+            successful += 1
+            log.info("Payout OK wallet=%s cc=%.4f tx=%s", row["wallet"], cc_amount, tx_hash)
+        except Exception as exc:
+            log.error("Payout FAILED wallet=%s: %s", row["wallet"], exc)
+            status_str = "FAILED"
+            error_msg = str(exc)[:200]
+            failed += 1
+
+        # Record in campaign_payouts table
+        await execute(
+            """
+            INSERT INTO campaign_payouts
+                (campaign_id, wallet, xp_earned, xp_share, cc_amount, status, tx_hash, executed_at, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)
+            ON CONFLICT (campaign_id, wallet) DO UPDATE
+                SET status = EXCLUDED.status, tx_hash = EXCLUDED.tx_hash, executed_at = EXCLUDED.executed_at
+            """,
+            campaign_id,
+            row["wallet"],
+            row["campaign_xp"],
+            float(xp_share),
+            float(cc_amount),
+            status_str,
+            tx_hash,
+            now,
+        )
+
+        results.append(PayoutRecord(
+            wallet=row["wallet"],
+            display_name=display,
+            xp_share=xp_share,
+            cc_amount=cc_amount,
+            status=status_str,
+            tx_hash=tx_hash,
+            error=error_msg,
+        ))
+
+    # Update pool_remaining and mark CLOSED
+    await execute(
+        """
+        UPDATE campaigns
+        SET status = 'CLOSED',
+            pool_remaining = pool_remaining - $1,
+            updated_at = NOW()
+        WHERE id = $2
+        """,
+        float(total_distributed),
+        campaign_id,
+    )
+
+    return CampaignPayoutResult(
+        campaign_id=campaign_id,
+        title=campaign["title"],
+        pool_amount=pool_amount,
+        total_distributed=total_distributed,
+        total_participants=len(rows),
+        successful=successful,
+        failed=failed,
+        skipped=skipped,
+        executed_at=now,
+        payouts=results,
+    )
+
+
 def _row_to_campaign(row: dict[str, Any]) -> Campaign:
     return Campaign(
-        id=UUID(row["id"]),
+        id=UUID(str(row["id"])),
         creator_wallet=row["creator_wallet"],
         title=row["title"],
         description=row["description"],
@@ -414,8 +580,8 @@ def _row_to_campaign(row: dict[str, Any]) -> Campaign:
 
 def _row_to_campaign_participant(row: dict[str, Any]) -> CampaignParticipant:
     return CampaignParticipant(
-        id=UUID(row["id"]),
-        campaign_id=UUID(row["campaign_id"]),
+        id=UUID(str(row["id"])),
+        campaign_id=UUID(str(row["campaign_id"])),
         wallet=row["wallet"],
         campaign_xp=row["campaign_xp"],
         enrolled_at=row["enrolled_at"],

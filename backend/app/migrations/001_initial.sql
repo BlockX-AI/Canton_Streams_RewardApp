@@ -24,10 +24,6 @@ CREATE TABLE IF NOT EXISTS referrals (
   UNIQUE(referrer_user_id, referred_user_id)
 );
 
--- Add user_id to participants
-ALTER TABLE participants
-  ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id);
-
 -- Participants table
 CREATE TABLE IF NOT EXISTS participants (
   id            SERIAL PRIMARY KEY,
@@ -40,6 +36,10 @@ CREATE TABLE IF NOT EXISTS participants (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Add user_id FK to participants (after both tables exist)
+ALTER TABLE participants
+  ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id);
 
 -- Contributions table
 CREATE TABLE IF NOT EXISTS contributions (
@@ -131,7 +131,8 @@ CREATE TABLE IF NOT EXISTS campaign_payouts (
                CHECK (status IN ('PENDING','EXECUTED','FAILED','BELOW_MINIMUM')),
   tx_hash      VARCHAR,
   executed_at  TIMESTAMPTZ,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(campaign_id, wallet)
 );
 
 -- Add campaign_id to contributions
