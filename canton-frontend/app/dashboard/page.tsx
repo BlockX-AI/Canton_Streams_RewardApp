@@ -1,511 +1,552 @@
-"use client";
+"use client"
 
-import { motion } from "motion/react";
-import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
-import { Nav } from "@/components/nav";
-import { WalletModal } from "@/components/wallet-modal";
-import { useWallet } from "@/lib/wallet-context";
-import { API_BASE } from "@/lib/api";
+import { useState, useEffect } from "react"
+import { Navigation } from "@/components/provn/navigation"
+import { ProvnButton } from "@/components/provn/button"
+import { ProvnCard, ProvnCardContent } from "@/components/provn/card"
+// Auth removed for public mode
 
-const ease = [0.33, 1, 0.68, 1] as const;
-
-const DEVNET_PARTY =
-  "PAR::GINIE-VALIDATOR::1220f42cead6c3bf0443af1f0e51ee250afb48ee528756945ee2733cbfef62c10986";
-
-interface Health {
-  status: string;
-  canton_reachable: boolean;
-  canton_version: string;
-  env: string;
+interface CreatorRanking {
+  rank: number
+  profile_id: string
+  wallet_address: string
+  handle: string
+  display_name?: string
+  avatar_url?: string
+  total_score: number
+  views_score: number
+  tips_score: number
+  licenses_score: number
+  engagement_score: number
+  consistency_score: number
+  quality_score: number
+  videos_count: number
+  total_views: number
+  total_tips: number
+  total_licenses: number
+  total_earnings: number
+  rank_change: number
+  streak_days: number
+  tier: 'legendary' | 'diamond' | 'platinum' | 'gold' | 'silver' | 'bronze' | 'rising'
+  achievements: string[]
 }
 
-interface Stream {
-  contract_id: string;
-  sender: string;
-  receiver: string;
-  rate_per_second: string;
-  total_deposited: string;
-  total_withdrawn: string;
-  accrued: string;
-  status: string;
-  last_settled: string;
+interface LeaderboardData {
+  leaderboard: CreatorRanking[]
+  userRank: number | null
+  stats: {
+    total_creators: number
+    avg_score: number
+    highest_score: number
+  }
 }
 
-interface Campaign {
-  id: string;
-  title: string;
-  pool_amount: string;
-  pool_remaining: string;
-  token: string;
-  status: string;
-  participant_count: number;
-  track_type: string;
-  category?: string;
-  flow_rate?: string;
+interface CategoryData {
+  category: string
+  total_creators: number
+  total_videos: number
+  total_views: number
+  total_tips: number
+  total_licenses: number
+  total_revenue: number
+  avg_views_per_video: number
+  competition_level: 'low' | 'medium' | 'high' | 'intense'
+  growth_rate: number
+  emoji: string
 }
 
-interface LeaderboardStats {
-  total_participants: number;
-  total_xp: number;
-  total_contributions: number;
-  pool_cc: number;
+const tierColors = {
+  legendary: 'from-yellow-400 to-yellow-600',
+  diamond: 'from-blue-400 to-blue-600', 
+  platinum: 'from-gray-400 to-gray-600',
+  gold: 'from-yellow-300 to-yellow-500',
+  silver: 'from-gray-300 to-gray-500',
+  bronze: 'from-orange-400 to-orange-600',
+  rising: 'from-green-400 to-green-600'
 }
 
-export default function DashboardPage() {
-  const [health, setHealth] = useState<Health | null>(null);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [lbStats, setLbStats] = useState<LeaderboardStats | null>(null);
-  const { status: walletStatus, partyId: connectedParty, setManualParty } = useWallet();
-  const [walletModalOpen, setWalletModalOpen] = useState(false);
-  const [streams, setStreams] = useState<Stream[]>([]);
-  const [loadingStreams, setLoadingStreams] = useState(false);
-  const [streamError, setStreamError] = useState<string | null>(null);
-  const [withdrawing, setWithdrawing] = useState<string | null>(null);
-  const [withdrawResult, setWithdrawResult] = useState<Record<string, string>>({});
+const tierLabels = {
+  legendary: 'Legendary',
+  diamond: 'Diamond', 
+  platinum: 'Platinum',
+  gold: 'Gold',
+  silver: 'Silver',
+  bronze: 'Bronze',
+  rising: 'Rising Star'
+}
 
+
+export default function LeaderboardPage() {
+  const walletAddress: string | undefined = undefined
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null)
+  const [categories, setCategories] = useState<CategoryData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'all-time'>('all-time')
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedTier, setSelectedTier] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize] = useState(10)
+
+  // Fetch leaderboard data
   useEffect(() => {
-    Promise.all([
-      fetch(`${API_BASE}/health`).then((r) => r.json()).catch(() => null),
-      fetch(`${API_BASE}/campaigns`).then((r) => r.json()).catch(() => ({ campaigns: [] })),
-      fetch(`${API_BASE}/leaderboard/stats`).then((r) => r.json()).catch(() => null),
-    ]).then(([h, c, lb]) => {
-      setHealth(h);
-      setCampaigns(c?.campaigns ?? []);
-      setLbStats(lb);
-    });
-  }, []);
+    const fetchLeaderboardData = async () => {
+      try {
+        setLoading(true)
+        
+        const offset = (currentPage - 1) * pageSize
+        const params = new URLSearchParams({
+          timeframe,
+          limit: pageSize.toString(),
+          offset: offset.toString()
+        })
+        
+        if (selectedCategory) params.append('category', selectedCategory)
+        if (selectedTier) params.append('tier', selectedTier)
+        if (walletAddress) params.append('userWallet', walletAddress)
 
-  useEffect(() => {
-    if (connectedParty) loadStreams(connectedParty);
-  }, [connectedParty]);
-
-  const loadStreams = useCallback(async (party: string) => {
-    if (!party.trim()) return;
-    setLoadingStreams(true);
-    setStreamError(null);
-    try {
-      const res = await fetch(
-        `${API_BASE}/streams?party=${encodeURIComponent(party.trim())}`
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setStreams(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setStreamError("No streams found or party not recognised on DevNet.");
-      setStreams([]);
-    } finally {
-      setLoadingStreams(false);
-    }
-  }, []);
-
-  const openWallet = () => setWalletModalOpen(true);
-
-  const handleWithdraw = async (contractId: string) => {
-    if (!connectedParty) return;
-    setWithdrawing(contractId);
-    try {
-      const res = await fetch(
-        `${API_BASE}/streams/${contractId}/withdraw?party=${encodeURIComponent(connectedParty)}`,
-        { method: "POST" }
-      );
-      const data = await res.json();
-      if (res.ok) {
-        setWithdrawResult((prev) => ({
-          ...prev,
-          [contractId]: `✓ Withdrawn — tx: ${data.transaction_id ?? "confirmed"}`,
-        }));
-        loadStreams(connectedParty);
-      } else {
-        setWithdrawResult((prev) => ({
-          ...prev,
-          [contractId]: `Error: ${data.detail ?? "withdraw failed"}`,
-        }));
+        const response = await fetch(`/api/leaderboard?${params}`)
+        if (response.ok) {
+          const data = await response.json()
+          setLeaderboardData(data.data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch leaderboard data:', error)
+      } finally {
+        setLoading(false)
       }
-    } catch {
-      setWithdrawResult((prev) => ({
-        ...prev,
-        [contractId]: "Network error",
-      }));
-    } finally {
-      setWithdrawing(null);
     }
-  };
 
-  const totalPoolCC = campaigns.reduce(
-    (sum, c) => sum + parseFloat(c.pool_amount ?? "0"),
-    0
-  );
-  const activeCampaigns = campaigns.filter((c) => c.status === "ACTIVE");
+    fetchLeaderboardData()
+  }, [timeframe, selectedCategory, selectedTier, walletAddress, currentPage, pageSize])
 
-  return (
-    <div className="min-h-screen bg-neutral-950 text-white">
-      <Nav />
+  // Fetch categories data
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/leaderboard/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data.data.categories)
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      }
+    }
 
-      <main className="relative pt-28 pb-20 px-6 lg:px-10 max-w-[1680px] mx-auto">
+    fetchCategories()
+  }, [])
 
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease }}
-          className="mb-10 flex flex-col sm:flex-row sm:items-end gap-6 justify-between"
-        >
-          <div>
-            <span className="inline-flex items-center rounded-md border border-white/10 px-3.5 py-1.5 font-mono text-xs uppercase tracking-widest text-white/70 mb-4">
-              Dashboard
-            </span>
-            <h1 className="text-4xl md:text-5xl font-medium leading-tight tracking-tight">
-              GrowStreams on Canton DevNet
-            </h1>
-          </div>
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
+    return num.toString()
+  }
 
-          {/* DevNet status pill */}
-          {health && (
-            <div
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-mono border ${
-                health.canton_reachable
-                  ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                  : "border-red-400/30 bg-red-400/10 text-red-300"
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  health.canton_reachable ? "bg-emerald-400 animate-pulse" : "bg-red-400"
-                }`}
-              />
-              {health.canton_reachable
-                ? `DevNet Live — v${health.canton_version.split(".").slice(0, 2).join(".")}`
-                : "DevNet Unreachable"}
+  const getRankChange = (change: number) => {
+    if (change > 0) return { icon: '↗', color: 'text-green-500', text: `+${change}` }
+    if (change < 0) return { icon: '↘', color: 'text-red-500', text: `${change}` }
+    return { icon: '→', color: 'text-provn-muted', text: '0' }
+  }
+
+  const getCompetitionLevel = (totalCreators: number) => {
+    if (totalCreators >= 20) return { level: 'Intense', color: 'text-red-400', dotColor: 'bg-red-500' }
+    if (totalCreators >= 10) return { level: 'High', color: 'text-orange-400', dotColor: 'bg-orange-500' }
+    if (totalCreators >= 5) return { level: 'Medium', color: 'text-yellow-400', dotColor: 'bg-yellow-500' }
+    return { level: 'Low', color: 'text-green-400', dotColor: 'bg-green-500' }
+  }
+
+
+  const filteredLeaderboard = leaderboardData?.leaderboard.filter(creator =>
+    creator.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    creator.handle.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || []
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [timeframe, selectedCategory, selectedTier, searchQuery])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen font-headline bg-provn-bg">
+        <Navigation currentPage="dashboard" />
+        <div className="pt-16 pb-8 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="space-y-8">
+              {/* Header Skeleton */}
+              <div className="text-center font-headline space-y-4 py-16">
+                <div className="h-16 bg-provn-surface rounded-xl w-96 mx-auto animate-pulse"></div>
+                <div className="h-6 bg-provn-surface rounded-xl w-80 mx-auto animate-pulse"></div>
+              </div>
+              
+              {/* Stats Skeleton */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-24 bg-provn-surface rounded-xl animate-pulse"></div>
+                ))}
+              </div>
+              
+              {/* Top 3 Skeleton */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-64 bg-provn-surface rounded-xl animate-pulse"></div>
+                ))}
+              </div>
             </div>
-          )}
-        </motion.div>
-
-        {/* Stats row */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease, delay: 0.1 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
-        >
-          {[
-            { label: "Active Campaigns", value: activeCampaigns.length },
-            {
-              label: "Total CC Pool",
-              value: `${(totalPoolCC / 1000).toFixed(0)}k CC`,
-            },
-            {
-              label: "Participants",
-              value: lbStats?.total_participants ?? "—",
-            },
-            {
-              label: "Canton Version",
-              value: health?.canton_version?.split("-")[0] ?? "—",
-            },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className="p-5 border border-white/10 rounded-2xl bg-white/[0.03]"
-            >
-              <p className="text-white/40 text-xs font-mono uppercase tracking-wider mb-2">
-                {s.label}
-              </p>
-              <p className="text-2xl font-medium font-mono">{s.value}</p>
-            </div>
-          ))}
-        </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left col — party connect + streams */}
-          <div className="lg:col-span-2 space-y-6">
-
-              {/* Connect panel */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease, delay: 0.15 }}
-              className="p-6 border border-white/10 rounded-2xl bg-white/[0.03]"
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-medium">Canton Party</h2>
-                {connectedParty && (
-                  <button
-                    onClick={openWallet}
-                    className="text-xs text-white/40 hover:text-white/70 transition-colors"
-                  >
-                    Manage
-                  </button>
-                )}
-              </div>
-
-              {connectedParty ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                    <span className="font-mono text-sm text-emerald-300 break-all">
-                      {connectedParty}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => loadStreams(connectedParty)}
-                    disabled={loadingStreams}
-                    className="mt-2 px-4 py-2 rounded-lg bg-cyan-600/20 text-cyan-300 text-sm font-medium hover:bg-cyan-600/30 transition-colors disabled:opacity-50"
-                  >
-                    {loadingStreams ? "Loading…" : "Refresh Streams"}
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-white/50 text-sm">
-                    Connect your Canton wallet to view streams. Use the GINIE-VALIDATOR
-                    party for DevNet testing.
-                  </p>
-                  <button
-                    onClick={openWallet}
-                    className="w-full py-3 bg-white text-neutral-900 rounded-xl text-sm font-medium hover:bg-white/90 transition-colors"
-                  >
-                    Connect Wallet
-                  </button>
-                </div>
-              )}
-            </motion.div>
-
-            <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
-
-            {/* Streams list */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease, delay: 0.2 }}
-              className="p-6 border border-white/10 rounded-2xl bg-white/[0.03]"
-            >
-              <h2 className="text-lg font-medium mb-5">Active Streams</h2>
-
-              {!connectedParty ? (
-                <p className="text-white/30 text-sm py-8 text-center">
-                  Connect a party to see streams
-                </p>
-              ) : loadingStreams ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="w-7 h-7 border-2 border-white/20 border-t-cyan-400 rounded-full animate-spin" />
-                </div>
-              ) : streamError ? (
-                <div className="py-8 text-center">
-                  <p className="text-white/40 text-sm">{streamError}</p>
-                  <p className="text-white/25 text-xs mt-2">
-                    Deploy Daml contracts to DevNet to create real streams.
-                  </p>
-                </div>
-              ) : streams.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-white/40 text-sm">No streams found for this party.</p>
-                  <p className="text-white/25 text-xs mt-2">
-                    Daml contracts need to be deployed to create streams on DevNet.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {streams.map((s) => (
-                    <div
-                      key={s.contract_id}
-                      className="p-5 border border-white/10 rounded-xl bg-white/[0.02] hover:border-white/20 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider mr-2 ${
-                              s.status === "ACTIVE"
-                                ? "bg-emerald-500/20 text-emerald-300"
-                                : "bg-white/10 text-white/50"
-                            }`}
-                          >
-                            {s.status}
-                          </span>
-                          <span className="font-mono text-xs text-white/30">
-                            {s.contract_id.slice(0, 20)}…
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => handleWithdraw(s.contract_id)}
-                          disabled={
-                            withdrawing === s.contract_id ||
-                            s.status !== "ACTIVE"
-                          }
-                          className="px-4 py-1.5 bg-cyan-600/20 text-cyan-300 text-xs font-medium rounded-lg hover:bg-cyan-600/30 transition-colors disabled:opacity-40"
-                        >
-                          {withdrawing === s.contract_id ? "Claiming…" : "Claim"}
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <p className="text-white/40 text-xs mb-1">Accrued</p>
-                          <p className="font-mono text-cyan-300">
-                            {parseFloat(s.accrued ?? "0").toFixed(4)} CC
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-white/40 text-xs mb-1">Rate</p>
-                          <p className="font-mono">
-                            {parseFloat(s.rate_per_second ?? "0").toFixed(6)}/s
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-white/40 text-xs mb-1">Withdrawn</p>
-                          <p className="font-mono text-white/60">
-                            {parseFloat(s.total_withdrawn ?? "0").toFixed(4)} CC
-                          </p>
-                        </div>
-                      </div>
-
-                      {withdrawResult[s.contract_id] && (
-                        <p className="mt-3 text-xs font-mono text-emerald-400">
-                          {withdrawResult[s.contract_id]}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          </div>
-
-          {/* Right col */}
-          <div className="space-y-6">
-
-            {/* DevNet info */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease, delay: 0.2 }}
-              className="p-6 border border-white/10 rounded-2xl bg-white/[0.03]"
-            >
-              <h2 className="text-lg font-medium mb-5">DevNet Info</h2>
-              <div className="space-y-3 text-sm">
-                {[
-                  { label: "Validator", value: "GINIE-VALIDATOR" },
-                  { label: "Ledger API", value: "100.49.52.241:7575" },
-                  { label: "Network", value: "Canton DevNet" },
-                  {
-                    label: "Status",
-                    value: health?.canton_reachable ? "Connected" : "Offline",
-                    color: health?.canton_reachable
-                      ? "text-emerald-300"
-                      : "text-red-300",
-                  },
-                  {
-                    label: "SDK Version",
-                    value: health?.canton_version?.split("-")[0] ?? "—",
-                  },
-                ].map((row) => (
-                  <div
-                    key={row.label}
-                    className="flex justify-between items-center py-2 border-b border-white/5 last:border-0"
-                  >
-                    <span className="text-white/40">{row.label}</span>
-                    <span
-                      className={`font-mono text-xs ${row.color ?? "text-white/80"}`}
-                    >
-                      {row.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <a
-                href="https://scan.sv-2.dev.global.canton.network.digitalasset.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 block text-center py-2.5 border border-cyan-400/30 rounded-lg text-cyan-300 text-sm hover:bg-cyan-400/10 transition-colors"
-              >
-                View on DevNet Explorer ↗
-              </a>
-            </motion.div>
-
-            {/* Active campaigns */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease, delay: 0.25 }}
-              className="p-6 border border-white/10 rounded-2xl bg-white/[0.03]"
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-medium">Active Campaigns</h2>
-                <Link
-                  href="/campaigns"
-                  className="text-xs text-cyan-400/70 hover:text-cyan-300 transition-colors"
-                >
-                  View all →
-                </Link>
-              </div>
-
-              <div className="space-y-3">
-                {activeCampaigns.slice(0, 4).map((c) => (
-                  <Link
-                    key={c.id}
-                    href={`/campaigns/${c.id}`}
-                    className="block p-4 border border-white/10 rounded-xl hover:border-white/20 hover:bg-white/[0.02] transition-all"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="text-sm font-medium leading-snug line-clamp-1">
-                        {c.title}
-                      </p>
-                      <span className="text-xs font-mono text-cyan-300 ml-2 shrink-0">
-                        {parseFloat(c.pool_amount).toLocaleString()} CC
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-white/40">
-                        {c.participant_count} participants
-                      </span>
-                      <span className="text-white/20">·</span>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${
-                          c.category === "OSS Development" || c.track_type === "OSS"
-                            ? "bg-purple-500/20 text-purple-300"
-                            : c.category === "Social"
-                            ? "bg-pink-500/20 text-pink-300"
-                            : c.category === "DeFi"
-                            ? "bg-cyan-500/20 text-cyan-300"
-                            : "bg-amber-500/20 text-amber-300"
-                        }`}
-                      >
-                        {c.category ?? c.track_type}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Quick links */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease, delay: 0.3 }}
-              className="p-6 border border-white/10 rounded-2xl bg-white/[0.03]"
-            >
-              <h2 className="text-lg font-medium mb-4">Quick Links</h2>
-              <div className="space-y-2">
-                {[
-                  { label: "Leaderboard", href: "/leaderboard" },
-                  { label: "Claim Rewards", href: "/claim" },
-                  { label: "Browse Campaigns", href: "/campaigns" },
-                ].map((l) => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    className="flex items-center justify-between py-2.5 px-3 rounded-lg border border-white/10 hover:border-white/20 hover:bg-white/5 transition-all text-sm"
-                  >
-                    <span>{l.label}</span>
-                    <span className="text-white/30">→</span>
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
           </div>
         </div>
-      </main>
+      </div>
+    )
+  }
+
+  const topThree = leaderboardData?.leaderboard.slice(0, 3) || []
+
+  return (
+    <div className="min-h-screen bg-provn-bg">
+      <Navigation currentPage="dashboard" />
+
+      {/* Hero Section - Clean and Simple */}
+      <div className="pt-20 pb-8 px-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Minimalist Header */}
+          <div className="text-center py-12">
+            <h1 className="font-headline text-4xl font-bold text-provn-text mb-4">
+              Creator Leaderboard
+            </h1>
+            <p className="text-provn-muted max-w-xl mx-auto">
+              Compete with the best creators and climb your way to the top
+            </p>
+          </div>
+
+          {/* Key Metrics */}
+          {leaderboardData && (
+            <ProvnCard className="mb-8">
+              <ProvnCardContent className="p-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div>
+                    <div className="text-3xl font-bold text-provn-text">{formatNumber(leaderboardData.stats.total_creators)}</div>
+                    <div className="text-sm text-provn-muted mt-1">Total Creators</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-provn-text">{formatNumber(leaderboardData.stats.avg_score)}</div>
+                    <div className="text-sm text-provn-muted mt-1">Average Score</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-provn-text">{formatNumber(leaderboardData.stats.highest_score)}</div>
+                    <div className="text-sm text-provn-muted mt-1">Top Score</div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      {(() => {
+                        const competition = getCompetitionLevel(leaderboardData.stats.total_creators)
+                        return (
+                          <>
+                            <div className={`text-3xl font-bold ${competition.color}`}>{competition.level}</div>
+                            <div className={`w-2 h-2 ${competition.dotColor} rounded-full animate-pulse`}></div>
+                          </>
+                        )
+                      })()}
+                    </div>
+                    <div className="text-sm text-provn-muted mt-1">Competition Level</div>
+                  </div>
+                </div>
+              </ProvnCardContent>
+            </ProvnCard>
+          )}
+
+          {/* Top Performers - Simple List - Commented out for now */}
+          {/* {topThree.length >= 3 && (
+            <div className="mb-8">
+              <h2 className="font-headline text-xl font-bold text-provn-text mb-4">Top 3 This Month</h2>
+              
+              <ProvnCard>
+                <ProvnCardContent className="p-0">
+                  {topThree.map((creator, index) => (
+                    <div key={creator.profile_id} className={`p-4 flex items-center justify-between ${index < topThree.length - 1 ? 'border-b border-provn-border' : ''}`}>
+                      <div className="flex items-center gap-4">
+                        <div className="text-lg font-bold text-provn-accent">#{index + 1}</div>
+                        <img
+                          src={creator.avatar_url && creator.avatar_url.trim() !== '' ? creator.avatar_url : '/diverse-profile-avatars.png'}
+                          alt={creator.display_name || creator.handle}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="font-medium text-provn-text">{creator.display_name || creator.handle}</div>
+                          <div className="text-sm text-provn-muted">@{creator.handle}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-provn-text">{formatNumber(creator.total_score)}</div>
+                        <div className="text-xs text-provn-muted">points</div>
+                      </div>
+                    </div>
+                  ))}
+                </ProvnCardContent>
+              </ProvnCard>
+            </div>
+          )} */}
+
+          {/* Filters - Simplified */}
+          <ProvnCard className="mb-6">
+            <ProvnCardContent className="p-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Timeframe */}
+                <div>
+                  <label className="block text-sm text-provn-muted mb-2">Time Period</label>
+                  <div className="flex bg-provn-surface-2 rounded-lg p-1">
+                    {[
+                      { value: 'all-time', label: 'All' },
+                      { value: 'monthly', label: 'Month' },
+                      { value: 'weekly', label: 'Week' }
+                    ].map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => setTimeframe(option.value as any)}
+                        className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                          timeframe === option.value
+                            ? 'bg-provn-accent text-provn-bg'
+                            : 'text-provn-muted hover:text-provn-text'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search */}
+                <div>
+                  <label className="block text-sm text-provn-muted mb-2">Search</label>
+                  <input
+                    type="text"
+                    placeholder="Search creators..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-2 bg-provn-surface-2 border border-provn-border rounded-lg text-provn-text placeholder-provn-muted focus:ring-2 focus:ring-provn-accent focus:border-transparent transition-all text-sm"
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm text-provn-muted mb-2">Category</label>
+                  <select 
+                    value={selectedCategory || ''}
+                    onChange={(e) => setSelectedCategory(e.target.value || null)}
+                    className="w-full px-3 py-2 bg-provn-surface-2 border border-provn-border rounded-lg text-provn-text focus:ring-2 focus:ring-provn-accent focus:border-transparent transition-all text-sm"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map(cat => (
+                      <option key={cat.category} value={cat.category}>
+                        {cat.category.charAt(0).toUpperCase() + cat.category.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Tier */}
+                <div>
+                  <label className="block text-sm text-provn-muted mb-2">Tier</label>
+                  <select 
+                    value={selectedTier || ''}
+                    onChange={(e) => setSelectedTier(e.target.value || null)}
+                    className="w-full px-3 py-2 bg-provn-surface-2 border border-provn-border rounded-lg text-provn-text focus:ring-2 focus:ring-provn-accent focus:border-transparent transition-all text-sm"
+                  >
+                    <option value="">All Tiers</option>
+                    {Object.entries(tierLabels).map(([tier, label]) => (
+                      <option key={tier} value={tier}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </ProvnCardContent>
+          </ProvnCard>
+
+          {/* Rankings Table - Clean and Organized */}
+          {leaderboardData && (
+            <ProvnCard className="mb-6">
+              <ProvnCardContent className="p-0">
+                <div className="px-5 py-4 border-b border-provn-border">
+                  <h2 className="font-headline text-xl font-bold text-provn-text">Full Rankings</h2>
+                </div>
+                
+                <div className="divide-y divide-provn-border">
+                  {filteredLeaderboard.map((creator) => {
+                    const rankChange = getRankChange(creator.rank_change)
+                    const isCurrentUser = false
+                    
+                    return (
+                      <div
+                        key={creator.profile_id}
+                        className={`p-4 hover:bg-provn-surface/30 transition-colors ${
+                          isCurrentUser ? 'bg-provn-accent/5 border-l-2 border-l-provn-accent' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          {/* Rank */}
+                          <div className="flex-shrink-0 text-center w-12">
+                            <div className="text-lg font-bold text-provn-text">#{creator.rank}</div>
+                            <div className={`text-xs ${rankChange.color}`}>
+                              {rankChange.icon}{rankChange.text}
+                            </div>
+                          </div>
+
+                          {/* Avatar */}
+                          <div className="relative flex-shrink-0">
+                            <img
+                              src={creator.avatar_url && creator.avatar_url.trim() !== '' ? creator.avatar_url : '/diverse-profile-avatars.png'}
+                              alt={creator.display_name || creator.handle}
+                              className="w-12 h-12 rounded-full object-cover border border-provn-border"
+                            />
+                            <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${tierColors[creator.tier]} flex items-center justify-center`}>
+                              {tierLabels[creator.tier].charAt(0)}
+                            </div>
+                          </div>
+                          
+                          {/* Creator Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-provn-text truncate">
+                                {creator.display_name || creator.handle}
+                              </h3>
+                              {isCurrentUser && (
+                                <span className="text-xs bg-provn-accent text-provn-bg px-2 py-1 rounded font-medium">You</span>
+                              )}
+                            </div>
+                            <p className="text-provn-muted text-sm truncate">@{creator.handle}</p>
+                          </div>
+
+                          {/* Stats - Desktop */}
+                          <div className="hidden md:flex items-center gap-6 text-sm">
+                            <div className="text-center">
+                              <div className="font-bold text-provn-text">
+                                {formatNumber(creator.total_score)}
+                              </div>
+                              <div className="text-xs text-provn-muted">Points</div>
+                            </div>
+                            
+                            <div className="text-center">
+                              <div className="font-semibold text-provn-text">
+                                {formatNumber(creator.total_views)}
+                              </div>
+                              <div className="text-xs text-provn-muted">Views</div>
+                            </div>
+                            
+                            <div className="text-center">
+                              <div className="font-semibold text-provn-text">
+                                {formatNumber(creator.total_tips)}
+                              </div>
+                              <div className="text-xs text-provn-muted">Tips</div>
+                            </div>
+                          </div>
+
+                          {/* Action */}
+                          <div className="flex-shrink-0">
+                            <ProvnButton
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => window.location.href = `/u/${creator.handle}`}
+                              className="text-xs px-3 py-1"
+                            >
+                              View
+                            </ProvnButton>
+                          </div>
+                        </div>
+
+                        {/* Mobile Stats */}
+                        <div className="md:hidden mt-3 pt-3 border-t border-provn-border">
+                          <div className="grid grid-cols-3 gap-3 text-center text-sm">
+                            <div>
+                              <div className="font-bold text-provn-text">
+                                {formatNumber(creator.total_score)}
+                              </div>
+                              <div className="text-xs text-provn-muted">Points</div>
+                            </div>
+                            <div>
+                              <div className="font-semibold text-provn-text">
+                                {formatNumber(creator.total_views)}
+                              </div>
+                              <div className="text-xs text-provn-muted">Views</div>
+                            </div>
+                            <div>
+                              <div className="font-semibold text-provn-text">
+                                {formatNumber(creator.total_tips)}
+                              </div>
+                              <div className="text-xs text-provn-muted">Tips</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </ProvnCardContent>
+            </ProvnCard>
+          )}
+
+          {/* Pagination Controls */}
+          {leaderboardData && leaderboardData.stats.total_creators > pageSize && (
+            <div className="flex justify-center items-center gap-4 py-6">
+              <ProvnButton
+                variant="secondary"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2"
+              >
+                Previous
+              </ProvnButton>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-provn-muted">
+                  Page {currentPage} of {Math.ceil(leaderboardData.stats.total_creators / pageSize)}
+                </span>
+              </div>
+              
+              <ProvnButton
+                variant="secondary"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage >= Math.ceil(leaderboardData.stats.total_creators / pageSize)}
+                className="px-4 py-2"
+              >
+                Next
+              </ProvnButton>
+            </div>
+          )}
+
+          {/* Call to Action - Minimal */}
+          <div className="mt-12 mb-8">
+            <ProvnCard className="border-provn-accent/30">
+              <ProvnCardContent className="p-8 text-center">
+                <h2 className="font-headline text-2xl font-bold text-provn-text mb-3">
+                  Ready to Climb the Ranks?
+                </h2>
+                <p className="text-provn-muted mb-6 max-w-lg mx-auto">
+                  Create amazing content and compete with the best creators on Provn.
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <ProvnButton 
+                    onClick={() => window.location.href = '/upload'}
+                    className="px-6 py-2"
+                  >
+                    Create Content
+                  </ProvnButton>
+                  <ProvnButton 
+                    variant="secondary" 
+                    onClick={() => window.location.href = '/explore'}
+                    className="px-6 py-2"
+                  >
+                    Explore
+                  </ProvnButton>
+                </div>
+              </ProvnCardContent>
+            </ProvnCard>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }

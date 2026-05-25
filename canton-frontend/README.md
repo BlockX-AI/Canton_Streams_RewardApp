@@ -1,243 +1,322 @@
-# GrowStreams — Frontend
+# GrowStreams
 
-> Next.js 14 dashboard for the GrowStreams streaming protocol. Queries live Canton contracts, displays real-time accrual, and submits lifecycle choices through Canton's JSON Ledger API.
+**Canton-native Money Streaming Protocol — per-second token payments for payroll, subscriptions, bounties, grants, and revenue sharing.**
 
-**Framework**: Next.js 14 (App Router) · **Styling**: TailwindCSS · **Canton API**: port 7575
+[![Build](https://img.shields.io/badge/build-passing-10b981.svg)](https://growstreams.app)
+[![Canton Network](https://img.shields.io/badge/built%20on-Canton%20Network-00D4AA.svg)](https://digitalasset.com)
+[![Next.js 15](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+**Live**: [growstreams.app](https://growstreams.app) · **Docs**: [/developers](https://growstreams.app/developers) · **Testnet**: Canton DevNet
 
 ---
 
-## Architecture
+## What is GrowStreams?
 
-```mermaid
-graph TD
-    subgraph Browser["Browser — Client Components"]
-        P["page.tsx\nStream dashboard"]
-        CALC["calculateAccrued()\nClient-side display math\nflowRate × elapsed ms"]
-        TIMER["setInterval 1s\nRe-renders accrual display"]
-        P --> CALC
-        P --> TIMER
-    end
+GrowStreams is a **generalized token streaming protocol** on Canton Network. It enables real-time, per-second movement of tokens between addresses — composable, token-agnostic, and production-ready.
 
-    subgraph Routes["Next.js Server — API Routes (server-only)"]
-        QR["/api/canton/query/route.ts\nReads CANTON_AUTH_SECRET from process.env\nGenerates HS256 JWT\nPOST /v2/state/active-contracts"]
-        ER["/api/canton/exercise/route.ts\nReads CANTON_AUTH_SECRET from process.env\nMaps party name → party ID\nPOST /v2/commands/submit-and-wait"]
-    end
-
-    subgraph Canton["Canton JSON Ledger API :7575"]
-        ACS["POST /v2/state/active-contracts\nReturns active StreamAgreement UTXOs"]
-        SAW["POST /v2/commands/submit-and-wait\nExercises Withdraw, Pause, Resume, Stop"]
-        PA["POST /v2/parties/allocate\nSetup only"]
-    end
-
-    P -->|"fetch /api/canton/query"| QR
-    P -->|"fetch /api/canton/exercise"| ER
-    QR -->|"JWT in Authorization header"| ACS
-    ER -->|"JWT in Authorization header"| SAW
 ```
+Sender ──► StreamCore Contract ──► Receiver
+           (per-second flow)
+           Buffer-secured
+           Pause / Resume / Cancel
+           Any DAML token (CC, USDCx)
+```
+
+### Core Contracts
+
+| Contract | Purpose |
+|----------|---------|
+| **StreamCore** | Creates and manages per-second token streams |
+| **TokenVault** | Holds deposited tokens and handles withdrawals |
+| **SplitsRouter** | Splits a single stream into multiple recipients |
+
+### Use Cases
+
+- **Streaming Payroll** — pay teams every second, not every month
+- **Subscriptions** — per-second SaaS billing with auto-cancel on insufficient buffer
+- **Bounties & Gigs** — time-locked streams released on completion
+- **Revenue Sharing** — automatic splits to contributors
+- **Vesting Streams** — token vesting that flows continuously
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | Next.js 15, React 19, TypeScript, App Router |
+| **Styling** | Tailwind CSS 3.4 + custom design system (`provn-*` tokens) |
+| **Fonts** | Space Grotesk (UI) + JetBrains Mono (code/hashes) |
+| **Animations** | Framer Motion, WebGL shaders (OGL) |
+| **Blockchain** | Canton Network (DAML), JSON API v2 |
+| **Wallets** | Canton Party ID |
+| **Database** | Supabase (PostgreSQL) |
+| **Storage** | IPFS via Pinata |
+| **Hosting** | Vercel |
 
 ---
 
 ## Project Structure
 
 ```
-canton-frontend/
+growstreams/
 ├── app/
-│   ├── page.tsx                   # Main dashboard — stream list, accrual display
-│   ├── layout.tsx                 # Root layout + global metadata
-│   ├── globals.css
-│   └── api/canton/
-│       ├── query/
-│       │   └── route.ts           # Server route: query active contracts
-│       └── exercise/
-│           └── route.ts           # Server route: exercise choices
-├── lib/
-│   └── canton-api.ts              # Client helpers (calculateAccrued, formatTimeRemaining)
-├── next.config.mjs                # Only NEXT_PUBLIC_ vars exposed to browser
-├── .env.local                     # Local secrets — never committed
-├── env.example                    # Template for .env.local
-├── package.json
-├── tsconfig.json
-└── tailwind.config.ts
+│   ├── page.tsx              # Landing page (hero, protocol, use cases, demo, CTA)
+│   ├── developers/           # SDK docs, contract addresses, quickstart
+│   ├── protocol/             # Stream lifecycle, security model, architecture
+│   ├── use-cases/            # Detailed use case breakdowns
+│   ├── ecosystem/            # Partner integrations + contact form
+│   ├── campaign/             # Web3 Contribution Challenge (leaderboard, rules)
+│   ├── dashboard/            # User dashboard
+│   ├── explore/              # Content discovery
+│   ├── upload/               # Content upload + derivative works
+│   └── api/                  # 40+ API routes
+│
+├── components/
+│   ├── v2/                   # 30+ custom UI components (see below)
+│   ├── campaign/             # Campaign-specific components
+│   ├── explore/              # Discovery UI
+│   ├── provn/                # Legacy Provn components
+│   └── ui/                   # shadcn/ui base components
+│
+├── hooks/                    # 13 custom React hooks
+├── contexts/                 # Vara wallet, follow state, video modal
+├── lib/                      # Utilities, API clients, campaign helpers
+├── contracts/                # Smart contract ABIs
+├── services/                 # Backend service layers
+└── utils/                    # Shared utility functions
 ```
 
 ---
 
-## Environment Variables
+## UI Component Library (`components/v2/`)
 
-```mermaid
-graph LR
-    subgraph Server["Server-only — process.env in route handlers"]
-        S1["CANTON_AUTH_SECRET\nHS256 JWT signing secret"]
-        S2["CANTON_JSON_API_URL\nhttp://localhost:7575"]
-        S3["CANTON_PACKAGE_ID\nhex hash from dpm inspect-dar"]
-        S4["CANTON_NAMESPACE\nfingerprint from party allocation"]
-        S5["CANTON_ADMIN_PARTY\nAdmin::namespace"]
-        S6["CANTON_ALICE_PARTY\nAlice::namespace"]
-        S7["CANTON_BOB_PARTY\nBob::namespace"]
-    end
+GrowStreams ships with **31 custom components** — each designed for the dark, protocol-grade aesthetic.
 
-    subgraph Client["Client-safe — NEXT_PUBLIC_ prefix only"]
-        C1["NEXT_PUBLIC_CANTON_JSON_API_URL\nOnly if frontend needs direct access"]
-    end
+### Backgrounds & Effects
 
-    subgraph Danger["NEVER in next.config.mjs env block"]
-        D1["CANTON_AUTH_SECRET\nWould be bundled into browser JS"]
-        D2["Party IDs\nPrivacy violation"]
-    end
-```
+| Component | Description |
+|-----------|-------------|
+| `aurora-background` | Animated radial gradient blobs with themed color variants (default/cyan/amber/purple) |
+| `gradient-blinds` | WebGL shader background using OGL — diagonal animated blinds |
+| `animated-grid` | Subtle grid pattern background |
+| `dot-matrix` | Dot grid pattern with configurable color and density |
+| `flowing-particles` | Canvas particle system with velocity and proximity connections |
+| `floating-network` | Animated network nodes with connection lines |
+| `pixel-blast` | Pixel explosion effect |
+| `meteor-lines` | Animated meteor trail lines |
 
-**Rule**: Server-side `process.env.CANTON_*` reads inside `app/api/canton/*/route.ts` are safe. Anything added to the `env:` block in `next.config.mjs` becomes a public browser constant.
+### Text Animations
+
+| Component | Description |
+|-----------|-------------|
+| `true-focus` | Word-by-word focus animation with blur/unblur and corner bracket frame |
+| `text-scramble` | Scramble-to-reveal text animation triggered on viewport entry |
+| `gradient-text` | Animated gradient-filled text with optional shimmer |
+| `word-rotate` | Rotating word animation for dynamic headlines |
+| `code-typing` | Character-by-character code block typing animation |
+| `split-text` | Per-character staggered text reveal |
+| `letter-pullup` | Letters pull up from below with stagger |
+| `shiny-text` | Shimmering text highlight effect |
+
+### Interactive Elements
+
+| Component | Description |
+|-----------|-------------|
+| `spotlight-card` | Card with radial glow that follows cursor on hover |
+| `magnet-button` | Button that magnetically pulls toward cursor |
+| `tilt-card` | 3D tilt effect on hover |
+| `ripple-button` | Material-style ripple click effect |
+| `border-beam` | Animated beam traveling around element border |
+
+### Data & Display
+
+| Component | Description |
+|-----------|-------------|
+| `stream-visualizer` | Live stream card with animated dots flowing sender → receiver |
+| `streaming-counter` | Real-time ticking counter for streamed amounts |
+| `number-ticker` | Animated number counting up |
+| `count-up` | Simple count-up animation |
+| `infinite-marquee` | Continuous scrolling text/logo marquee |
+
+### Layout & Navigation
+
+| Component | Description |
+|-----------|-------------|
+| `navigation-v2` | Sticky nav with sliding pill indicator + mobile menu |
+| `footer-v2` | Full footer with trust strip, social links, sitemap |
+| `scroll-progress` | Thin progress bar at page top showing scroll position |
 
 ---
 
-## Setup
+## Pages Overview
+
+### Landing Page (`/`)
+
+The landing page is built as a **content factory** — every section is designed to be screenshot/screen-recorded independently for social content.
+
+| Section | Key Elements |
+|---------|-------------|
+| **Hero** | TrueFocus animated headline, TextScramble badge, protocol status bento cards, live stream preview with ticking counter |
+| **Protocol Features** | SpotlightCard bento grid with mouse-follow glow, animated mesh gradient blobs |
+| **How It Works** | 5-step timeline with pulse dot, CodeTyping animation, contract address sidebar |
+| **Use Cases** | Cards with micro-tags, hover reveal "Learn more" links, Link routing to anchors |
+| **Stream Demo** | 4 scenario tabs (Payroll/Subscriptions/Bounties/Splits) with animated pill indicator |
+| **Developer CTA** | Animated conic-gradient border, btn-shimmer buttons |
+| **Footer** | Trust strip (Built on Canton, Audit-Ready, Open Source, Pilot Slots), social icons with magnetic hover |
+
+### Other Pages
+
+| Page | Purpose |
+|------|---------|
+| `/developers` | SDK reference, tab-based code switcher (TypeScript/Rust/CLI), contract addresses, quickstart guide |
+| `/protocol` | Stream lifecycle, contract architecture, security model — cyan aurora theme |
+| `/use-cases` | Detailed breakdowns per use case with alternating layouts — purple aurora theme |
+| `/ecosystem` | Partner types, current integrations, contact form — amber aurora theme |
+| `/campaign` | Web3 Contribution Challenge: wallet connect → GitHub verify → AI scoring → NFT mint |
+| `/campaign/leaderboard` | Real-time rankings with category filters and prize breakdown |
+| `/campaign/rules` | Eligibility, anti-gaming rules, scoring system, FAQ |
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- Canton sandbox running (`dpm sandbox --project-root ../daml-contracts`)
+```
+Node.js >= 18.18
+npm >= 9.8
+```
 
-### Install
+### Install & Run
 
 ```bash
-cd canton-frontend
+git clone https://github.com/growstreams/growstreams.git
+cd growstreams
 npm install
+cp env.example .env.local   # fill in your credentials
+npm run dev                  # → http://localhost:3000
 ```
 
-### Configure
+### Environment Variables
+
+See `env.example` for the full list. Key variables:
 
 ```bash
-cp env.example .env.local
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Canton Network
+CANTON_LEDGER_API_URL=http://localhost:7575
+CANTON_PACKAGE_ID=
+
+# Reclaim Protocol (GitHub verification)
+NEXT_PUBLIC_RECLAIM_APP_ID=
+RECLAIM_APP_SECRET=
+
+# GitHub (for AI scoring engine)
+GITHUB_TOKEN=
+
+# IPFS (Pinata)
+NEXT_PUBLIC_PINATA_JWT=
 ```
 
-Edit `.env.local`:
-
-```env
-# Canton JSON Ledger API
-CANTON_JSON_API_URL=http://localhost:7575
-
-# JWT auth — HS256 secret for sandbox (replace with RS256/OAuth2 for production)
-CANTON_AUTH_SECRET=your-dev-secret-here
-
-# Package hash — from: dpm damlc inspect-dar --json ../.daml/dist/growstreams-1.0.0.dar | jq .main_package_id
-CANTON_PACKAGE_ID=<hex-hash>
-
-# Namespace fingerprint — from the party IDs returned by /v2/parties/allocate
-CANTON_NAMESPACE=<fingerprint>
-
-# Party IDs — from: curl localhost:7575/v2/parties/allocate
-CANTON_ADMIN_PARTY=Admin::<fingerprint>
-CANTON_ALICE_PARTY=Alice::<fingerprint>
-CANTON_BOB_PARTY=Bob::<fingerprint>
-```
-
-### Run
+### Scripts
 
 ```bash
-npm run dev
-# Open http://localhost:3000
+npm run dev       # Development server
+npm run build     # Production build
+npm run start     # Start production server
+npm run lint      # ESLint
+```
+
+### Deploy
+
+```bash
+vercel --prod
 ```
 
 ---
 
 ## API Routes
 
-### `POST /api/canton/query`
+### Streaming Protocol (DAML contracts on Canton)
 
-Queries active `StreamAgreement` contracts visible to the given party.
+The streaming protocol lives on-chain via DAML smart contracts. The frontend interacts through the FastAPI backend which calls Canton's JSON API v2.
 
-```mermaid
-sequenceDiagram
-    participant UI as page.tsx
-    participant R as query/route.ts
-    participant C as Canton :7575
-
-    UI->>R: POST /api/canton/query\n{party: "alice", template: "StreamAgreement"}
-    R->>R: Read CANTON_AUTH_SECRET (server env)\nBuild JWT: {sub: "alice", actAs: [partyId], readAs: [partyId]}
-    R->>C: POST /v2/state/active-contracts\n{filter: {templateId, parties}, activeAtOffset: "..."}
-    C-->>R: [{contractId, createdEvent: {payload: StreamAgreement}}]
-    R-->>UI: [{contractId, payload}]
-```
-
-**Key**: `readAs` is scoped to the single requesting party. Never set `readAs` to all parties — that violates Canton's privacy model.
-
-### `POST /api/canton/exercise`
-
-Exercises a choice on a `StreamAgreement` or `StreamFactory` contract.
-
-```mermaid
-sequenceDiagram
-    participant UI as page.tsx
-    participant R as exercise/route.ts
-    participant C as Canton :7575
-
-    UI->>R: POST /api/canton/exercise\n{contractId, choice: "Withdraw", actingParty: "alice"}
-    R->>R: Map "alice" → CANTON_ALICE_PARTY env var\nGenerate JWT: {actAs: [alicePartyId]}
-    R->>C: POST /v2/commands/submit-and-wait\n{exerciseCommand: {contractId, choiceName, choiceArgument: {}}}
-    C-->>R: {completionOffset, exerciseResult}
-    R-->>UI: {success: true, result}
-```
-
----
-
-## Client-Side Accrual Display
-
-The displayed accrual balance updates every second without making any network requests. This mirrors the on-ledger `calculateAccrued` formula:
-
-```typescript
-// lib/canton-api.ts
-export function calculateAccrued(stream: StreamAgreement): number {
-  if (stream.status !== "Active") return 0;
-  const now = Date.now();
-  const lastUpdate = new Date(stream.lastUpdate).getTime();
-  const elapsedSeconds = (now - lastUpdate) / 1000;
-  const accrued = stream.flowRate * elapsedSeconds;
-  const available = stream.deposited - stream.withdrawn;
-  return Math.min(accrued, available);
-}
-```
-
-This is **display-only math**. The authoritative value is always computed on-ledger via `getTime` when a choice is exercised.
-
----
-
-## Security Checklist
-
-| Item | Status | Notes |
-|---|---|---|
-| `CANTON_AUTH_SECRET` in `.env.local` only | Required | Must not be in `next.config.mjs` |
-| JWT generated server-side only | Required | Never in client-side code |
-| `readAs` scoped to acting party | Required | One party per request |
-| `actAs` mapped from env vars | Required | Never trust client-supplied party IDs |
-| `.env.local` in `.gitignore` | Required | Verify before pushing |
-| Production: RS256 / OAuth2 | Recommended | Replace HS256 for non-sandbox |
-
----
-
-## Build and Deploy
+### Web3 Challenge APIs
 
 ```bash
-# Production build
-npm run build
+POST   /api/web3/analyze           # Analyze GitHub user's Web3 contributions
+GET    /api/web3/health            # Scoring engine health check
+GET    /api/scorecard/:username    # Full scorecard JSON
+GET    /api/badge/:username        # SVG score badge (embeddable)
+GET    /api/badge/tier/:username   # SVG tier badge
+GET    /api/leaderboard/all       # Paginated leaderboard
+GET    /api/result/:actorId       # Shareable result page data
+```
 
-# Start production server
-npm start
+### Platform APIs
 
-# Lint
-npm run lint
+```bash
+GET    /api/explore/feed          # Content discovery
+GET    /api/platform-stats        # Platform metrics
+GET    /api/profile/:id           # User profile
+POST   /api/follow                # Follow/unfollow
+POST   /api/minted-content        # Upload + mint IP-NFT
+POST   /api/tips                  # Creator tipping
 ```
 
 ---
 
-## Planned Improvements
+## Content Factory
 
-- Replace `canton-api.ts` with `openapi-fetch` typed client generated from the Canton JSON API OpenAPI spec
-- Add stream creation UI (create `StreamProposal` → `AcceptStream` flow)
-- Add GrowToken balance display (query `GrowToken` UTXOs per party)
-- WebSocket / SSE for real-time contract event updates
-- RS256 / OAuth2 token exchange (Keycloak or Auth0)
-- CIP-0103 wallet connectivity via dApp SDK + Discovery Component
+Every frontend section is designed as a **standalone visual asset** for marketing. The content team can screenshot or screen-record any section in isolation:
+
+| Asset Type | Source | Content Angle |
+|------------|--------|---------------|
+| **GIF / short clip** | TrueFocus hero headline | Hook — "What if you got paid every second?" |
+| **GIF** | Live stream preview with ticking counter | Product demo — "Watch tokens flow in real-time" |
+| **Screenshot** | Protocol status bento cards | Credibility — "Here's exactly where we stand" |
+| **Screen recording** | Demo tab switching (4 scenarios) | Walkthrough — "One protocol, four use cases" |
+| **Screenshot per card** | Use case cards with micro-tags | Explainer series (5 posts) |
+| **Scrolling capture** | How It Works timeline + CodeTyping | Dev education thread |
+| **Screenshot** | Contract address sidebar | Technical trust — "Verify on-chain" |
+| **GIF** | SpotlightCard mouse-follow glow | Aesthetic / design community content |
+| **Screenshot** | Footer trust strip | Trust — "Open source. Audit-ready. 3 pilot slots left." |
+| **Full scroll recording** | Entire landing page | Brand video with voiceover |
 
 ---
 
-**Version**: 1.0.0 · **Framework**: Next.js 14 · **Last Updated**: April 2026
+## Campaign System
+
+The platform includes a **Web3 Contribution Challenge** for developer engagement:
+
+1. **Connect** Canton wallet (Party ID)
+2. **Verify** GitHub ownership via Reclaim Protocol (zero-knowledge proof)
+3. **Analyze** — AI scores contributions across impact, quality, collaboration, security (0–100)
+4. **Mint** — score becomes an NFT badge on Canton Network
+5. **Share** — one-click share to X/Twitter with pre-filled template
+6. **Compete** — live leaderboard with prize pool
+
+See `CAMPAIGN_README.md` for implementation details and `RECLAIM_SETUP.md` for Reclaim Protocol configuration.
+
+---
+
+## Security
+
+- **Contracts**: Threat model documented, comprehensive test coverage, audit-ready
+- **Wallet auth**: Signature-based, no passwords stored
+- **API protection**: Rate limiting on all scoring/analysis endpoints
+- **Content moderation**: Automated inappropriate content detection (Obscenity library)
+- **Sybil resistance**: One NFT per GitHub account, Reclaim verification required
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+**Built on [Canton Network](https://digitalasset.com).**
