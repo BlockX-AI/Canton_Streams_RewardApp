@@ -30,6 +30,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         base_url=settings.canton_ledger_api_url,
         user_id=settings.canton_user_id,
         timeout=settings.canton_timeout_seconds,
+        validator_api_url=settings.canton_validator_api_url,
+        admin_token=settings.canton_admin_token,
+        namespace=settings.canton_namespace,
     )
     cmd = CommandBuilder(
         package_id=settings.canton_package_id,

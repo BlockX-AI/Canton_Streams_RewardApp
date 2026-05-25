@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     canton_package_id: str = "054d83ae7849878d487d4522881260c5aa599c4c25244040232251cd0c3b5b9c"
     canton_timeout_seconds: float = 30.0
     canton_namespace: str = ""
+    canton_validator_api_url: str = "http://localhost:80"
+    canton_admin_token: str = ""
 
     canton_admin_party: str = ""
     canton_alice_party: str = ""
@@ -27,7 +29,7 @@ class Settings(BaseSettings):
     enable_admin_endpoints: bool = True
     enable_demo_endpoints: bool = True
 
-    cors_origins: str = "http://localhost:3000,http://localhost:5173,http://192.168.1.4:3000"
+    cors_origins: str = "http://localhost:3000,http://localhost:5173,http://192.168.1.4:3000,"
 
     database_url: str = ""
     database_pool_size: int = 10
