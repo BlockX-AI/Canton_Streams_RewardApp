@@ -18,6 +18,8 @@ from app.models.campaigns import (
     LeaderboardEntry,
     TrackType,
 )
+from app.dependencies import get_lp_pool_service
+from app.models.campaigns import CampaignPayoutResult
 from app.services.campaign_service import (
     create_campaign,
     enroll_in_campaign,
@@ -28,7 +30,9 @@ from app.services.campaign_service import (
     get_campaign_participants,
     get_campaign_payout_preview,
     list_campaigns,
+    payout_campaign,
 )
+from app.services.lp_pool_service import LPPoolService
 
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
@@ -361,3 +365,13 @@ async def get_payout_preview_endpoint(campaign_id: UUID) -> CampaignPayoutPrevie
                 )
         raise ValueError("Campaign not found")
     return await get_campaign_payout_preview(campaign_id)
+
+
+@router.post("/{campaign_id}/payout", response_model=CampaignPayoutResult)
+async def execute_campaign_payout(
+    campaign_id: UUID,
+    lp_pool_contract_id: str = Query(..., description="StreamPool contract ID on Canton ledger"),
+    lp_pool_svc: Annotated[LPPoolService, Depends(get_lp_pool_service)] = ...,
+) -> CampaignPayoutResult:
+    """Execute XP-to-CC payout. Calls StreamPool.WithdrawMember() for every participant."""
+    return await payout_campaign(campaign_id, lp_pool_contract_id, lp_pool_svc)

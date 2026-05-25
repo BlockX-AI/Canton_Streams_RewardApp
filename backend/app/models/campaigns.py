@@ -128,3 +128,26 @@ class CampaignPayoutPreview(BaseModel):
     minimum_payout: Decimal = Decimal("1.0")
     generated_at: datetime
     payouts: list[PayoutPreview]
+
+
+class PayoutRecord(BaseModel):
+    wallet: str
+    display_name: str | None = None
+    xp_share: Decimal
+    cc_amount: Decimal
+    status: str
+    tx_hash: str | None = None
+    error: str | None = None
+
+
+class CampaignPayoutResult(BaseModel):
+    campaign_id: UUID
+    title: str
+    pool_amount: Decimal
+    total_distributed: Decimal
+    total_participants: int
+    successful: int
+    failed: int
+    skipped: int
+    executed_at: datetime
+    payouts: list[PayoutRecord]
