@@ -1,17 +1,47 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  poweredByHeader: false,
-  compress: true,
-  experimental: {
-    optimizePackageImports: ["lucide-react", "motion"],
-  },
+  // Environment variables
   env: {
-    CANTON_JSON_API_URL: process.env.CANTON_JSON_API_URL || 'http://localhost:7575',
-    CANTON_AUTH_SECRET:  process.env.CANTON_AUTH_SECRET  || 'change-me-in-production',
-    CANTON_ADMIN_PARTY:  process.env.CANTON_ADMIN_PARTY  || '',
-    CANTON_ALICE_PARTY:  process.env.CANTON_ALICE_PARTY  || '',
-    CANTON_BOB_PARTY:    process.env.CANTON_BOB_PARTY    || '',
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  },
+
+  // Compress responses
+  compress: true,
+
+  // Faster builds + smaller output
+  poweredByHeader: false,
+  reactStrictMode: false,
+
+  // Image optimization — allow external logo/banner URLs
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+    ],
+    minimumCacheTTL: 86400,
+  },
+
+  // Webpack configuration
+  webpack: (config, { isServer }) => {
+    if (isServer && (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)) {
+      console.warn('⚠️ Warning: Missing Supabase environment variables.')
+    }
+    return config;
+  },
+
+  // HTTP headers for caching static assets
+  async headers() {
+    return [
+      {
+        source: '/_next/static/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/fonts/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+    ];
   },
 };
 
