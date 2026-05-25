@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { SDK } from "@canton-network/wallet-sdk";
+
+declare global {
+  interface Window {
+    canton?: {
+      requestParties?: () => Promise<string[]>;
+    };
+  }
+}
 
 export type WalletStatus =
   | "idle"
@@ -50,15 +57,10 @@ export function useCantonWallet(): CantonWalletState {
     setStatus("connecting");
     setError(null);
 
-    if (window.canton) {
+    if (window.canton?.requestParties) {
       try {
-        const sdk = await SDK.create({
-          ledgerProvider: window.canton as Parameters<typeof SDK.create>[0]["ledgerProvider"],
-        });
-        const parties = await sdk.party.list();
-        const ids = parties.map((p) => p.toString());
+        const ids = await window.canton.requestParties();
         setAllParties(ids);
-
         const first = ids[0] ?? null;
         setPartyId(first);
         if (first) {

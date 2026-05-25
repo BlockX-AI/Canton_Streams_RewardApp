@@ -1,30 +1,37 @@
-"use client";
+'use client';
 
-import { ShaderVariantProvider } from "@/components/shader-variant-context";
-import { SmoothScroll } from "@/components/smooth-scroll";
-import { ReducedMotionProvider } from "@/lib/motion";
-import { WalletProvider } from "@/lib/wallet-context";
-import { MotionConfig } from "motion/react";
-import { ThemeProvider } from "next-themes";
-import type { ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { Toaster } from 'sonner';
+import { WalletProvider } from '@/lib/wallet-context';
 
-export function Providers({ children }: { children: ReactNode }): ReactNode {
+export default function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <div className="flex items-center justify-center min-h-screen bg-provn-bg">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+            <p className="text-provn-muted">Loading Canton DevNet…</p>
+          </div>
+        </div>
+      </QueryClientProvider>
+    );
+  }
+
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <ReducedMotionProvider>
-        <MotionConfig reducedMotion="user">
-          <ShaderVariantProvider>
-            <WalletProvider>
-              <SmoothScroll>{children}</SmoothScroll>
-            </WalletProvider>
-          </ShaderVariantProvider>
-        </MotionConfig>
-      </ReducedMotionProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <WalletProvider>
+        {children}
+        <Toaster position="top-right" richColors />
+      </WalletProvider>
+    </QueryClientProvider>
   );
 }
