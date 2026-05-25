@@ -46,4 +46,10 @@ export async function fetchRewardsActivity(limit = 50) {
   return res.json();
 }
 
+export async function fetchCantonProofStats() {
+  const res = await fetch(`${API_BASE}/proof/canton-stats`, { cache: "no-store" });
+  if (!res.ok) return null;
+  return res.json();
+}
+
 export { API_BASE };

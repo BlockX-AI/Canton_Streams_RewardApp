@@ -130,6 +130,7 @@ from app.routes import (  # noqa: E402
     milestones,
     parties,
     participants,
+    proof,
     rewards,
     streams,
     subscriptions,
@@ -151,4 +152,5 @@ app.include_router(milestones.router)
 app.include_router(campaigns.router)
 app.include_router(leaderboard.router)
 app.include_router(rewards.router)
+app.include_router(proof.router)
 app.include_router(demo.router)
