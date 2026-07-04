@@ -26,6 +26,14 @@ build/
 # Nested frontend repo backup
 frontend/.git.backup/
 
+# Unrelated projects in workspace
+ReactBit_Pro/
+shader/
+
+# Backend virtualenv (both naming conventions)
+backend/venv/
+backend/.venv/
+
 # IDE
 .vscode/
 .idea/

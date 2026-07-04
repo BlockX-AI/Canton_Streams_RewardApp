@@ -4,6 +4,7 @@ import Daml.Script
 import DA.Date
 import DA.Time
 import StreamCore
+import FeaturedAppActivity
 
 testWithdrawCreatesToken : Script ()
 testWithdrawCreatesToken = script do
@@ -189,3 +190,69 @@ testUnauthorizedWithdrawFails = script do
 
   submitMustFail carol do
     exerciseCmd stream Withdraw
+
+testFeaturedActivityRecorded : Script ()
+testFeaturedActivityRecorded = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 1000.0
+
+  passTime (seconds 100)
+
+  (_, _) <- submitMulti [bob, admin] [] do
+    exerciseCmd stream Withdraw
+
+  activities <- query @FeaturedAppActivityRecord admin
+  assertMsg "Withdraw records FeaturedAppActivity" (length activities >= 1)
+
+  let withdrawActivities = filter (\(_, a) -> a.activityType == "stream_withdraw") activities
+  assertMsg "Activity type must be stream_withdraw" (length withdrawActivities >= 1)
+
+  let (_, act) = head withdrawActivities
+  assertMsg "Provider must be admin" (act.provider == admin)
+
+testPrivacyIsolation : Script ()
+testPrivacyIsolation = script do
+  admin <- allocateParty "Admin"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+  carol <- allocateParty "Carol"
+
+  setTime (time (date 2025 Jan 1) 0 0 0)
+
+  factory <- submit admin do
+    createCmd StreamFactory with
+      admin        = admin
+      nextStreamId = 1
+      users        = [alice, bob]
+
+  (_, _stream) <- submit alice do
+    exerciseCmd factory CreateStream with
+      sender         = alice
+      receiver       = bob
+      flowRate       = 1.0
+      initialDeposit = 500.0
+
+  carolStreams <- query @StreamAgreement carol
+  assertMsg "Carol cannot see Alice-Bob stream" (length carolStreams == 0)
+
+  aliceStreams <- query @StreamAgreement alice
+  assertMsg "Alice can see the stream she created" (length aliceStreams == 1)
+
+  bobStreams <- query @StreamAgreement bob
+  assertMsg "Bob can see the stream he receives" (length bobStreams == 1)

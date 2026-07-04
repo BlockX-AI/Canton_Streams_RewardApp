@@ -19,27 +19,8 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "GrowStreams — Canton DevNet Money Streaming Protocol",
-  description:
-    "GrowStreams is a generalized token streaming protocol on Canton. Per-second CC payments for bounties, payroll, subscriptions, revenue share, grants, and more.",
-  openGraph: {
-    title: "GrowStreams — Canton DevNet Money Streaming Protocol",
-    description:
-      "Per-second token streaming on Canton DevNet. Bounties, payroll, subscriptions, revenue share — all powered by real-time streams.",
-    url: "https://growstreams.app",
-    siteName: "GrowStreams",
-    images: [
-      { url: "/logo.png", width: 1200, height: 630, alt: "GrowStreams Protocol" },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "GrowStreams — Canton DevNet Money Streaming Protocol",
-    description:
-      "Per-second token streaming on Canton DevNet. Bounties, payroll, subscriptions, revenue share — composable, token-agnostic, real-time.",
-    images: ["/logo.png"],
-  },
+  title: "Smile Wallet — Canton Network",
+  description: "Smile is a Canton Network wallet for managing CC tokens and payment streams.",
 }
 
 export default function RootLayout({
