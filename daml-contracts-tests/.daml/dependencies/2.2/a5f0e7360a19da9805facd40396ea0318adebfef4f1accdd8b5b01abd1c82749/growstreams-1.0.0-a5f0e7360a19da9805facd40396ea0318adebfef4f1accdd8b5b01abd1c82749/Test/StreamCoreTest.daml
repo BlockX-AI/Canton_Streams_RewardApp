@@ -1,3 +1,0 @@
--- daml/Test/StreamCoreTest.daml
--- Tests live in daml-contracts-tests/daml/Test/StreamCoreTest.daml
-module Test.StreamCoreTest where

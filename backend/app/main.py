@@ -59,12 +59,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="GrowStreams API",
-    description=(
-        "FastAPI wrapper for GrowStreams Canton LocalNet Daml contracts. "
-        "Canton is source of truth. FastAPI owns request validation and response normalization."
-    ),
-    version="0.1.0",
+    title="Smile CC Wallet API",
+    description="FastAPI backend for Smile CC Wallet on Canton DevNet.",
+    version="1.0.0",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -120,37 +117,13 @@ async def generic_handler(request: Request, exc: Exception) -> JSONResponse:
 
 
 from app.routes import (  # noqa: E402
-    billing,
-    campaigns,
     canton,
-    demo,
     health,
-    leaderboard,
-    lp_pools,
-    milestones,
     parties,
     participants,
-    proof,
-    rewards,
-    streams,
-    subscriptions,
-    tokens,
-    vesting,
 )
 
 app.include_router(health.router)
 app.include_router(canton.router)
 app.include_router(parties.router)
 app.include_router(participants.router)
-app.include_router(tokens.router)
-app.include_router(streams.router)
-app.include_router(lp_pools.router)
-app.include_router(billing.router)
-app.include_router(vesting.router)
-app.include_router(subscriptions.router)
-app.include_router(milestones.router)
-app.include_router(campaigns.router)
-app.include_router(leaderboard.router)
-app.include_router(rewards.router)
-app.include_router(proof.router)
-app.include_router(demo.router)

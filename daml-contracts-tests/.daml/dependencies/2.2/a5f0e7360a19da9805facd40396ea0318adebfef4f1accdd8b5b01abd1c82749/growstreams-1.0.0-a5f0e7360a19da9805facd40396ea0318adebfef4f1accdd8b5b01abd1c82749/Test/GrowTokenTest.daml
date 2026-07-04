@@ -1,3 +1,0 @@
--- daml/Test/GrowTokenTest.daml
--- Tests live in daml-contracts-tests/daml/Test/GrowTokenTest.daml
-module Test.GrowTokenTest where

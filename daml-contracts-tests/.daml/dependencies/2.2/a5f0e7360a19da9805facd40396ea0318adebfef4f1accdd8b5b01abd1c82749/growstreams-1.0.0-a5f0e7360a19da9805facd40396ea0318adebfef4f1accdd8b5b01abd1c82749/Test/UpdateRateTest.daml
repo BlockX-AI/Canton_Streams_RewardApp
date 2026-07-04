@@ -1,3 +1,0 @@
--- daml/Test/UpdateRateTest.daml
--- Tests live in daml-contracts-tests/daml/Test/UpdateRateTest.daml
-module Test.UpdateRateTest where
